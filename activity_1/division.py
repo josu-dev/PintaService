@@ -18,7 +18,7 @@ def division(a:int|float, b:int|float) -> int|float:
 
 
 def main():
-    assert division(10, 2) == 2
+    assert division(10, 5) == 2
 
     exception_raised = False
     try:
