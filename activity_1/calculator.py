@@ -1,4 +1,5 @@
 import addition as add
+import division
 
 
 def get_operand(name: str) -> float:
@@ -12,7 +13,7 @@ def get_operand(name: str) -> float:
 
 def main():
     while True:
-        operation = input("What operation you want to perform? (+ -):")
+        operation = input("What operation you want to perform? (+ /):")
         left_operand = get_operand("left")
         right_operand = get_operand("right")
 
@@ -25,7 +26,7 @@ def main():
                     print("Division by zero is not allowed.")
                 else:
                     print(
-                    f"{left_operand} / {right_operand} = {left_operand / right_operand}")
+                    f"{left_operand} / {right_operand} = {division.division(left_operand, right_operand)}")
             case _:
                 print(
                     "Operation {operation} is not supported. Please try again.", end="\n\n")
