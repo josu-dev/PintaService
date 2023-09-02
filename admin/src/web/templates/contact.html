@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='contact.css') }}"> {% endblock %}
+
+{% block title %}Contactos{% endblock %}
+
+{% block header %}Nuestros Perfiles de GitHub{% endblock %}
+
+{% block content %}
+  <h2>Conoce a nuestro equipo en GitHub</h2>
+  <p>Para más información sobre cada miembro del equipo, visita nuestros perfiles de GitHub:</p>
+
+  <ul class="github-links">
+    <li><a href="https://github.com/KinnaGt" target="_blank">Iñaki Lapeyre</a></li>
+    <li><a href="https://github.com/j-josu" target="_blank">Josue Suarez</a></li>
+    <li><a href="https://github.com/lucho-lopez" target="_blank">Luciano Lopez</a></li>
+    <li><a href="https://github.com/Fabian-Martinez-Rincon" target="_blank">Fabian Martinez</a></li>
+  </ul>
+{% endblock %}

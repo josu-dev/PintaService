@@ -1,0 +1,16 @@
+.mission-statement,
+.vision-statement {
+  background-color: #e6f7ff;
+  padding: 15px;
+  border-radius: 4px;
+  margin: 20px 0;
+}
+
+.values-list {
+  list-style-type: disc;
+  margin-left: 40px;
+}
+
+.values-list li {
+  margin: 5px 0;
+}
