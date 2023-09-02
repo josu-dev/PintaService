@@ -1,6 +1,8 @@
-from flask import Flask
-app=Flask(__name__)
-@app.get("/")
-def index():
-    return "hola"
-app.run()
+from src.web import create_app
+
+def main():
+    app = create_app()
+    app.run()
+
+if __name__ == '__main__':
+    main()
