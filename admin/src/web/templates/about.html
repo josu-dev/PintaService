@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block head %}<link rel="stylesheet" href="{{ url_for('static', filename='contact.css') }}"> {% endblock %}
+
+{% block title %}Acerca de Nosotros{% endblock %}
+
+{% block header %}Acerca de Nosotros{% endblock %}
+
+{% block content %}
+  <h2>Nuestra Misión</h2>
+  <p class="mission-statement">Nuestra misión es ayudar a las personas a mejorar su calidad de vida a través de la educación y la tecnología.</p>
+
+  <h2>Nuestra Visión</h2>
+  <p class="vision-statement">Nuestra visión es ser la empresa líder en el mercado de la educación en línea.</p>
+
+  <h2>Nuestros Valores</h2>
+  <ul class="values-list">
+    <li>Respeto</li>
+    <li>Responsabilidad</li>
+    <li>Integridad</li>
+    <li>Compromiso</li>
+    <li>Excelencia</li>
+  </ul>
+{% endblock %}

@@ -7,6 +7,10 @@ def create_app(env='development', static_folder='../../static'):
     @app.get('/')
     def home():
         return render_template('home.html')
+        
+    @app.get('/about')
+    def about():
+        return render_template('about.html')
     
     @app.get('/contact')
     def contact():
