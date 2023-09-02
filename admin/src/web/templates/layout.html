@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Grupo 4{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+    <header>
+        <h1>{% block header %}Aplicación del grupo 4{% endblock %}</h1>
+    </header>
+
+    <nav>
+        <ul>
+            <li><a href="/">Pagina 1 Ejemplo Raiz</a></li>
+            <li><a href="/about">Pagina 2 Ejemplo Sobre Nosotros</a></li>
+            <li><a href="/contact">Pagina 3 Ejemplo Contactos</a></li>
+        </ul>
+    </nav>
+
+    <main>
+        {% block content %}
+        <!-- El contenido específico de cada página irá aquí -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        <p>Copyright &copy; 2023, TuNombre.</p>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,32 @@
+.error-container {
+    text-align: center;
+    padding: 50px;
+    background-color: #f2dede;
+    margin: 30px;
+    border-radius: 10px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+}
+
+.error-container h2 {
+    color: #a94442;
+    font-size: 48px;
+    margin-bottom: 20px;
+}
+
+.error-container p {
+    font-size: 18px;
+    margin-bottom: 20px;
+}
+
+.error-container a {
+    background-color: #337ab7;
+    color: white;
+    padding: 10px 20px;
+    text-decoration: none;
+    border-radius: 5px;
+    transition: background-color 0.3s ease;
+}
+
+.error-container a:hover {
+    background-color: #286090;
+}

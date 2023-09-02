@@ -1,0 +1,46 @@
+/* Estilos generales */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+header {
+  background-color: #50b3a2;
+  color: white;
+  text-align: center;
+  padding: 1em;
+}
+
+nav ul {
+  background-color: #333;
+  overflow: hidden;
+  color: white;
+}
+
+nav ul li {
+  float: left;
+  display: inline;
+  padding: 14px 16px;
+}
+
+nav ul li a {
+  color: white;
+  text-decoration: none;
+}
+
+main {
+  padding: 20px;
+  margin-top: 30px;
+}
+
+footer {
+  background-color: #333;
+  color: white;
+  text-align: center;
+  padding: 10px;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+}
