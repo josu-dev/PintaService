@@ -10,12 +10,17 @@ This document describes how to setup the developer enviroment.
 The following enviroment variables are required:
 
 ```ini
-# Postgres config
+# postgres config
 DB_HOST=localhost
 DB_PORT=5432
-DB_USER=postgres
+DB_USER=dev
 DB_PASS=password
-DB_NAME=service-search
+DB_NAME=service_search
+
+# pgadmin config
+PGADMIN_PORT=5050
+PGADMIN_DEFAULT_EMAIL=dev@dev.com
+PGADMIN_DEFAULT_PASSWORD=password
 ```
 
 
@@ -47,22 +52,6 @@ Run the following command:
 docker run --name service-search -e POSTGRES_PASSWORD=password -e POSTGRES_DB=service-search -p 5432:5432 -d postgres
 ```
 
-<!-- ### Creating the database
-
-Open a terminal and run the following command:
-
-```bash
-docker exec -it postgres psql -U postgres -c "CREATE DATABASE <database_name>"
-``` -->
-
-### Connecting to the database
-
-Open a terminal and run the following command:
-
-```bash
-docker exec -it postgres psql -U postgres -d <database_name>
-```
-
 
 <br/>
 
@@ -74,10 +63,13 @@ To connect to the database, open pgAdmin and click on the "Add New Server" butto
 
 Fill the form with the following information:
 
-- **Name:** service-search
-- **Host name/address:** localhost
+Initial panel:
+- **Name:** service_search
+
+Connection panel:
+- **Host name/address:** postgres
 - **Port:** 5432
-- **Username:** postgres
+- **Username:** dev
 - **Password:** password
 
 Click on the "Save" button.
@@ -92,12 +84,19 @@ Click on the "Save" button.
 - [Python](https://marketplace.visualstudio.com/items?itemName=ms-python.python)
 - [Pylance](https://marketplace.visualstudio.com/items?itemName=ms-python.vscode-pylance)
 - [Black formatter](https://marketplace.visualstudio.com/items?itemName=ms-python.black-formatter)
-- [Jinja HTML](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml)
+- [Better Jinja](https://marketplace.visualstudio.com/items?itemName=samuelcolvin.jinjahtml)
 - [Even Better TOML](https://marketplace.visualstudio.com/items?itemName=tamasfe.even-better-toml)
 - [Flake8](https://marketplace.visualstudio.com/items?itemName=ms-python.flake8)
 - [isort](https://marketplace.visualstudio.com/items?itemName=ms-python.isort)
 
 ### Settings for extensions:
+
+Use local settings to override the default settings.
+
+Local settings files:
+
+- `.vscode/settings.json` (project root settings)
+- `admin/.vscode/settings.json` (inside admin folder settings)
 
 Minimal settings:
 ```json

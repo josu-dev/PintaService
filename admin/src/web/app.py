@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from flask import Flask, render_template
 from sqlalchemy.sql import text
+from werkzeug import exceptions
 
 from src.core import db
 from src.web.config import Config
@@ -9,7 +10,6 @@ from src.web.config import Config
 def create_app(env: str = "development", static_folder: str = "../../static"):
     if env == "development":
         load_dotenv()
-
     app = Flask(__name__, static_folder=static_folder)
 
     app.config.from_object(Config)
@@ -35,7 +35,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         return "OK"
 
     @app.errorhandler(404)  # type: ignore  # noqa
-    def page_not_found():  # type: ignore  # noqa
+    def page_not_found(error: exceptions.NotFound):  # type: ignore  # noqa
         return (
             render_template(
                 "error.html",
