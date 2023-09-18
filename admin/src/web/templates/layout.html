@@ -1,34 +1,43 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <meta charset="UTF-8">
-    <title>{% block title %}Grupo 4{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
-    {% block head %}{% endblock %}
+  <meta charset="UTF-8">
+  <title>{% block title %}Grupo 4{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='layout.css') }}">
+
+  {% block head %}{% endblock %}
+
+  {% if config.DEBUG %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='.dev/tailwindcss.css') }}">
+  <script src="{{ url_for('static', filename='.dev/live_reload.js') }}" defer></script>
+  {% else %}
+  <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='tailwindcss_min.css') }}">
+  {% endif %}
 </head>
+
 <body>
 
-    <header>
-        <h1>{% block header %}Aplicación del grupo 4{% endblock %}</h1>
-    </header>
+  <header class='uppercase text-3xl'>
+    <h1>{% block header %}Aplicación del grupo 4{% endblock %}</h1>
+  </header>
 
-    <nav>
-        <ul>
-            <li><a href="/">Pagina 1 Ejemplo Raiz</a></li>
-            <li><a href="/about">Pagina 2 Ejemplo Sobre Nosotros</a></li>
-            <li><a href="/contact">Pagina 3 Ejemplo Contactos</a></li>
-        </ul>
-    </nav>
+  <nav>
+    <ul>
+      <li><a href="/">Paginas pedro hola 1 Ejemplo Raiz</a></li>
+      <li><a href="/about">Pagina 2 Ejemplo Sobre Nosotros</a></li>
+      <li><a href="/contact">Pagina 3 Ejemplo Contactos</a></li>
+    </ul>
+  </nav>
 
-    <main>
-        {% block content %}
-        <!-- El contenido específico de cada página irá aquí -->
-        {% endblock %}
-    </main>
+  <main>
+    {% block content %}
+    {% endblock %}
+  </main>
 
-    <footer>
-        <p>Copyright &copy; 2023, TuNombre.</p>
-    </footer>
-
+  <footer>
+    <p>Copyright &copy; 2023, TuNombre.</p>
+  </footer>
 </body>
+
 </html>

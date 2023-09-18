@@ -1,3 +1,6 @@
+# dev mode
+static/.dev/tailwindcss.css
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
