@@ -1,8 +1,12 @@
-from src.web import create_app
+from src.web.app import create_app
 
-def main():
+
+def main() -> int:
     app = create_app()
     app.run()
 
-if __name__ == '__main__':
-    main()
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
