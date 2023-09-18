@@ -7,7 +7,7 @@ services:
     container_name: service_search_postgres
     image: postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-pgadmin}
+      POSTGRES_USER: ${DB_USER:-postgres}
       POSTGRES_PASSWORD: ${DB_PASS:-changeme}
       POSTGRES_DB: ${DB_NAME:-postgres}
       PGDATA: /data/postgres
