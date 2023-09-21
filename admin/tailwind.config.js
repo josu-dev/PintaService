@@ -3,10 +3,14 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
-    "./src/web/templates/**/*.html"
+    "./src/templates/**/*.html"
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'xs': '360px',
+      },
+    },
   },
   plugins: [
     require('@tailwindcss/typography'),

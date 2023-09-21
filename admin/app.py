@@ -1,4 +1,4 @@
-from src.web.app import create_app
+from src.web import create_app
 
 
 def main() -> int:
@@ -8,5 +8,5 @@ def main() -> int:
     return 0
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     raise SystemExit(main())
