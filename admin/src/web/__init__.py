@@ -1,9 +1,10 @@
 from dotenv import load_dotenv
-from flask import Flask, render_template
+from flask import Flask, render_template, request
 from sqlalchemy.sql import text
 from werkzeug import exceptions
 
-from src.core import db
+from src.core import db, seed
+from src.services.site import SiteService
 from src.web.config import Config
 
 
@@ -23,6 +24,26 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     def home():
         return render_template("home.html")
 
+    @app.route("/site_config", methods=["GET", "POST"])
+    def site_config():
+        if request.method == "POST":
+            page_size = request.form.get("page_size", type=int)
+            contact_info = request.form.get("contact_info")
+            maintenance_active = request.form.get(
+                "maintenance_active", type=bool
+            )
+            maintenance_message = request.form.get("maintenance_message")
+            site_config = SiteService.update_site_config(
+                page_size=page_size,
+                contact_info=contact_info,
+                maintenance_active=maintenance_active,
+                maintenance_message=maintenance_message,
+            )
+        else:
+            site_config = SiteService.get_site_config()
+
+        return render_template("site_config.html", site_config=site_config)
+
     @app.get("/ping_db")
     def ping_db():
         with db.db.get_engine().connect() as conn:
@@ -39,5 +60,20 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
             ),
             404,
         )
+
+    @app.cli.command("reset_db")  # pyright: ignore[reportUnknownMemberType]
+    def reset_db():
+        """
+        Reset the database.
+        Clear all tables and create them again.
+        """
+        db.reset_db()
+
+    @app.cli.command("seed_db")  # pyright: ignore[reportUnknownMemberType]
+    def seed_db():
+        """
+        Seed the database.
+        """
+        seed.seed_db()
 
     return app
