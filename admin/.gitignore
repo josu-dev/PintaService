@@ -1,5 +1,5 @@
 # dev mode
-static/.dev/tailwindcss.css
+static/.dev/tailwind.css
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
