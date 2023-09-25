@@ -22,7 +22,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     @app.get("/")
     def home():
         return render_template("home.html")
-    
+
     @app.get("/ping_db")
     def ping_db():
         with db.db.get_engine().connect() as conn:
@@ -39,9 +39,9 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
             ),
             404,
         )
-    
+
     @app.get("/register")
     def register():
         return render_template("register.html")
-    
+
     return app
