@@ -44,13 +44,14 @@ class SiteService(BaseService):
             values["maintenance_active"] = maintenance_active
         if maintenance_message is not None:
             values["maintenance_message"] = maintenance_message
-        print(values, flush=True)
+
         site_config = db.session.execute(
             update(SiteConfig)
             .where(SiteConfig.id == id)
             .values(**values)
             .returning(SiteConfig)
         ).scalar()
+        db.session.commit()
         if site_config is None:
             raise ServiceError("No site config loaded")
 
