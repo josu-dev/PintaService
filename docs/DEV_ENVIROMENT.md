@@ -18,7 +18,6 @@ admin/
 ├── .env                      # enviroment variables for configuration
 ├── .pre-commit-config.yaml   # pre-commit configuration of git hooks
 ├── compose.yaml              # docker compose for database and pgadmin
-├── dev.py                    # dev server script
 ├── pyproject.toml            # poetry and tools configuration
 └── tailwind.config.js        # tailwindcss configuration for the templates
 ```
@@ -144,18 +143,20 @@ Use local settings to override the default settings.
 Local settings files:
 
 - `.vscode/settings.json` (project root settings)
-- `admin/.vscode/settings.json` (inside admin folder settings)
 
 Minimal settings:
 ```json
 {
   "[python]": {
     "editor.defaultFormatter": "ms-python.black-formatter",
-    "editor.formatOnSave": true
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always"
+    }
   },
   "black-formatter.args": [
     "--line-length=79",
   ],
+  "editor.formatOnSave": true,
   "emmet.includeLanguages": {
     "jinja-html": "html"
   },
@@ -164,6 +165,14 @@ Minimal settings:
   },
   "isort.args": [
     "--profile=black",
+    "--line-length=79",
+    "--src-path=./admin/"
+  ],
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportUnusedFunction": "none"
+  },
+  "python.analysis.extraPaths": [
+    "./admin/"
   ]
 }
 ```
@@ -185,8 +194,9 @@ Extra settings:
 }
 ```
 
-> **Note:** The .vscode folder is ignored by git, so you can add your own settings without worrying about commiting them.
-
+> **Note 1:** The .vscode folder is ignored by git, so you can add your own settings without worrying about commiting them.
+>
+> **Note 2:** Settings can be duplicated to`admin/.vscode/settings.json` if want to open the project from the admin folder.
 
 <br/>
 
@@ -230,14 +240,10 @@ The dev server generates the tailwindcss file on template changes and triggers t
 To run the backend in Dev mode run:
 
 ```bash
-python dev.py dev
-
-# or
-
-./dev.py dev
+flask-livetw dev
 ```
 
-> **Note 1:** The `cwd` must be `<project_root>/admin/` folder (where the `dev.py` file is located).
+> **Note 1:** The `cwd` must be `<project_root>/admin/`.
 >
 > **Note 2:** If fails to run, try starting a poetry shell first (`poetry shell`).
 
@@ -249,11 +255,7 @@ Building for production in this case means to generate a minimized version of th
 To build for production run:
 
 ```bash
-python dev.py build
-
-# or
-
-./dev.py build
+flask-livetw build
 ```
 
 > **Note:** Same notes as the dev server.

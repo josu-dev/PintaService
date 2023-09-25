@@ -4,6 +4,7 @@ repos:
     hooks:
     -   id: check-yaml
     -   id: end-of-file-fixer
+        exclude: '^admin/static/tailwind_min.css$'
     -   id: trailing-whitespace
     -   id: no-commit-to-branch
 
@@ -11,18 +12,27 @@ repos:
     rev: '5.12.0'
     hooks:
     -   id: isort
-        args: ['--profile', 'black']
+        args: [
+          '--profile=black',
+          '--line-length=79',
+          '--src-path=./admin/',
+        ]
 
 -   repo: https://github.com/psf/black
     rev: '23.9.1'
     hooks:
     -   id: black
-        args: ['--line-length', '79']
+        args: ['--line-length=79']
 
 # only install this hook if you feel confident with type annotations
 -   repo: https://github.com/pycqa/flake8
     rev: '6.1.0'
     hooks:
     -   id: flake8
-        args: ['--extend-ignore', 'E203']
+        args: ['--extend-ignore=E203']
         stages: [pre-push]
+
+exclude: |
+    (?x)^(
+        docs/.*.excalidraw
+    )$

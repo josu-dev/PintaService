@@ -12,7 +12,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         load_dotenv()
 
     app = Flask(
-        __name__, static_folder=static_folder, template_folder="../templates"
+        __name__, static_folder=static_folder, template_folder="./templates"
     )
 
     app.config.from_object(Config)
