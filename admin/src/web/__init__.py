@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from werkzeug import exceptions
 
+from src.config import config
 from src.core import db, seed
 from src.services.site import SiteService
-from src.web.config import Config
 
 
 def create_app(env: str = "development", static_folder: str = "../../static"):
@@ -15,7 +15,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         __name__, static_folder=static_folder, template_folder="./templates"
     )
 
-    app.config.from_object(Config)
+    app.config.from_object(config.Config)
 
     db.init_db(app)
 
