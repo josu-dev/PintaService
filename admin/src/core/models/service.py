@@ -1,7 +1,8 @@
 """Model for service."""
 from enum import Enum
+from typing import List
 
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
@@ -13,6 +14,7 @@ from src.core.models.base import (
     Str512,
     UpdatedAt,
 )
+from src.core.models.institution import Institution
 
 
 class ServiceType(Enum):
@@ -21,7 +23,6 @@ class ServiceType(Enum):
     DEVELOPMENT = "development"
 
 
-# TODO RELATIONS
 class Service(BaseModel):
     __tablename__ = "services"
 
@@ -35,4 +36,8 @@ class Service(BaseModel):
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
+    )
+    # Relation with Institutions
+    institutions: Mapped[List["Institution"]] = relationship(
+        back_populates="service", default_factory=list
     )

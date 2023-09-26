@@ -30,20 +30,24 @@ class ServiceRequest(BaseModel):
     title: Mapped[Str32]
     description: Mapped[Str512]
     status: Mapped[Status]
-    created_date: Mapped[CreatedAt] = mapped_column(init=False)
-    close_date: Mapped[UpdatedAt] = mapped_column(
+
+    created_at: Mapped[CreatedAt] = mapped_column(init=False)
+    updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
+    # Relations
     user_id: Mapped[IntPK] = mapped_column(init=False)
+    institution_id: Mapped[IntPK]
     service_id: Mapped[IntPK] = mapped_column(init=False)
 
 
 class RequestNote(BaseModel):
     id: Mapped[IntPK] = mapped_column(init=False)
     note: Mapped[Str512]
-    created_date: Mapped[CreatedAt] = mapped_column(init=False)
-    user_id: Mapped[IntPK] = mapped_column(init=False)
-    service_request_id: Mapped[IntPK] = mapped_column(init=False)
+
+    created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
+    # Relations
+    service_request_id: Mapped[IntPK] = mapped_column(init=False)

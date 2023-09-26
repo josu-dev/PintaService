@@ -1,5 +1,7 @@
 """Model for institution."""
-from sqlalchemy.orm import Mapped, mapped_column
+from typing import List
+
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
@@ -11,9 +13,11 @@ from src.core.models.base import (
     Str512,
     UpdatedAt,
 )
+from src.core.models.service import Service
+from src.core.models.service_requests import ServiceRequest
+from src.core.models.user import User
 
 
-# TODO RELATIONS
 class Institution(BaseModel):
     __tablename__ = "institutions"
 
@@ -32,4 +36,16 @@ class Institution(BaseModel):
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
+    )
+    # Relation with user
+    users: Mapped[List["User"]] = relationship(
+        back_populates="institution", default_factory=list
+    )
+    # Relation with his services
+    services: Mapped[List["Service"]] = relationship(
+        back_populates="institution", default_factory=list
+    )
+    # Relation with his service requests
+    service_requests: Mapped[List["ServiceRequest"]] = relationship(
+        back_populates="institution", default_factory=list
     )
