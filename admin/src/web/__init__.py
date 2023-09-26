@@ -1,6 +1,5 @@
 from dotenv import load_dotenv
 from flask import Flask, render_template, request
-from sqlalchemy.sql import text
 from werkzeug import exceptions
 
 from src.core import db, seed
@@ -20,35 +19,33 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
 
     db.init_db(app)
 
-    @app.get("/")
-    def home():
-        return render_template("home.html")
+    from src.web.pages import blueprints
 
-    @app.route("/site_config", methods=["GET", "POST"])
-    def site_config():
-        if request.method == "POST":
-            page_size = request.form.get("page_size", type=int)
-            contact_info = request.form.get("contact_info")
-            maintenance_active = request.form.get(
-                "maintenance_active", type=bool
-            )
-            maintenance_message = request.form.get("maintenance_message")
-            site_config = SiteService.update_site_config(
-                page_size=page_size,
-                contact_info=contact_info,
-                maintenance_active=maintenance_active,
-                maintenance_message=maintenance_message,
-            )
-        else:
-            site_config = SiteService.get_site_config()
+    for bp in blueprints:
+        app.register_blueprint(bp)
 
-        return render_template("site_config.html", site_config=site_config)
+    @app.before_request
+    def hook():
+        if (
+            not SiteService.maintenance_active()
+            or request.path.startswith("/api")
+            or request.args.get("maintenance") != "true"
+        ):
+            return None
 
-    @app.get("/ping_db")
-    def ping_db():
-        with db.db.get_engine().connect() as conn:
-            conn.execute(text("SELECT 1"))
-        return "OK"
+        if request.method == "GET" and (
+            request.path.startswith("/login")
+            or request.path.startswith("/static")
+        ):
+            return None
+
+        return (
+            render_template(
+                "maintenance.html",
+                maintenance_message=SiteService.maintenance_message(),
+            ),
+            503,
+        )
 
     @app.errorhandler(404)
     def page_not_found(error: exceptions.NotFound):

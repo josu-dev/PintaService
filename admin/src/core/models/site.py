@@ -22,12 +22,16 @@ class SiteConfig(BaseModel):
     )
 
 
-def seed_site_config(db: SQLAlchemy):
-    new_config = SiteConfig(
+def defaultSiteConfig():
+    return SiteConfig(
         page_size=10,
         contact_info="",
         maintenance_active=False,
         maintenance_message="",
     )
+
+
+def seed_site_config(db: SQLAlchemy):
+    new_config = defaultSiteConfig()
     db.session.add(new_config)
     db.session.commit()

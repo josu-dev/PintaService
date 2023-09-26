@@ -3,30 +3,29 @@ from typing import Union
 from sqlalchemy import select, update
 
 from src.core.db import db
-from src.core.models.site import SiteConfig
+from src.core.models.site import SiteConfig, defaultSiteConfig
 from src.services.base import BaseService, ServiceError
 
 
 class SiteService(BaseService):
-    @staticmethod
-    def default() -> SiteConfig:
-        return SiteConfig(
-            page_size=10,
-            contact_info="",
-            maintenance_active=False,
-            maintenance_message="",
-        )
+    _cache: Union[SiteConfig, None] = None
 
     @staticmethod
-    def get_site_config() -> SiteConfig:
+    def default() -> SiteConfig:
+        return defaultSiteConfig()
+
+    @classmethod
+    def get_site_config(cls) -> SiteConfig:
         site_config = db.session.execute(select(SiteConfig)).scalar()
         if site_config is None:
             raise ServiceError("No site config loaded")
 
+        cls._cache = site_config
         return site_config
 
-    @staticmethod
+    @classmethod
     def update_site_config(
+        cls,
         id: Union[int, None] = None,
         page_size: Union[int, None] = None,
         contact_info: Union[str, None] = None,
@@ -52,7 +51,28 @@ class SiteService(BaseService):
             .returning(SiteConfig)
         ).scalar()
         db.session.commit()
+
+        cls._cache = site_config
+
         if site_config is None:
             raise ServiceError("No site config loaded")
 
         return site_config
+
+    @classmethod
+    def maintenance_active(cls) -> bool:
+        if cls._cache is None:
+            cls.get_site_config()
+            if cls._cache is None:
+                return False
+
+        return cls._cache.maintenance_active
+
+    @classmethod
+    def maintenance_message(cls) -> str:
+        if cls._cache is None:
+            cls.get_site_config()
+            if cls._cache is None:
+                return ""
+
+        return cls._cache.maintenance_message
