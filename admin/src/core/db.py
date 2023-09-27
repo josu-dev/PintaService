@@ -6,7 +6,7 @@ from src.core.models.base import BaseModel
 db = SQLAlchemy(model_class=BaseModel)
 
 
-def init_db(app: Flask):
+def init_app(app: Flask):
     db.init_app(app)
     config_db(app)
 

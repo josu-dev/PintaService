@@ -1,0 +1,37 @@
+{% macro render_field(field) %}
+{% if field.widget.input_type != 'hidden' %}
+<dt>{{ field.label }}</dt>
+{% endif %}
+<dd>{{ field(**kwargs)|safe }}
+  {% if field.errors %}
+  <ul class=errors>
+    {% for error in field.errors %}
+    <li>{{ error }}</li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+</dd>
+{% endmacro %}
+
+{% macro render_fields(form) %}
+<dl class="flex flex-col gap-4">
+  {% for field in form %}
+  <div>
+    {{ render_field(field) }}
+  </div>
+  {% endfor %}
+</dl>
+{% endmacro %}
+
+{% macro render_form(form, method="post", action="", enctype="", class="flex flex-col p-4 md:mt-4") %}
+<form method="{{ method }}" {% if action %}action="{{ action }}" {% endif %} {% if enctype %}enctype="{{ enctype }}" {%
+  endif %} class="{{ class }}">
+  {{ render_fields(form) }}
+  {{ caller() }}
+</form>
+{% endmacro %}
+
+{% macro button_submit(text) %}
+<button type="submit" class="mx-auto px-4 py-3 rounded border border-black bg-slate-100 hover:bg-slate-200">{{ text
+  }}</button>
+{% endmacro %}
