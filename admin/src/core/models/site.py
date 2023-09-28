@@ -1,6 +1,7 @@
 from flask_sqlalchemy import SQLAlchemy
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
+from typing_extensions import override
 
 from src.core.models.base import BaseModel, IntPK, Str256, Str512, Timestamp
 
@@ -20,6 +21,10 @@ class SiteConfig(BaseModel):
     updated_at: Mapped[Timestamp] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
+
+    @override
+    def _hidden_columns(self):
+        return ("created_at", "updated_at")
 
 
 def defaultSiteConfig():

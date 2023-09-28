@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% import "_macros/form.html" as Form %}
 
 {% block head %}
 <title>Pinta Service</title>
@@ -8,30 +9,8 @@
 <main class="flex-1 flex flex-col">
   <h1 class="text-3xl font-semibold mt-[1em] ml-2">Configuracion del sitio</h1>
 
-  <form method='post' class='flex flex-col gap-4 p-4 md:mt-4'>
-    <div class="flex flex-col">
-      <label for="page_size">Tamaño de paginado</label>
-      <input type="text" name="page_size" id="page_size" value="{{ site_config.page_size }}">
-    </div>
-
-    <div class="flex flex-col">
-      <label for="contact_info">Información de contacto</label>
-      <textarea name="contact_info" id="contact_info">{{ site_config.contact_info }}</textarea>
-    </div>
-
-    <div class="flex gap-2">
-      <label for="maintenance_active">Mantenimiento</label>
-      <input type="checkbox" name="maintenance_active" id="maintenance_active" {% if
-        site_config.maintenance_active%}checked{% endif %} class='w-6 h-6'>
-    </div>
-
-    <div class="flex flex-col">
-      <label for="maintenance_message">Mensaje de mantenimiento</label>
-      <textarea name="maintenance_message" id="maintenance_message">{{ site_config.maintenance_message }}</textarea>
-    </div>
-
-    <button type="submit"
-      class="mx-auto px-4 py-3 rounded border border-black bg-slate-100 hover:bg-slate-200">Actualizar</button>
-  </form>
+  {% call Form.render_form(form) %}
+  {{ Form.button_submit("Actualizar") }}
+  {% endcall %}
 </main>
 {% endblock %}

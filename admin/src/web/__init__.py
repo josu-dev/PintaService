@@ -2,9 +2,9 @@ from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from werkzeug import exceptions
 
-from src.core import db, seed
+from src.config import config
+from src.core import csrf, db, seed
 from src.services.site import SiteService
-from src.web.config import Config
 
 
 def create_app(env: str = "development", static_folder: str = "../../static"):
@@ -15,11 +15,12 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         __name__, static_folder=static_folder, template_folder="./templates"
     )
 
-    app.config.from_object(Config)
+    app.config.from_object(config.Config)
 
-    db.init_db(app)
+    db.init_app(app)
+    csrf.init_app(app)
 
-    from src.web.pages import blueprints
+    from src.web.controllers import blueprints
 
     for bp in blueprints:
         app.register_blueprint(bp)
@@ -58,7 +59,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
             404,
         )
 
-    @app.cli.command("reset_db")  # pyright: ignore[reportUnknownMemberType]
+    @app.cli.command("reset_db")
     def reset_db():
         """
         Reset the database.
@@ -66,7 +67,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         """
         db.reset_db()
 
-    @app.cli.command("seed_db")  # pyright: ignore[reportUnknownMemberType]
+    @app.cli.command("seed_db")
     def seed_db():
         """
         Seed the database.
