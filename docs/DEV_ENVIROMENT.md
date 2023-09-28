@@ -5,7 +5,7 @@ This document describes the development enviroment and how to setup the tools us
 
 <br/>
 
-## Backend - _'admin/'_
+## Backend - admin/
 
 This section describes how to setup the backend related development enviroment and how to run the related tools.
 
@@ -22,6 +22,8 @@ admin/
 └── tailwind.config.js        # tailwindcss configuration for the templates
 ```
 
+This guide assumes that your `cwd` is the `admin/` folder (where the `pyproject.toml` file is located).
+
 
 <br/>
 
@@ -36,8 +38,6 @@ After installing poetry is recommended to run the following command to configure
 ```bash
 poetry config virtualenvs.in-project true
 ```
-
-> **Note:** `cwd` must be the root of the project (where the `pyproject.toml` file is located).
 
 To install the dependencies, run the following command:
 
@@ -64,6 +64,12 @@ DB_NAME=service_search
 PGADMIN_PORT=5050
 PGADMIN_DEFAULT_EMAIL=dev@dev.com
 PGADMIN_DEFAULT_PASSWORD=password
+
+# Flask config
+SECRET_KEY='development key'
+
+# WTF Forms
+WTF_CSRF_SECRET_KEY='development key'
 ```
 
 > **Note 1:** The values above are examples, can be changed to whatever you want.
@@ -95,8 +101,6 @@ docker compose up -d
 > **Note 1:** The database and pgadmin will be configured using the enviroment variables described above.
 >
 > **Note 2:** The `-d` flag is to detach the process from the terminal, so it can run in the background.
->
-> **Note 3:** The `cwd` must be `<project_root>/admin/` folder (where the `compose.yaml` file is located).
 
 
 #### Using pgadmin
@@ -121,6 +125,23 @@ Connection panel:
 Click on the "Save" button.
 
 
+#### Resetting the database
+
+To reset the database, run the following command:
+
+```bash
+flask reset_db
+```
+
+To seed the database, run the following command:
+
+```bash
+flask seed_db
+```
+
+> **Note:** This maybe change in the future.
+
+
 <br/>
 
 ### Editor setup (VSCode)
@@ -138,13 +159,10 @@ Click on the "Save" button.
 
 #### Settings for extensions:
 
-Use local settings to override the default settings.
-
-Local settings files:
-
-- `.vscode/settings.json` (project root settings)
+Create a `.vscode/settings.json` (at the root of the project) with the following settings:
 
 Minimal settings:
+
 ```json
 {
   "[python]": {
@@ -177,7 +195,7 @@ Minimal settings:
 }
 ```
 
-Extra settings:
+Optional settings:
 
 ```json
 {
@@ -197,6 +215,7 @@ Extra settings:
 > **Note 1:** The .vscode folder is ignored by git, so you can add your own settings without worrying about commiting them.
 >
 > **Note 2:** Settings can be duplicated to`admin/.vscode/settings.json` if want to open the project from the admin folder.
+
 
 <br/>
 
@@ -237,16 +256,13 @@ pre-commit install --hook-type pre-push
 
 The dev server generates the tailwindcss file on template changes and triggers the client (browser page) to reload in order to apply the changes.
 
+> **Note:** If the commands below fails, try starting a poetry shell first (`poetry shell`)
+
 To run the backend in Dev mode run:
 
 ```bash
 flask-livetw dev
 ```
-
-> **Note 1:** The `cwd` must be `<project_root>/admin/`.
->
-> **Note 2:** If fails to run, try starting a poetry shell first (`poetry shell`).
-
 
 #### Build for production
 
@@ -258,11 +274,9 @@ To build for production run:
 flask-livetw build
 ```
 
-> **Note:** Same notes as the dev server.
-
 
 <br/>
 
-## Frontend - _'folder_name/'_
+## Frontend - folder_name/
 
 _Will be added at some point..._
