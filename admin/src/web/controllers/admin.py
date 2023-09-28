@@ -1,6 +1,6 @@
 from flask import Blueprint, render_template, request
+from web.forms.site import SiteUpdateForm
 
-from src.controllers.site import SiteUpdateForm
 from src.services.database import DatabaseService
 from src.services.site import SiteService
 

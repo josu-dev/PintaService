@@ -20,7 +20,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     db.init_app(app)
     csrf.init_app(app)
 
-    from src.web.pages import blueprints
+    from src.web.controllers import blueprints
 
     for bp in blueprints:
         app.register_blueprint(bp)
