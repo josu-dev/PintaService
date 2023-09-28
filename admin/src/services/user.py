@@ -1,59 +1,78 @@
-from typing import Optional
+from typing import List, Optional, TypedDict
+
+from typing_extensions import Unpack
 
 from src.core.db import db
 from src.core.models.user import User
 from src.services.base import BaseService
 
 
+class PartialUserConfig(TypedDict):
+    firstname: str
+    lastname: str
+    password: str
+    email: str
+    username: str
+    document_type: str
+    document_number: str
+    gender: str
+    address: str
+    phone: str
+    gender_other: Optional[str]
+
+
 class UserService(BaseService):
     """Create, read, update and delete users."""
 
-    def get_users(self):
+    @classmethod
+    def get_users(cls) -> List[User]:
         """Get all users from database"""
-        pass
+        return db.session.query(User).all()
 
-    def get_user(self, user_id: int):
-        """Get user from database"""
-        pass
+    @classmethod
+    def get_user(cls, user_id: int):
+        """Get an user from database"""
+        db.session.get(User, user_id)
 
-    def update_user(self, user_id: int):
-        """Update user in database"""
-        pass
+    @classmethod
+    def update_user(cls, user_id: int, **kwargs: Unpack[PartialUserConfig]):
+        """Update user in the database"""
+        user = db.session.query(User).get(user_id)
+        if user:
+            for key, value in kwargs.items():
+                setattr(user, key, value)
+            db.session.commit()
+            return user
+        return None
 
-    def delete_user(self, user_id: int):
+    @classmethod
+    def delete_user(cls, user_id: int):
         """Delete user from database"""
-        pass
+        user = db.session.query(User).get(user_id)
+        if user:
+            db.session.delete(user)
+            db.session.commit()
 
     @classmethod
     def create_user(
         cls,
-        firstname: str,
-        lastname: str,
-        password: str,
-        email: str,
-        username: str,
-        document_type: str,
-        document_number: str,
-        gender: str,
-        address: str,
-        phone: str,
-        gender_other: Optional[str] = None,
-        is_active: bool = True,
+        **kwargs: Unpack[PartialUserConfig],
     ):
         """Create user in database"""
-        user = User(
-            firstname=firstname,
-            lastname=lastname,
-            password=password,
-            email=email,
-            username=username,
-            document_type=document_type,
-            document_number=document_number,
-            gender=gender,
-            gender_other=gender_other,
-            address=address,
-            phone=phone,
-            institutions=[],
-        )
+        user = User(**kwargs)
+        if UserService.get_by_email(kwargs["email"]):
+            raise ValueError("Email already exists")
+        if UserService.get_by_username(kwargs["username"]):
+            raise ValueError("Username already exists")
         db.session.add(user)
         db.session.commit()
+
+    @classmethod
+    def get_by_email(cls, email: str):
+        """Get user by email"""
+        return db.session.query(User).filter(User.email == email).first()
+
+    @classmethod
+    def get_by_username(cls, username: str):
+        """Get user by username"""
+        return db.session.query(User).filter(User.username == username).first()

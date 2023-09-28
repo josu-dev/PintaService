@@ -1,7 +1,7 @@
 """Model for service request."""
 from enum import Enum
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
@@ -35,6 +35,9 @@ class ServiceRequest(BaseModel):
         init=False, onupdate=func.current_timestamp()
     )
     # TODO Relations
+    institution_id: Mapped[int] = mapped_column(init=False)
+    user_id: Mapped[int] = mapped_column(init=False)
+    service_id: Mapped[int] = mapped_column(init=False)
 
 
 class RequestNote(BaseModel):
@@ -46,4 +49,4 @@ class RequestNote(BaseModel):
         init=False, onupdate=func.current_timestamp()
     )
     # Relations
-    service_request_id: Mapped[IntPK] = mapped_column(init=False)
+    service_request_id: Mapped[int] = mapped_column(init=False)

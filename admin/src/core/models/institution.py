@@ -1,8 +1,7 @@
 """Model for institution."""
 
-from typing import List
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
