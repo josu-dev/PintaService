@@ -37,7 +37,4 @@ class Service(BaseModel):
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
-    # Relation with Institutions
-    institutions: Mapped[List["Institution"]] = relationship(
-        back_populates="service", default_factory=list
-    )
+    # TODO Relations

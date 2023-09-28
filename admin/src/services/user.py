@@ -24,8 +24,9 @@ class UserService(BaseService):
         """Delete user from database"""
         pass
 
+    @classmethod
     def create_user(
-        self,
+        cls,
         firstname: str,
         lastname: str,
         password: str,
@@ -52,6 +53,7 @@ class UserService(BaseService):
             gender_other=gender_other,
             address=address,
             phone=phone,
+            institutions=[],
         )
         db.session.add(user)
         db.session.commit()

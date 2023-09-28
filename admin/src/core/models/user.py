@@ -1,11 +1,10 @@
 """Model for user."""
-from typing import List, Optional
+from typing import Optional
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.core.models.base import BaseModel, IntPK, Str32, Str256, Timestamp
-from src.core.models.institution import Institution
 
 
 class User(BaseModel):
@@ -29,10 +28,6 @@ class User(BaseModel):
     created_at: Mapped[Timestamp] = mapped_column(init=False)
     updated_at: Mapped[Timestamp] = mapped_column(
         init=False, onupdate=func.current_timestamp()
-    )
-    # Relation with institution
-    institutions: Mapped[List["Institution"]] = relationship(
-        back_populates="user", default_factory=list
     )
 
 
