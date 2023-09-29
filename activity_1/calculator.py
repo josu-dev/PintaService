@@ -1,7 +1,8 @@
 import addition as add
 import division
-import substraction as sub
 import multiplication as mult
+import substraction as sub
+
 
 def get_operand(name: str) -> float:
     while True:
@@ -18,25 +19,34 @@ def main():
         left_operand = get_operand("left")
         right_operand = get_operand("right")
 
-        match operation:
-            case "+":
+        if operation == "+":
+            print(
+                f"{left_operand} + {right_operand} = \
+                    {add.addition(left_operand, right_operand)}"
+            )
+        elif operation == "/":
+            if right_operand == 0:
+                print("Division by zero is not allowed.")
+            else:
                 print(
-                    f"{left_operand} + {right_operand} = {add.addition(left_operand, right_operand)}")
-            case "/":
-                if right_operand == 0:
-                    print("Division by zero is not allowed.")
-                else:
-                    print(
-                    f"{left_operand} / {right_operand} = {division.division(left_operand, right_operand)}")
-            case "-":
-                print(
-                    f"{left_operand} - {right_operand} = {sub.substraction(left_operand, right_operand)}")
-            case "*":
-                print(
-                    f"{left_operand} * {right_operand} = {mult.multiplication(left_operand, right_operand)}")
-            case _:
-                print(
-                    "Operation {operation} is not supported. Please try again.", end="\n\n")
+                    f"{left_operand} / {right_operand} = \
+                    {division.division(left_operand, right_operand)}"
+                )
+        elif operation == "-":
+            print(
+                f"{left_operand} - {right_operand} = \
+                    {sub.substraction(left_operand, right_operand)}"
+            )
+        elif operation == "*":
+            print(
+                f"{left_operand} * {right_operand} = \
+                    {mult.multiplication(left_operand, right_operand)}"
+            )
+        else:
+            print(
+                "Operation {operation} is not supported. Please try again.",
+                end="\n\n",
+            )
 
         if input("Do you want to continue? (y/n): ").strip().lower() != "y":
             break

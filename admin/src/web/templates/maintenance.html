@@ -1,0 +1,15 @@
+{% extends "base_layout.html" %}
+
+{% block head %}
+<title>Mantenimiento en curso</title>
+{% endblock %}
+
+{% block body %}
+<main class="flex-1 flex flex-col">
+  <div class="flex-1 flex flex-col justify-center items-center">
+    <h1 class="text-6xl font-bold text-gray-900">Mantenimiento en curso</h1>
+    <p class="text-gray-600">{{ maintenance_message }}</p>
+  </div>
+  <p class="text-center my-[1em] text-slate-500/80">Vuelva a intentarlo más tarde</p>
+</main>
+{% endblock %}

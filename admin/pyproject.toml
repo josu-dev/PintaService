@@ -4,16 +4,40 @@ version = "0.1.0"
 description = ""
 authors = ["Lopez Luciano <lucholopezlp@hotmail.com>"]
 readme = "README.md"
-packages = [{include = "web", from = "src"}]
+packages = [{ include = "web", from = "src" }]
+
+
+[tool.poetry.scripts]
+env_update = "src.config.env:main"
 
 [tool.poetry.dependencies]
 python = "^3.8"
 flask = "^2.3.3"
+python-dotenv = "^1.0.0"
+psycopg2-binary = "^2.9.7"
+flask-sqlalchemy = "^3.1.1"
+flask-wtf = "^1.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^7.4.1"
+python-dotenv = "^1.0.0"
+pre-commit = "^3.4.0"
+flask-livetw = "^0.3.1"
+
 
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+
+[tool.isort]
+profile = "black"
+line_length = 79
+
+[tool.pyright]
+reportUnusedFunction = false
+
+[tool.flask-livetw]
+static_folder = "../static"
+templates_folder = "web/templates"
