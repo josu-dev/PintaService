@@ -7,6 +7,9 @@ readme = "README.md"
 packages = [{ include = "web", from = "src" }]
 
 
+[tool.poetry.scripts]
+env_update = "src.config.env:main"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 flask = "^2.3.3"

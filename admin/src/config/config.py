@@ -21,5 +21,5 @@ class Config(FlaskConfig):
     SECRET_KEY = os.getenv("SECRET_KEY")  # needed for session
 
     # WTForms config
-    WTF_CSRF_ENABLED = True
+    WTF_CSRF_ENABLED = os.getenv("WTF_CSRF_ENABLED") == "True"
     WTF_CSRF_SECRET_KEY = os.getenv("WTF_CSRF_SECRET_KEY")
