@@ -41,6 +41,8 @@ class ServiceRequest(BaseModel):
 
 
 class RequestNote(BaseModel):
+    __tablename__ = "request_notes"
+
     id: Mapped[IntPK] = mapped_column(init=False)
     note: Mapped[Str512]
 
