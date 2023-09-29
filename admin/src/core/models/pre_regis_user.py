@@ -12,7 +12,7 @@ from src.core.models.base import (
 
 
 class PreRegisterUser(BaseModel):
-    __tablename__ = "PreRegisterUsers"
+    __tablename__ = "pre_register_user"
 
     id: Mapped[IntPK] = mapped_column(init=False)
     firstname: Mapped[Str32]
