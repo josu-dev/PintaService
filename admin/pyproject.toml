@@ -7,12 +7,16 @@ readme = "README.md"
 packages = [{ include = "web", from = "src" }]
 
 
+[tool.poetry.scripts]
+env_update = "src.config.env:main"
+
 [tool.poetry.dependencies]
 python = "^3.8"
 flask = "^2.3.3"
 python-dotenv = "^1.0.0"
 psycopg2-binary = "^2.9.7"
 flask-sqlalchemy = "^3.1.1"
+flask-wtf = "^1.1.1"
 
 
 [tool.poetry.group.dev.dependencies]
