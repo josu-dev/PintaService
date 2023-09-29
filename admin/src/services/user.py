@@ -76,3 +76,5 @@ class UserService(BaseService):
     def get_by_username(cls, username: str):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
+
+    # TODO Filter by email and Active/unactive

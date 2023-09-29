@@ -1,18 +1,20 @@
 from typing import List
 
-from core.models.base import BaseModel, IntPK, Timestamp
-from core.models.institution import Institution
-from core.models.service import Service
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
+
+from src.core.models.base import BaseModel, IntPK, Timestamp
+from src.core.models.institution import Institution
+from src.core.models.service import Service
 
 
 class Institution_Service(BaseModel):
     __tablename__ = "institution_service"
 
     id: Mapped[IntPK] = mapped_column(init=False)
-    institution_id: int
-    service_id: int
+    service_id = Column(Integer, ForeignKey("services.id"))
+    institution_id = Column(Integer, ForeignKey("institutions.id"))
 
     service: Mapped[List[Service]] = relationship(
         "Service", back_populates="institutions"

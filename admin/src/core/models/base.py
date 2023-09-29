@@ -59,5 +59,7 @@ UpdatedAt = Annotated[
 ]
 
 Str32 = Annotated[str, orm.mapped_column(String(32))]
+Str64 = Annotated[str, orm.mapped_column(String(64))]
+Str128 = Annotated[str, orm.mapped_column(String(128))]
 Str256 = Annotated[str, orm.mapped_column(String(256))]
 Str512 = Annotated[str, orm.mapped_column(String(512))]
