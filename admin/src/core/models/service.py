@@ -31,8 +31,8 @@ class Service(BaseModel):
     keywords: Mapped[Str256]
     service_type: Mapped[ServiceType]
     enabled: Mapped[bool] = mapped_column(init=False, default=True)
+
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
-    # TODO Relations

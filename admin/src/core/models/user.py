@@ -4,9 +4,17 @@ from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from src.core.models.base import BaseModel, IntPK, Str32, Str256, Timestamp
+from src.core.models.base import (
+    BaseModel,
+    IntPK,
+    Str32,
+    Str64,
+    Str256,
+    Timestamp,
+)
 
 
+# TODO Make Optional Fields
 class User(BaseModel):
     __tablename__ = "users"
 
@@ -15,7 +23,7 @@ class User(BaseModel):
     firstname: Mapped[Str32]
     lastname: Mapped[Str32]
     password: Mapped[Str32]
-    email: Mapped[Str32]
+    email: Mapped[Str64]
     username: Mapped[Str32]
     document_type: Mapped[Str32]
     document_number: Mapped[Str32]
