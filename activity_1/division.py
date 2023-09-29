@@ -1,4 +1,4 @@
-def division(a:int|float, b:int|float) -> int|float:
+def division(a: int | float, b: int | float) -> int | float:
     """Divides two numbers and returns the result.
 
     Args:
@@ -12,9 +12,9 @@ def division(a:int|float, b:int|float) -> int|float:
         int|float: The quotient.
     """
 
-    if (b == 0):
+    if b == 0:
         raise ZeroDivisionError("Cannot divide by zero")
-    return a/b
+    return a / b
 
 
 def main():

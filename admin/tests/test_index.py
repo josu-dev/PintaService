@@ -6,6 +6,6 @@ client = app.test_client()
 
 
 def test_index():
-    response = client.get('/')
+    response = client.get("/")
     assert response.status_code == 200
-    assert b'Grupo 4' in response.data
+    assert b"Grupo 4" in response.data
