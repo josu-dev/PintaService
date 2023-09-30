@@ -1,26 +1,16 @@
-from dotenv import load_dotenv
 from flask import Flask, render_template, request
 from werkzeug import exceptions
 
-from src.config import env as env_utils
-from src.core import csrf, db, seed
+from src.core import config, csrf, db, seed
 from src.services.site import SiteService
 
 
 def create_app(env: str = "development", static_folder: str = "../../static"):
-    if env == "development":
-        load_dotenv()
-    else:
-        env_utils.load_dbdotenv()
-
-    from src.config import config
-
     app = Flask(
         __name__, static_folder=static_folder, template_folder="./templates"
     )
 
-    app.config.from_object(config.Config)
-
+    config.init_app(app, env)
     db.init_app(app)
     csrf.init_app(app)
 
