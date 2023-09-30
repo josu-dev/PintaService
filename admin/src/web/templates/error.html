@@ -1,10 +1,8 @@
 {% extends "layout.html" %}
 {% block head %}
-<link rel="stylesheet" href="{{ url_for('static', filename='error.css') }}"> {% endblock %}
-{% block title %}Error{% endblock %}
-
-{% block header %}Algo salió mal{% endblock %}
-
+<title>Error</title>
+<link rel="stylesheet" href="{{ url_for('static', filename='error.css') }}">
+{% endblock %}
 {% block content %}
 <div class="error-container">
   <h2>Error {{ error_code }}</h2>
