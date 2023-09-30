@@ -8,7 +8,8 @@ packages = [{ include = "web", from = "src" }]
 
 
 [tool.poetry.scripts]
-env_update = "src.config.env:main"
+env-update = "src.core.config:env_update"
+
 
 [tool.poetry.dependencies]
 python = "^3.8"
