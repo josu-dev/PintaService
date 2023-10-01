@@ -1,46 +1,68 @@
-from typing import TypedDict
+import typing as t
 
-from sqlalchemy import select, update
-from typing_extensions import NotRequired, Unpack
+import typing_extensions as te
+from sqlalchemy import exc, select, update
 
 from src.core.db import db
 from src.core.models.site import SiteConfig, defaultSiteConfig
 from src.services.base import BaseService, BaseServiceError, filter_nones
 
 
-class PartialSiteConfig(TypedDict):
-    page_size: NotRequired[int]
-    contact_info: NotRequired[str]
-    maintenance_active: NotRequired[bool]
-    maintenance_message: NotRequired[str]
+class PartialSiteConfig(t.TypedDict):
+    page_size: te.NotRequired[int]
+    contact_info: te.NotRequired[str]
+    maintenance_active: te.NotRequired[bool]
+    maintenance_message: te.NotRequired[str]
+
+
+class SiteServiceError(BaseServiceError):
+    pass
 
 
 class SiteService(BaseService):
+    SiteServiceError = SiteServiceError
+
     @staticmethod
-    def default() -> SiteConfig:
+    def default_site_config() -> SiteConfig:
         return defaultSiteConfig()
 
     @classmethod
+    def _on_missing_site_config(cls) -> SiteConfig:
+        site_config = defaultSiteConfig()
+        return site_config
+
+    @classmethod
     def get_site_config(cls) -> SiteConfig:
-        site_config = db.session.execute(select(SiteConfig)).scalar()
+        try:
+            site_config = db.session.execute(select(SiteConfig)).scalar()
+        except exc.SQLAlchemyError as e:
+            db.session.rollback()
+            raise SiteServiceError(f"Could not retrieve site config: {e.code}")
+
         if site_config is None:
-            raise BaseServiceError("No site config loaded")
+            return cls._on_missing_site_config()
 
         return site_config
 
     @classmethod
     def update_site_config(
-        cls, **kwargs: Unpack[PartialSiteConfig]
+        cls, **kwargs: te.Unpack[PartialSiteConfig]
     ) -> SiteConfig:
-        site_config = db.session.execute(
-            update(SiteConfig)
-            .values(**filter_nones(kwargs))
-            .returning(SiteConfig)
-        ).scalar()
-        db.session.commit()
+        try:
+            site_config = db.session.execute(
+                update(SiteConfig)
+                .values(**filter_nones(kwargs))
+                .returning(SiteConfig)
+            ).scalar()
+            db.session.commit()
+        except exc.SQLAlchemyError as e:
+            db.session.rollback()
+            raise SiteServiceError(f"Could not update site config: {e.code}")
 
         if site_config is None:
-            raise BaseServiceError("No site config loaded")
+            raise SiteServiceError(
+                "Could not retrieve site config after update"
+            )
 
         return site_config
 

@@ -6,7 +6,7 @@ from src.services.base import BaseService
 
 class DatabaseService(BaseService):
     @staticmethod
-    def ping() -> bool:
+    def health_check() -> bool:
         try:
             db.session.execute(text("SELECT 1")).close()
             return True
