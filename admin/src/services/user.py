@@ -4,7 +4,9 @@ from typing_extensions import Unpack
 
 from src.core.db import db
 from src.core.models.user import User
-from src.services.base import BaseService
+from src.services.base import BaseService, BaseServiceError
+
+from src.core.models.pre_regis_user import PreRegisterUser
 
 
 class PartialUserConfig(TypedDict):
@@ -21,14 +23,25 @@ class PartialUserConfig(TypedDict):
     gender_other: Optional[str]
 
 
-class PreRegisterUser(TypedDict):
+class FullPreRegisterUser(TypedDict):
     firstname: str
     lastname: str
     email: str
 
 
+class LoginUser(TypedDict):
+    email: str
+    password: str
+
+
+class UserServiceError(BaseServiceError):
+    pass
+
+
 class UserService(BaseService):
     """Create, read, update and delete users."""
+
+    UserServiceError = UserServiceError
 
     @classmethod
     def get_users(cls) -> List[User]:
@@ -60,15 +73,13 @@ class UserService(BaseService):
             db.session.commit()
 
     @classmethod
-    def create_pre_user(cls, **kwargs: Unpack[PreRegisterUser]):
+    def create_pre_user(cls, **kwargs: Unpack[FullPreRegisterUser]):
         """Create parcial user in database"""
-        user = PreRegisterUser(**kwargs)
+        user = PreRegisterUser(**kwargs, token="")
         if UserService.get_by_email(kwargs["email"]):
-            raise ValueError(
-                "Email already exists"
-            )  # cambiar con actualizacion
+            raise UserServiceError(f"{user.email} Email already exists")
         db.session.add(user)
-        db.session.commit
+        db.session.commit()
 
     @classmethod
     def create_user(
@@ -77,10 +88,8 @@ class UserService(BaseService):
     ):
         """Create user in database"""
         user = User(**kwargs)
-        if UserService.get_by_email(kwargs["email"]):
-            raise ValueError("Email already exists")
         if UserService.get_by_username(kwargs["username"]):
-            raise ValueError("Username already exists")
+            raise UserServiceError("Username already exists")
         db.session.add(user)
         db.session.commit()
 
@@ -93,5 +102,14 @@ class UserService(BaseService):
     def get_by_username(cls, username: str):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
+
+    @classmethod
+    def find_user_email_password(cls, email: str, password: str):
+        """Check if the mail and password are valid"""
+        return (
+            db.session.query(User)
+            .filter(User.email == email, User.password == password)
+            .first()
+        )
 
     # TODO Filter by email and Active/unactive

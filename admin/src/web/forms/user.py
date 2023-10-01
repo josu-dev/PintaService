@@ -3,7 +3,7 @@ from typing_extensions import cast
 from wtforms import EmailField, IntegerField, PasswordField, StringField
 from wtforms import validators as v
 
-from src.services.user import PartialUserConfig, PreRegisterUser
+from src.services.user import PartialUserConfig, FullPreRegisterUser
 
 
 class UserUpdateForm(FlaskForm):
@@ -72,7 +72,7 @@ class UserPreRegister(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
 
-    def values(self) -> PreRegisterUser:
+    def values(self) -> FullPreRegisterUser:
         return {
             "firstname": self.firstname.data,
             "lastname": self.lastname.data,
