@@ -18,7 +18,7 @@
     rel="stylesheet">
   <script src="{{ url_for('static', filename='js/layout.js') }}" defer></script>
 
-  {% if config.DEBUG %}
+  {% if config.LIVETW_DEV %}
   <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='.dev/tailwind.css') }}">
   <script src="{{ url_for('static', filename='.dev/live_reload.js') }}" defer></script>
   {% else %}
@@ -28,6 +28,7 @@
 
 <body
   class="h-full flex flex-col overflow-hidden bg-slate-100 text-slate-900 font-[Poppins] max-w-7xl mx-auto xl:border-l xl:border-r border-slate-950">
+  {% include "_frags/flash_message.html" %}
   <header class="flex justify-between p-2 border-b shadow border-slate-900">
     <div class="ml-2">
       <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"

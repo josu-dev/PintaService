@@ -1,9 +1,10 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 
-from src.core.models.base import BaseModel
+from src.core.models import all_models, base
 
-db = SQLAlchemy(model_class=BaseModel)
+db = SQLAlchemy(model_class=base.BaseModel)
+# db = SQLAlchemy(model_class=base.BaseModel, engine_options={"echo": True})
 
 
 def init_app(app: Flask):

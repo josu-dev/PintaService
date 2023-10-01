@@ -5,13 +5,9 @@ from web.forms.user import UserUpdateForm
 from src.services.database import DatabaseService
 from src.services.site import SiteService
 from src.services.user import UserService
+from src.web.controllers import _helpers as h
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
-
-
-@bp.route("/", methods=["GET"])
-def index():
-    return render_template("admin/index.html")
 
 
 @bp.route("/site_config", methods=["GET", "POST"])
@@ -23,18 +19,22 @@ def site_config():
         form.process(obj=site_config)
 
     elif request.method == "POST" and form.validate():
-        site_config = SiteService.update_site_config(**form.values())
-        form.process(obj=site_config)
+        try:
+            site_config = SiteService.update_site_config(**form.values())
+            form.process(obj=site_config)
+            h.flash_success("Site config updated")
+        except SiteService.SiteServiceError as e:
+            h.flash_error(e.message)
 
     return render_template("admin/site_config.html", form=form)
 
 
-@bp.route("/ping_db", methods=["GET"])
-def ping_db():
-    if DatabaseService.ping():
-        return "Database connection successful"
+@bp.route("/check_db", methods=["GET"])
+def check_db():
+    if DatabaseService.health_check():
+        return "Database is up and running", 200
 
-    return "Database connection failed", 500
+    return "Database is not running", 500
 
 
 # TODO Lucho podes tocar lo que necesites de aca para mostrar
