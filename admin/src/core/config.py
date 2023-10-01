@@ -177,7 +177,7 @@ class Config:
         cls.DB_USER = env_or_error("DB_USER")
         cls.DB_PASS = env_or_error("DB_PASS")
         cls.DB_HOST = env_or_error("DB_HOST")
-        cls.DB_PORT = env_or_error("DB_PORT")
+        cls.DB_PORT = env_or_error("DB_PORT", "5432")
         cls.DB_NAME = env_or_error("DB_NAME")
 
         cls.SQLALCHEMY_TRACK_MODIFICATIONS = True
