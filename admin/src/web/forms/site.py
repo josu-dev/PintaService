@@ -1,5 +1,5 @@
+import typing_extensions as te
 from flask_wtf import FlaskForm
-from typing_extensions import cast
 from wtforms import BooleanField, IntegerField, StringField
 from wtforms import validators as v
 
@@ -13,18 +13,20 @@ class SiteUpdateForm(FlaskForm):
     )
     contact_info = StringField(
         "Informacion de contacto",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[v.Length(min=0, max=256)],
     )
     maintenance_active = BooleanField("En mantenimiento")
     maintenance_message = StringField(
         "Mensaje de mantenimiento",
-        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+        validators=[v.Length(min=0, max=512)],
     )
 
     def values(self) -> PartialSiteConfig:
-        return PartialSiteConfig(
-            page_size=cast(int, self.page_size.data),
-            contact_info=cast(str, self.contact_info.data),
+        config = PartialSiteConfig(
+            page_size=te.cast(int, self.page_size.data),
+            contact_info=te.cast(str, self.contact_info.data),
             maintenance_active=self.maintenance_active.data,
-            maintenance_message=cast(str, self.maintenance_message.data),
+            maintenance_message=te.cast(str, self.maintenance_message.data),
         )
+
+        return config

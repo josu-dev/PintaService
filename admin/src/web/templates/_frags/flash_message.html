@@ -1,0 +1,49 @@
+<div data-flash-notification-container class="fixed w-auto ml-auto z-50 right-0 top-20 shadow-md">
+  {% with messages = get_flashed_messages(category_filter=["error"]) %}{% if messages %}{% for message in messages %}
+  <div class="flex gap-2 p-4 text-red-800 bg-red-100" role="alert">
+    {{ message }}
+    <button data-flash-notification-delete class="rounded-l-none text-red-800 bg-red-100"><svg
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg></button>
+  </div>
+  {% endfor %}{% endif %}{% endwith %}
+
+  {% with messages = get_flashed_messages(category_filter=["success"]) %}{% if messages %}{% for message in messages %}
+  <div class="flex gap-2 p-4 text-green-800 bg-green-100" role="alert">
+    {{ message }}
+    <button data-flash-notification-delete class="rounded-l-none text-green-800 bg-green-100"><svg
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg></button>
+  </div>
+  {% endfor %}{% endif %}{% endwith %}
+
+  {% with messages = get_flashed_messages(category_filter=["info"]) %}{% if messages %}{% for message in messages %}
+  <div class="flex gap-2 p-4 text-yellow-800 bg-yellow-100" role="alert">
+    {{ message }}
+    <button data-flash-notification-delete class="rounded-l-none text-yellow-800 bg-yellow-100"><svg
+        xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg></button>
+  </div>
+  {% endfor %}{% endif %}{% endwith %}
+</div>
+<script>
+  /** @type {NodeListOf<HTMLButtonElement>} */
+  const deleteButtons = document.querySelectorAll('[data-flash-notification-delete]') || [];
+
+  deleteButtons.forEach(($delete) => {
+    const $notification = $delete.parentNode;
+
+    $delete.addEventListener('click', () => {
+      $notification.parentNode.removeChild($notification);
+    });
+  });
+</script>
