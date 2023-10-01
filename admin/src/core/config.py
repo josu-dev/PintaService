@@ -171,6 +171,9 @@ class Config:
     # flask-livetw config
     LIVETW_DEV: bool
 
+    # flask session config
+    SESSION_TYPE: str
+
     @classmethod
     def load_env_config(cls) -> None:
         # DB environment variables names CAN'T be changed
@@ -191,6 +194,8 @@ class Config:
         cls.WTF_CSRF_SECRET_KEY = env_or_error("WTF_CSRF_SECRET_KEY")
 
         cls.LIVETW_DEV = env_or_error("LIVETW_DEV", "false").lower() == "true"
+
+        cls.SESSION_TYPE = env_or_error("SESSION_TYPE", "filesystem")
 
 
 def init_app(app: Flask, env: str) -> None:

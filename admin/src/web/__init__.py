@@ -4,6 +4,10 @@ from werkzeug import exceptions
 from src.core import config, csrf, db, seed
 from src.services.site import SiteService
 
+from flask_session import Session
+
+session = Session()
+
 
 def create_app(env: str = "development", static_folder: str = "../../static"):
     app = Flask(
@@ -13,6 +17,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     config.init_app(app, env)
     db.init_app(app)
     csrf.init_app(app)
+    session.init_app(app)
 
     from src.web.controllers import blueprints
 
