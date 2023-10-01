@@ -63,17 +63,6 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
             404,
         )
 
-    @app.get("/register")
-    def register():
-        return render_template("register.html")
-
-    @app.get("/confirmation")
-    def confirmation():
-        return render_template("confirmation.html")
-    
-    @app.get("/search_user")
-    def search_user():
-        return render_template("search_user.html")
     @app.cli.command("reset_db")
     def reset_db():
         """

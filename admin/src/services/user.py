@@ -21,6 +21,12 @@ class PartialUserConfig(TypedDict):
     gender_other: Optional[str]
 
 
+class PreRegisterUser(TypedDict):
+    firstname: str
+    lastname: str
+    email: str
+
+
 class UserService(BaseService):
     """Create, read, update and delete users."""
 
@@ -52,6 +58,17 @@ class UserService(BaseService):
         if user:
             db.session.delete(user)
             db.session.commit()
+
+    @classmethod
+    def create_pre_user(cls, **kwargs: Unpack[PreRegisterUser]):
+        """Create parcial user in database"""
+        user = PreRegisterUser(**kwargs)
+        if UserService.get_by_email(kwargs["email"]):
+            raise ValueError(
+                "Email already exists"
+            )  # cambiar con actualizacion
+        db.session.add(user)
+        db.session.commit
 
     @classmethod
     def create_user(
