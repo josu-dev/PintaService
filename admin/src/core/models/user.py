@@ -58,9 +58,9 @@ class RolePermission(BaseModel):
 
 
 def seed_site_users(db: SQLAlchemy):
-    from src.services.user import UserService
+    from src.services.user import AuthService
 
-    UserService.create_user(
+    AuthService.create_user(
         firstname="Luciano Ariel",
         lastname="Lopez",
         password="1234",
@@ -73,7 +73,7 @@ def seed_site_users(db: SQLAlchemy):
         address="155",
         phone="2213169050",
     )
-    UserService.create_user(
+    AuthService.create_user(
         firstname="Luciano",
         lastname="Lopez",
         password="1234",
@@ -87,7 +87,7 @@ def seed_site_users(db: SQLAlchemy):
         phone="2213169050",
     )
 
-    UserService.create_user(
+    AuthService.create_user(
         firstname="Franco",
         lastname="Cirielli",
         password="1234",

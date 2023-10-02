@@ -3,7 +3,8 @@ from typing_extensions import cast
 from wtforms import EmailField, IntegerField, PasswordField, StringField
 from wtforms import validators as v
 
-from src.services.user import PartialUserConfig, FullPreRegisterUser
+from src.services.user import PartialUserConfig
+from src.services.auth import FullPreRegisterUser
 
 
 class UserUpdateForm(FlaskForm):

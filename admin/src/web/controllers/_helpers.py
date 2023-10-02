@@ -1,7 +1,8 @@
 import flask
 import typing as t
-from functools import wraps
+from flask import typing as tf
 from flask.sessions import SessionMixin
+from functools import wraps
 
 
 def flash_info(message: str):
@@ -34,7 +35,7 @@ def login_required(
 ) -> t.Callable[[TRoute], TRoute]:
     def decorator(func: TRoute) -> TRoute:
         @wraps(func)
-        def wrapper(*args: t.Any, **kwargs: t.Any):
+        def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
             if not is_authenticated(flask.session):
                 if message:
                     flash_info(message)
