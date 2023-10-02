@@ -23,7 +23,7 @@ class User(BaseModel):
 
     firstname: Mapped[Str32]
     lastname: Mapped[Str32]
-    password: Mapped[Str32]
+    password: Mapped[Str256]
     email: Mapped[Str64]
     username: Mapped[Str32]
     document_type: Mapped[Str32]
@@ -58,49 +58,47 @@ class RolePermission(BaseModel):
 
 
 def seed_site_users(db: SQLAlchemy):
-    db.session.add(
-        User(
-            firstname="Luciano Ariel",
-            lastname="Lopez",
-            password="1234",
-            email="waderlax@hotmail.com",
-            username="waderlax",
-            document_type="DNI",
-            document_number="40188236",
-            gender="hombre",
-            gender_other="tal vez",
-            address="155",
-            phone="2213169050",
-        )
+    from src.services.user import UserService
+
+    UserService.create_user(
+        firstname="Luciano Ariel",
+        lastname="Lopez",
+        password="1234",
+        email="waderlax@hotmail.com",
+        username="waderlax",
+        document_type="DNI",
+        document_number="40188236",
+        gender="hombre",
+        gender_other="tal vez",
+        address="155",
+        phone="2213169050",
     )
-    db.session.add(
-        User(
-            firstname="Luciano",
-            lastname="Lopez",
-            password="1234",
-            email="lucholopezlp@hotmail.com",
-            username="lucho",
-            document_type="DNI",
-            document_number="40188236",
-            gender="mujer",
-            gender_other="",
-            address="155",
-            phone="2213169050",
-        )
+    UserService.create_user(
+        firstname="Luciano",
+        lastname="Lopez",
+        password="1234",
+        email="lucholopezlp@hotmail.com",
+        username="lucho",
+        document_type="DNI",
+        document_number="40188236",
+        gender="mujer",
+        gender_other="",
+        address="155",
+        phone="2213169050",
     )
-    db.session.add(
-        User(
-            firstname="Franco",
-            lastname="Cirielli",
-            password="1234",
-            email="franco@hotmail.com",
-            username="francry",
-            document_type="DNI",
-            document_number="25683652",
-            gender="dudoso",
-            gender_other="tal vez",
-            address="15 y 47",
-            phone="2355572726",
-        )
+
+    UserService.create_user(
+        firstname="Franco",
+        lastname="Cirielli",
+        password="1234",
+        email="franco@hotmail.com",
+        username="francry",
+        document_type="DNI",
+        document_number="25683652",
+        gender="dudoso",
+        gender_other="tal vez",
+        address="15 y 47",
+        phone="2355572726",
     )
+
     db.session.commit()

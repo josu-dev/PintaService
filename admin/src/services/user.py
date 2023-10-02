@@ -7,6 +7,7 @@ from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 from src.core.models.pre_regis_user import PreRegisterUser
+from src.core.bcrypt import bcrypt
 
 
 class PartialUserConfig(TypedDict):
@@ -75,9 +76,10 @@ class UserService(BaseService):
     @classmethod
     def create_pre_user(cls, **kwargs: Unpack[FullPreRegisterUser]):
         """Create parcial user in database"""
-        user = PreRegisterUser(**kwargs, token="")
         if UserService.get_by_email(kwargs["email"]):
-            raise UserServiceError(f"{user.email} Email already exists")
+            raise UserServiceError(f"{kwargs['email']} Email already exists")
+        user = PreRegisterUser(**kwargs, token="")
+
         db.session.add(user)
         db.session.commit()
 
@@ -87,9 +89,14 @@ class UserService(BaseService):
         **kwargs: Unpack[PartialUserConfig],
     ):
         """Create user in database"""
-        user = User(**kwargs)
         if UserService.get_by_username(kwargs["username"]):
             raise UserServiceError("Username already exists")
+
+        hash = bcrypt.generate_password_hash(
+            kwargs["password"].encode("utf-8")
+        )
+        kwargs["password"] = hash.decode("utf-8")
+        user = User(**kwargs)
         db.session.add(user)
         db.session.commit()
 
@@ -104,12 +111,20 @@ class UserService(BaseService):
         return db.session.query(User).filter(User.username == username).first()
 
     @classmethod
-    def find_user_email_password(cls, email: str, password: str):
+    def find_user_email(cls, email: str):
+        """returns the user according to email"""
+        return db.session.query(User).filter(User.email == email).first()
+
+    @classmethod
+    def check_user(cls, email: str, password: str):
         """Check if the mail and password are valid"""
-        return (
-            db.session.query(User)
-            .filter(User.email == email, User.password == password)
-            .first()
-        )
+        user = cls.find_user_email(email)
+
+        if user and bcrypt.check_password_hash(
+            user.password, password.encode("utf-8")
+        ):
+            return user
+
+        return None
 
     # TODO Filter by email and Active/unactive

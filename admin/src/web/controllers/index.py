@@ -35,7 +35,7 @@ def login():
     if request.method == "POST":
         form = UserLogin(request.form)
         if form.validate():
-            user = UserService.find_user_email_password(**form.values())
+            user = UserService.check_user(**form.values())
             if not user:
                 h.flash_error("Los parametros son invalidos")
                 return redirect(url_for("root.login"))
