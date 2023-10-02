@@ -3,6 +3,7 @@ from werkzeug import exceptions
 
 from src.core import config, csrf, db, seed
 from src.services.site import SiteService
+from src.web.controllers._helpers import is_authenticated
 
 from flask_session import Session
 
@@ -23,6 +24,8 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
 
     for bp in blueprints:
         app.register_blueprint(bp)
+
+    app.add_template_global(is_authenticated, "is_authenticated")
 
     @app.before_request
     def hook():

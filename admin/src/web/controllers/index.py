@@ -15,6 +15,7 @@ bp = Blueprint("root", __name__)
 
 
 @bp.route("/", methods=["GET", "POST"])
+@h.login_required()
 def index():
     return render_template("index.html")
 
