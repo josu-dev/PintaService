@@ -2,7 +2,7 @@
 from typing import Optional
 
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
@@ -15,7 +15,6 @@ from src.core.models.base import (
 )
 
 
-# TODO Make Optional Fields
 class User(BaseModel):
     __tablename__ = "users"
 
@@ -33,6 +32,10 @@ class User(BaseModel):
     address: Mapped[Str256]
     phone: Mapped[Str32]
     is_active: Mapped[bool] = mapped_column(init=False, default=True)
+
+    institutions = relationship(  # type: ignore
+        "Institution", secondary="institution_user", back_populates="users"
+    )
 
     created_at: Mapped[Timestamp] = mapped_column(init=False)
     updated_at: Mapped[Timestamp] = mapped_column(

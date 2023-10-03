@@ -1,5 +1,7 @@
 from src.core.models import (
     institution,
+    institution_service,
+    institution_user,
     pre_regis_user,
     service,
     service_requests,
@@ -14,4 +16,6 @@ __all__ = [
     "service_requests",
     "site",
     "user",
+    "institution_user",
+    "institution_service",
 ]
