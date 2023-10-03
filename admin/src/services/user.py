@@ -2,9 +2,10 @@ from typing import List, Optional, TypedDict
 
 from typing_extensions import Unpack
 
+from src.core.bcrypt import bcrypt
 from src.core.db import db
 from src.core.models.user import User
-from src.services.base import BaseService
+from src.services.base import BaseService, BaseServiceError
 
 
 class PartialUserConfig(TypedDict):
@@ -21,8 +22,14 @@ class PartialUserConfig(TypedDict):
     gender_other: Optional[str]
 
 
+class UserServiceError(BaseServiceError):
+    pass
+
+
 class UserService(BaseService):
     """Create, read, update and delete users."""
+
+    UserServiceError = UserServiceError
 
     @classmethod
     def get_users(cls) -> List[User]:
@@ -59,11 +66,14 @@ class UserService(BaseService):
         **kwargs: Unpack[PartialUserConfig],
     ):
         """Create user in database"""
-        user = User(**kwargs)
-        if UserService.get_by_email(kwargs["email"]):
-            raise ValueError("Email already exists")
         if UserService.get_by_username(kwargs["username"]):
-            raise ValueError("Username already exists")
+            raise UserServiceError("Username already exists")
+
+        hash = bcrypt.generate_password_hash(
+            kwargs["password"].encode("utf-8")
+        )
+        kwargs["password"] = hash.decode("utf-8")
+        user = User(**kwargs)
         db.session.add(user)
         db.session.commit()
 
@@ -76,5 +86,35 @@ class UserService(BaseService):
     def get_by_username(cls, username: str):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
+
+    @classmethod
+    def validate_email_password(cls, email: str, password: str):
+        """Check if the mail and password are valid"""
+        user = cls.get_by_email(email)
+
+        if user and bcrypt.check_password_hash(
+            user.password, password.encode("utf-8")
+        ):
+            return user
+
+        return None
+
+    @classmethod
+    def exist_user_with_email(cls, email: str):
+        """check if the email is valid"""
+
+        return (
+            db.session.query(User).filter(User.email == email).first()
+            is not None
+        )
+
+    @classmethod
+    def exist_user_with_username(cls, username: str):
+        """check if the username is valid"""
+
+        return (
+            db.session.query(User).filter(User.username == username).first()
+            is not None
+        )
 
     # TODO Filter by email and Active/unactive

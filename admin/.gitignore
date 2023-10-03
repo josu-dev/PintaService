@@ -4,6 +4,9 @@ static/.dev/tailwind.css
 # envs
 .env*
 
+#flask_session
+flask_session/
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]

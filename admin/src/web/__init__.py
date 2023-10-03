@@ -1,8 +1,13 @@
 from flask import Flask, render_template, request
 from werkzeug import exceptions
 
+from flask_session import Session
 from src.core import config, csrf, db, seed
+from src.services.mail import MailService
 from src.services.site import SiteService
+from src.web.controllers._helpers import is_authenticated
+
+session = Session()
 
 
 def create_app(env: str = "development", static_folder: str = "../../static"):
@@ -13,11 +18,15 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     config.init_app(app, env)
     db.init_app(app)
     csrf.init_app(app)
+    session.init_app(app)
+    MailService.init_app(app)
 
     from src.web.controllers import blueprints
 
     for bp in blueprints:
         app.register_blueprint(bp)
+
+    app.add_template_global(is_authenticated, "is_authenticated")
 
     @app.before_request
     def hook():
