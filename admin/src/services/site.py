@@ -1,11 +1,12 @@
 import typing as t
 
 import typing_extensions as te
-from sqlalchemy import exc, select, update
+from sqlalchemy import exc, insert, select, update
 
 from src.core.db import db
 from src.core.models.site import SiteConfig, defaultSiteConfig
-from src.services.base import BaseService, BaseServiceError, filter_nones
+from src.services.base import BaseService, BaseServiceError
+from src.utils import funcs
 
 
 class PartialSiteConfig(t.TypedDict):
@@ -51,7 +52,7 @@ class SiteService(BaseService):
         try:
             site_config = db.session.execute(
                 update(SiteConfig)
-                .values(**filter_nones(kwargs))
+                .values(**funcs.filter_nones(kwargs))
                 .returning(SiteConfig)
             ).scalar()
             db.session.commit()
@@ -60,9 +61,21 @@ class SiteService(BaseService):
             raise SiteServiceError(f"Could not update site config: {e.code}")
 
         if site_config is None:
-            raise SiteServiceError(
-                "Could not retrieve site config after update"
-            )
+            try:
+                site_config = db.session.execute(
+                    insert(SiteConfig).values(**kwargs).returning(SiteConfig)
+                ).scalar()
+                db.session.commit()
+            except exc.SQLAlchemyError as e:
+                db.session.rollback()
+                raise SiteServiceError(
+                    f"Could not insert site config on missing config: {e.code}"
+                )
+
+            if site_config is None:
+                raise SiteServiceError(
+                    "Could not retrieve site config after insert"
+                )
 
         return site_config
 
