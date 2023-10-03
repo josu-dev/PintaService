@@ -4,13 +4,18 @@ from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, StringField
 from wtforms import validators as v
 
-from src.services.auth import FullLoginUser, FullPreRegisterUser
+from src.services.auth import FullPreRegisterUser
 
 
 class FullRegisterUser(TypedDict):
     username: str
     password: str
     password_con: str
+
+
+class FullLoginUser(TypedDict):
+    email: str
+    password: str
 
 
 class UserLogin(FlaskForm):
@@ -41,7 +46,11 @@ class UserPreRegister(FlaskForm):
     )
     email = EmailField(
         "Email",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired(),
+            v.Length(min=0, max=32),
+            v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
+        ],
     )
 
     def values(self) -> FullPreRegisterUser:

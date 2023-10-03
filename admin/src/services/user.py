@@ -87,4 +87,34 @@ class UserService(BaseService):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
 
+    @classmethod
+    def validate_email_password(cls, email: str, password: str):
+        """Check if the mail and password are valid"""
+        user = cls.get_by_email(email)
+
+        if user and bcrypt.check_password_hash(
+            user.password, password.encode("utf-8")
+        ):
+            return user
+
+        return None
+
+    @classmethod
+    def exist_user_with_email(cls, email: str):
+        """check if the email is valid"""
+
+        return (
+            db.session.query(User).filter(User.email == email).first()
+            is not None
+        )
+
+    @classmethod
+    def exist_user_with_username(cls, username: str):
+        """check if the username is valid"""
+
+        return (
+            db.session.query(User).filter(User.username == username).first()
+            is not None
+        )
+
     # TODO Filter by email and Active/unactive

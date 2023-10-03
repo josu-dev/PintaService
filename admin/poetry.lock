@@ -188,6 +188,20 @@ tomli = ">=2.0.1,<3.0.0"
 websockets = ">=11.0.3,<12.0.0"
 
 [[package]]
+name = "flask-mail"
+version = "0.9.1"
+description = "Flask extension for sending email"
+optional = false
+python-versions = "*"
+files = [
+    {file = "Flask-Mail-0.9.1.tar.gz", hash = "sha256:22e5eb9a940bf407bcf30410ecc3708f3c56cc44b29c34e1726fe85006935f41"},
+]
+
+[package.dependencies]
+blinker = "*"
+Flask = "*"
+
+[[package]]
 name = "flask-session"
 version = "0.5.0"
 description = "Server-side session support for Flask"
@@ -959,4 +973,4 @@ testing = ["big-O", "jaraco.functools", "jaraco.itertools", "more-itertools", "p
 [metadata]
 lock-version = "2.0"
 python-versions = "^3.8"
-content-hash = "1916b6f3c6dec3b0a70ee38ff6eef14a22f401487b2c9bc935b77bdf9c4c42ae"
+content-hash = "010d15dde6e5249e9b9cac8fca0a5b1aeb5ab97e846457049d6af7457fe7a2af"

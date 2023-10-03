@@ -1,13 +1,14 @@
 import secrets
+from datetime import datetime, timedelta
 from typing import TypedDict
 
+from flask import request
 from typing_extensions import Unpack
 
-from src.core.bcrypt import bcrypt
 from src.core.db import db
 from src.core.models.pre_regis_user import PreRegisterUser
-from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
+from src.services.mail import MailService
 
 
 class FullPreRegisterUser(TypedDict):
@@ -16,18 +17,13 @@ class FullPreRegisterUser(TypedDict):
     email: str
 
 
-class FullLoginUser(TypedDict):
-    email: str
-    password: str
-
-
 class AuthServiceError(BaseServiceError):
     pass
 
 
 class AuthService(BaseService):
     @classmethod
-    def get_pre_register_user_by_email(cls, email: str):
+    def get_pre_user_by_email(cls, email: str):
         """returns the user according to email"""
         return (
             db.session.query(PreRegisterUser)
@@ -36,32 +32,20 @@ class AuthService(BaseService):
         )
 
     @classmethod
-    def get_user_by_email(cls, email: str):
-        """returns the user according to email"""
-        return db.session.query(User).filter(User.email == email).first()
-
-    @classmethod
-    def validate_email_password(cls, email: str, password: str):
-        """Check if the mail and password are valid"""
-        user = cls.get_user_by_email(email)
-
-        if user and bcrypt.check_password_hash(
-            user.password, password.encode("utf-8")
-        ):
-            return user
-
-        return None
-
-    @classmethod
     def create_pre_user(cls, **kwargs: Unpack[FullPreRegisterUser]):
         """Create parcial user in database"""
-        if AuthService.get_user_by_email(kwargs["email"]):
+        if AuthService.get_pre_user_by_email(kwargs["email"]):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
         token = secrets.token_urlsafe(64)
         user = PreRegisterUser(**kwargs, token=token)
-
         db.session.add(user)
         db.session.commit()
+        MailService.send_mail(
+            "Confirmacion de Registro",
+            user.email,
+            f"Finalice el registro entrando al siguiente link y completando con sus datos: <br/>{request.host_url}register?token={token}",  # noqa: E501
+        )
+        return user
 
     @classmethod
     def delete_pre_user(cls, token: str):  # consultar
@@ -73,7 +57,7 @@ class AuthService(BaseService):
         db.session.commit()
 
     @classmethod
-    def get_pre_user(cls, token: str):
+    def get_pre_user_by_token(cls, token: str):
         """check if the token is valid"""
 
         return (
@@ -81,3 +65,21 @@ class AuthService(BaseService):
             .filter(PreRegisterUser.token == token)
             .first()
         )
+
+    @classmethod
+    def exist_pre_user_with_email(cls, email: str):
+        """check if the token is valid"""
+
+        return (
+            db.session.query(PreRegisterUser)
+            .filter(PreRegisterUser.email == email)
+            .first()
+            is not None
+        )
+
+    @classmethod
+    def token_expired(cls, token_date: datetime):
+        current_date = datetime.now()
+        difference = current_date - token_date
+        one_day = timedelta(days=1)
+        return difference > one_day
