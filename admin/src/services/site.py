@@ -5,7 +5,8 @@ from sqlalchemy import exc, insert, select, update
 
 from src.core.db import db
 from src.core.models.site import SiteConfig, defaultSiteConfig
-from src.services.base import BaseService, BaseServiceError, filter_nones
+from src.services.base import BaseService, BaseServiceError
+from src.utils import funcs
 
 
 class PartialSiteConfig(t.TypedDict):
@@ -51,7 +52,7 @@ class SiteService(BaseService):
         try:
             site_config = db.session.execute(
                 update(SiteConfig)
-                .values(**filter_nones(kwargs))
+                .values(**funcs.filter_nones(kwargs))
                 .returning(SiteConfig)
             ).scalar()
             db.session.commit()
