@@ -71,3 +71,30 @@ def edit_user(user_id: int):
         return redirect(url_for("admin.show_users"))
 
     return render_template("admin/edit_user.html", user=user, form=form)
+
+
+@bp.route("/delete_user/<int:user_id>", methods=["GET"])
+def delete_user(user_id: int):
+    user = UserService.get_user(user_id)
+    if not user:
+        flash("Usuario no encontrado.", "error")
+        return redirect(url_for("admin.show_users"))
+    else:
+        UserService.delete_user(user_id)
+        flash("Usuario eliminado con éxito.", "success")
+    return redirect(url_for("admin.show_users"))
+
+
+@bp.route("/toggle_active/<int:user_id>", methods=["GET"])
+def toggle_active(user_id: int):
+    user = UserService.get_user(user_id)
+    if not user:
+        flash("Usuario no encontrado.", "error")
+        return redirect(url_for("admin.show_users"))
+    else:
+        UserService.toggle_active(user_id)
+        if user.is_active:
+            flash("Usuario activado con éxito.", "success")
+        else:
+            flash("Usuario desactivado con éxito.", "success")
+    return redirect(url_for("admin.show_users"))

@@ -21,14 +21,14 @@
             <a href="edit_user/{{ user.id }}" class="ml-2 text-blue-500">Editar</a>
             
             <!-- Botón para Activar/Desactivar -->
-            {% if user.active %}
-                <a href="/desactivar/{{ user.id }}" class="ml-2 text-red-500">Desactivar</a>
+            {% if user.is_active %}
+                <a href="toggle_active/{{ user.id }}" class="ml-2 text-red-400">Desactivar</a>
             {% else %}
-                <a href="/activar/{{ user.id }}" class="ml-2 text-green-500">Activar</a>
+                <a href="toggle_active/{{ user.id }}" class="ml-2 text-green-500">Activar</a>
             {% endif %}
             
             <!-- Botón para Eliminar -->
-            <a href="/eliminar/{{ user.id }}" class="ml-2 text-red-500">Eliminar</a>
+            <a href="delete_user/{{ user.id }}" class="ml-2 text-red-500">Eliminar</a>
         </li>
     {% endfor %}
   </ul>

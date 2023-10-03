@@ -77,4 +77,14 @@ class UserService(BaseService):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
 
+    @classmethod
+    def toggle_active(cls, id: int):
+        """Toggle user active status"""
+        user = db.session.query(User).get(id)
+        if user:
+            user.is_active = not user.is_active
+            db.session.commit()
+            return user
+        return None
+
     # TODO Filter by email and Active/unactive
