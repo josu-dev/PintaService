@@ -89,7 +89,6 @@ def seed_site_users(db: SQLAlchemy):
         address="155",
         phone="2213169050",
     )
-
     UserService.create_user(
         firstname="Franco",
         lastname="Cirielli",
@@ -103,5 +102,3 @@ def seed_site_users(db: SQLAlchemy):
         address="15 y 47",
         phone="2355572726",
     )
-
-    db.session.commit()
