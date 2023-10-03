@@ -1,15 +1,18 @@
+from datetime import datetime
+
 from flask import (
     Blueprint,
+    redirect,
     render_template,
     request,
-    redirect,
-    url_for,
     session,
+    url_for,
 )
-from src.web.forms.user import UserPreRegister
+
 from src.services.auth import AuthService
-from src.web.forms.auth import UserLogin
+from src.services.user import UserService
 from src.web.controllers import _helpers as h
+from src.web.forms.auth import UserLogin, UserPreRegister, UserRegister
 
 bp = Blueprint("root", __name__)
 
@@ -32,6 +35,7 @@ def logout():
 
 
 @bp.route("/login", methods=["GET", "POST"])
+@h.unauthenticated_route()
 def login():
     if request.method == "POST":
         form = UserLogin(request.form)
@@ -50,6 +54,7 @@ def login():
 
 
 @bp.route("/pre_register", methods=["GET", "POST"])
+@h.unauthenticated_route()
 def pre_register():
     form = UserPreRegister(request.form)
 
@@ -65,10 +70,47 @@ def pre_register():
     return render_template("pre_register.html")
 
 
-@bp.route("/register", methods=["GET"])
+@bp.route("/register", methods=["GET", "POST"])
+@h.unauthenticated_route()
 def register():
-    # if()
-    return render_template("register.html")
+    token = request.args.get("token")
+    if not token:
+        h.flash_info("realice el registro o revise su casilla de email")
+        return redirect(url_for("root.pre_register"))
+
+    user = AuthService.get_pre_user(token)
+    if user is None:
+        return redirect(url_for("root.pre_register"))
+
+    if user.created_at.day != datetime.now().day:
+        AuthService.delete_pre_user(token)
+        h.flash_info("El token invalido, realice el registro nuevamente")
+        return redirect(url_for("root.pre_register"))
+
+    if request.method == "GET":
+        return render_template("register.html")
+
+    form = UserRegister(request.form)
+    if not form.validate():
+        return render_template("register.html")
+
+    form_values = form.values()
+    UserService.create_user(
+        username=form_values["username"],
+        password=form_values["password"],
+        **user.asdict(
+            ("email", "firstname", "lastname"),
+        ),
+        document_type="",
+        document_number="",
+        gender="",
+        gender_other="",
+        address="",
+        phone="",
+    )
+    AuthService.delete_pre_user(token)
+    h.flash_success("Se ha registrado exitosamente")
+    return redirect(url_for("root.login"))
 
 
 @bp.route("/search_user", methods=["GET"])

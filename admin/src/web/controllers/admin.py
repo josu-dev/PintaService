@@ -4,7 +4,7 @@ from web.forms.user import UserUpdateForm
 
 from src.services.database import DatabaseService
 from src.services.site import SiteService
-from src.services.user import AuthService
+from src.services.user import UserService
 from src.web.controllers import _helpers as h
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
@@ -43,12 +43,12 @@ def create_user():
     """Create an user form page"""
     form = UserUpdateForm(request.form)
     if request.method == "POST":
-        AuthService.create_user(**form.values())
+        UserService.create_user(**form.values())
     return render_template("admin/create_user.html", form=form)
 
 
 @bp.route("/users", methods=["GET"])
 def show_users():
     """Show all users in the database"""
-    users = AuthService.get_users()
+    users = UserService.get_users()
     return render_template("admin/users.html", users=users)

@@ -1,12 +1,12 @@
-from typing_extensions import Unpack
-from typing import TypedDict
 import secrets
+from typing import TypedDict
 
-from src.core.db import db
-from src.core.models.user import User
+from typing_extensions import Unpack
 
-from src.core.models.pre_regis_user import PreRegisterUser
 from src.core.bcrypt import bcrypt
+from src.core.db import db
+from src.core.models.pre_regis_user import PreRegisterUser
+from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -26,6 +26,15 @@ class AuthServiceError(BaseServiceError):
 
 
 class AuthService(BaseService):
+    @classmethod
+    def get_pre_register_user_by_email(cls, email: str):
+        """returns the user according to email"""
+        return (
+            db.session.query(PreRegisterUser)
+            .filter(PreRegisterUser.email == email)
+            .first()
+        )
+
     @classmethod
     def get_user_by_email(cls, email: str):
         """returns the user according to email"""
@@ -48,8 +57,27 @@ class AuthService(BaseService):
         """Create parcial user in database"""
         if AuthService.get_user_by_email(kwargs["email"]):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
-        token = secrets.token_urlsafe(128)
+        token = secrets.token_urlsafe(64)
         user = PreRegisterUser(**kwargs, token=token)
 
         db.session.add(user)
         db.session.commit()
+
+    @classmethod
+    def delete_pre_user(cls, token: str):  # consultar
+        """delete pre-user"""
+
+        db.session.query(PreRegisterUser).where(
+            PreRegisterUser.token == token
+        ).delete()
+        db.session.commit()
+
+    @classmethod
+    def get_pre_user(cls, token: str):
+        """check if the token is valid"""
+
+        return (
+            db.session.query(PreRegisterUser)
+            .filter(PreRegisterUser.token == token)
+            .first()
+        )

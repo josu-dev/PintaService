@@ -1,8 +1,9 @@
-import flask
 import typing as t
+from functools import wraps
+
+import flask
 from flask import typing as tf
 from flask.sessions import SessionMixin
-from functools import wraps
 
 
 def flash_info(message: str):
@@ -40,6 +41,24 @@ def login_required(
                 if message:
                     flash_info(message)
                 return flask.redirect(flask.url_for("root.login"))
+
+            return func(*args, **kwargs)
+
+        return t.cast(TRoute, wrapper)
+
+    return decorator
+
+
+def unauthenticated_route(
+    message: t.Union[str, t.Literal[False]] = "",
+) -> t.Callable[[TRoute], TRoute]:
+    def decorator(func: TRoute) -> TRoute:
+        @wraps(func)
+        def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
+            if is_authenticated(flask.session):
+                if message:
+                    flash_info(message)
+                return flask.redirect("/")
 
             return func(*args, **kwargs)
 

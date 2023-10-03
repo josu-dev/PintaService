@@ -1,11 +1,10 @@
 from flask import Flask, render_template, request
 from werkzeug import exceptions
 
+from flask_session import Session
 from src.core import config, csrf, db, seed
 from src.services.site import SiteService
 from src.web.controllers._helpers import is_authenticated
-
-from flask_session import Session
 
 session = Session()
 

@@ -2,11 +2,10 @@ from typing import List, Optional, TypedDict
 
 from typing_extensions import Unpack
 
+from src.core.bcrypt import bcrypt
 from src.core.db import db
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
-
-from src.core.bcrypt import bcrypt
 
 
 class PartialUserConfig(TypedDict):
@@ -27,7 +26,7 @@ class UserServiceError(BaseServiceError):
     pass
 
 
-class AuthService(BaseService):
+class UserService(BaseService):
     """Create, read, update and delete users."""
 
     UserServiceError = UserServiceError
@@ -67,7 +66,7 @@ class AuthService(BaseService):
         **kwargs: Unpack[PartialUserConfig],
     ):
         """Create user in database"""
-        if AuthService.get_by_username(kwargs["username"]):
+        if UserService.get_by_username(kwargs["username"]):
             raise UserServiceError("Username already exists")
 
         hash = bcrypt.generate_password_hash(
