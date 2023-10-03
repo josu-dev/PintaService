@@ -32,7 +32,7 @@ class UserService(BaseService):
     @classmethod
     def get_user(cls, user_id: int):
         """Get an user from database"""
-        db.session.get(User, user_id)
+        return db.session.get(User, user_id)
 
     @classmethod
     def update_user(cls, user_id: int, **kwargs: Unpack[PartialUserConfig]):

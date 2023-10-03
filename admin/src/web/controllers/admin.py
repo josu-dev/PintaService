@@ -1,6 +1,6 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request, url_for
 from web.forms.site import SiteUpdateForm
-from web.forms.user import UserUpdateForm
+from web.forms.user import UserCreateForm, UserUpdateForm
 
 from src.services.database import DatabaseService
 from src.services.site import SiteService
@@ -37,13 +37,14 @@ def check_db():
     return "Database is not running", 500
 
 
-# TODO Lucho podes tocar lo que necesites de aca para mostrar
 @bp.route("/create_user", methods=["GET", "POST"])
 def create_user():
     """Create an user form page"""
-    form = UserUpdateForm(request.form)
-    if request.method == "POST":
+    form = UserCreateForm(request.form)
+    if request.method == "POST" and form.validate():
         UserService.create_user(**form.values())
+        flash("Usuario creado con éxito.", "success")
+        return redirect(url_for("admin.show_users"))
     return render_template("admin/create_user.html", form=form)
 
 
@@ -52,3 +53,21 @@ def show_users():
     """Show all users in the database"""
     users = UserService.get_users()
     return render_template("admin/users.html", users=users)
+
+
+@bp.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
+def edit_user(user_id: int):
+    """Edit an existing user"""
+    user = UserService.get_user(user_id)
+    if not user:
+        flash("Usuario no encontrado.", "error")
+        return redirect(url_for("admin.show_users"))
+
+    form = UserUpdateForm(request.form, obj=user)
+
+    if request.method == "POST" and form.validate():
+        UserService.update_user(user_id, **form.values())
+        flash("Usuario actualizado con éxito.", "success")
+        return redirect(url_for("admin.show_users"))
+
+    return render_template("admin/edit_user.html", user=user, form=form)
