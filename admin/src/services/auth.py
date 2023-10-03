@@ -48,7 +48,7 @@ class AuthService(BaseService):
         return user
 
     @classmethod
-    def delete_pre_user(cls, token: str):  # consultar
+    def delete_pre_user(cls, token: str):
         """delete pre-user"""
 
         db.session.query(PreRegisterUser).where(
@@ -58,8 +58,6 @@ class AuthService(BaseService):
 
     @classmethod
     def get_pre_user_by_token(cls, token: str):
-        """check if the token is valid"""
-
         return (
             db.session.query(PreRegisterUser)
             .filter(PreRegisterUser.token == token)
