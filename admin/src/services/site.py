@@ -9,7 +9,14 @@ from src.services.base import BaseService, BaseServiceError
 from src.utils import funcs
 
 
-class PartialSiteConfig(t.TypedDict):
+class SiteConfigParams(t.TypedDict):
+    page_size: int
+    contact_info: str
+    maintenance_active: bool
+    maintenance_message: str
+
+
+class SiteConfigPartialParams(t.TypedDict):
     page_size: te.NotRequired[int]
     contact_info: te.NotRequired[str]
     maintenance_active: te.NotRequired[bool]
@@ -47,7 +54,7 @@ class SiteService(BaseService):
 
     @classmethod
     def update_site_config(
-        cls, **kwargs: te.Unpack[PartialSiteConfig]
+        cls, **kwargs: te.Unpack[SiteConfigPartialParams]
     ) -> SiteConfig:
         try:
             site_config = db.session.execute(
