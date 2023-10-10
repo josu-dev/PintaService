@@ -181,6 +181,7 @@ class Config:
     MAIL_USE_TLS: bool
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
+    MAIL_DEFAULT_SENDER: str
 
     @classmethod
     def load_env_config(cls) -> None:
@@ -215,6 +216,7 @@ class Config:
         )
         cls.MAIL_USERNAME = env_or_error("MAIL_USERNAME")
         cls.MAIL_PASSWORD = env_or_error("MAIL_PASSWORD")
+        cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
 
 
 def init_app(app: Flask, env: str) -> None:
