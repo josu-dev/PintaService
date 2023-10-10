@@ -1,6 +1,5 @@
 from flask_wtf import FlaskForm
-from typing_extensions import cast
-from wtforms import EmailField, IntegerField, PasswordField, StringField
+from wtforms import EmailField, PasswordField, StringField
 from wtforms import validators as v
 
 from src.services.user import PartialUserConfig
@@ -31,9 +30,9 @@ class UserUpdateForm(FlaskForm):
         "Tipo de documento",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
-    document_number = IntegerField(
+    document_number = StringField(
         "Número de documento",
-        validators=[v.DataRequired(), v.Length(min=0, max=8)],
+        validators=[v.DataRequired(), v.Length(min=8, max=8)],
     )
     gender = StringField(
         "Género",
@@ -47,12 +46,22 @@ class UserUpdateForm(FlaskForm):
         "Dirección",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
-    phone = IntegerField(
+    phone = StringField(
         "Teléfono",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[v.DataRequired()],
     )
 
     def values(self) -> PartialUserConfig:
-        data = self.data  # type: ignore
-        data.pop("csrf_token")
-        return cast(PartialUserConfig, data)
+        return {
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "password": self.password.data,
+            "email": self.email.data,
+            "username": self.username.data,
+            "document_type": self.document_type.data,
+            "document_number": self.document_number.data,
+            "gender": self.gender.data,
+            "gender_other": self.gender_other.data,
+            "address": self.address.data,
+            "phone": self.phone.data,
+        }
