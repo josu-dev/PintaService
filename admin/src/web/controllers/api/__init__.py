@@ -10,16 +10,14 @@ for blueprint in _blueprints:
     bp.register_blueprint(blueprint)
 
 
-APIError = _base.APIError
+APIError = _base.BaseAPIError
 
-API_BAD_REQUEST_RESPONSE = _base.API_BAD_REQUEST_RESPONSE
 API_NOT_FOUND_RESPONSE = _base.API_NOT_FOUND_RESPONSE
 API_METHOD_NOT_ALLOWED_RESPONSE = _base.API_METHOD_NOT_ALLOWED_RESPONSE
-API_INTERNAL_SERVER_ERROR_RESPONSE = _base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
 
-def handle_api_error(e: _base.APIError):
+def handle_api_error(e: _base.BaseAPIError):
     return (
-        {"message": e.message},
+        e.asdict(),
         e.status_code,
     )
