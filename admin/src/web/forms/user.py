@@ -1,9 +1,8 @@
 from flask_wtf import FlaskForm
-from typing_extensions import cast
-from wtforms import EmailField, IntegerField, PasswordField, StringField
+from wtforms import EmailField, PasswordField, StringField
 from wtforms import validators as v
 
-from src.services.user import PartialUserConfig
+from src.services.user import UpdateUserConfig, UserConfig
 
 
 class UserCreateForm(FlaskForm):
@@ -31,8 +30,9 @@ class UserCreateForm(FlaskForm):
         "Tipo de documento",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
-    document_number = IntegerField(
-        "Número de documento", [v.NumberRange(min=0, max=8)]
+    document_number = StringField(
+        "Número de documento",
+        validators=[v.DataRequired(), v.Length(min=8, max=8)],
     )
     gender = StringField(
         "Género",
@@ -46,12 +46,22 @@ class UserCreateForm(FlaskForm):
         "Dirección",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
-    phone = IntegerField("Telefono", [v.NumberRange(min=0)])
+    phone = StringField("Telefono", [v.Length(min=0, max=16)])
 
-    def values(self) -> PartialUserConfig:
-        data = self.data  # type: ignore
-        data.pop("csrf_token")
-        return cast(PartialUserConfig, data)
+    def values(self) -> UserConfig:
+        return {
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "password": self.password.data,
+            "email": self.email.data,
+            "username": self.username.data,
+            "document_type": self.document_type.data,
+            "document_number": self.document_number.data,
+            "gender": self.gender.data,
+            "address": self.address.data,
+            "phone": self.phone.data,
+            "gender_other": self.gender_other.data,
+        }
 
 
 class UserUpdateForm(FlaskForm):
@@ -83,9 +93,16 @@ class UserUpdateForm(FlaskForm):
         "Dirección",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
-    phone = IntegerField("Telefono", [v.NumberRange(min=0)])
+    phone = StringField("Telefono", [v.Length(min=0, max=16)])
 
-    def values(self) -> PartialUserConfig:
-        data = self.data  # type: ignore
-        data.pop("csrf_token")
-        return cast(PartialUserConfig, data)
+    def values(self) -> UpdateUserConfig:
+        return {
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "document_type": self.document_type.data,
+            "document_number": self.document_number.data,
+            "gender": self.gender.data,
+            "gender_other": self.gender_other.data,
+            "address": self.address.data,
+            "phone": self.phone.data,
+        }

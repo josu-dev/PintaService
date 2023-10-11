@@ -1,0 +1,48 @@
+{% macro default(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-zinc-600 hover:bg-zinc-700 focus:ring-4 focus:ring-zinc-500 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-zinc-950">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro primary(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-orange-700 hover:bg-orange-800 focus:ring-4 focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-orange-600 dark:hover:bg-orange-700 dark:focus:ring-orange-800">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro secondary(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-lime-700 hover:bg-lime-800 focus:ring-4 focus:ring-lime-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-lime-600 dark:hover:bg-lime-700 dark:focus:ring-lime-800">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro success(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-green-600 hover:bg-green-700 focus:ring-4 focus:ring-green-500 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-green-950">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro info(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-blue-600 hover:bg-blue-700 focus:ring-4 focus:ring-blue-500 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-blue-950">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro warning(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-yellow-600 hover:bg-yellow-700 focus:ring-4 focus:ring-yellow-500 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:focus:ring-yellow-950">{{
+  text
+  }}</button>
+{% endmacro %}
+
+{% macro error(text, type="button") %}
+<button type="{{ type }}"
+  class="focus:outline-none text-white bg-red-700 hover:bg-red-800 focus:ring-4 focus:ring-red-300 font-medium rounded-lg text-sm px-5 py-2.5 mr-2 mb-2 dark:bg-red-600 dark:hover:bg-red-700 dark:focus:ring-red-900">{{
+  text
+  }}</button>
+{% endmacro %}
