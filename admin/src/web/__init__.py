@@ -1,11 +1,9 @@
-from flask import Flask, g, render_template, request
-from werkzeug import exceptions
+from flask import Flask
 
 from flask_session import Session
 from src.core import config, csrf, db, seed
 from src.services.mail import MailService
-from src.services.site import SiteService
-from src.web.controllers._helpers import is_authenticated
+from src.web import controllers
 
 session = Session()
 
@@ -20,48 +18,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     csrf.init_app(app)
     session.init_app(app)
     MailService.init_app(app)
-
-    from src.web.controllers import blueprints
-
-    for bp in blueprints:
-        app.register_blueprint(bp)
-
-    app.add_template_global(is_authenticated, "is_authenticated")
-
-    @app.before_request
-    def hook():
-        if request.path.startswith("/login") or request.path.startswith(
-            "/static"
-        ):
-            return None
-
-        site_config = SiteService.get_site_config()
-        if (
-            not site_config.maintenance_active
-            or request.path.startswith("/api")
-            or request.args.get("maintenance") != "true"
-        ):
-            g.site_config = site_config
-            return None
-
-        return (
-            render_template(
-                "maintenance.html",
-                maintenance_message=site_config.maintenance_message,
-            ),
-            503,
-        )
-
-    @app.errorhandler(404)
-    def page_not_found(error: exceptions.NotFound):
-        return (
-            render_template(
-                "error.html",
-                error_code="404",
-                error_message="Página no encontrada",
-            ),
-            404,
-        )
+    controllers.init_app(app)
 
     @app.cli.command("reset_db")
     def reset_db():
