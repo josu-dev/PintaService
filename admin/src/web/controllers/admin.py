@@ -49,7 +49,7 @@ def check_db_get():
 
 @bp.get("/user")
 def user_get():
-    form = UserUpdateForm(request.form)
+    form = UserCreateForm(request.form)
     return render_template("admin/user.html", form=form)
 
 
@@ -60,6 +60,7 @@ def user_post():
         UserService.create_user(**form.values())
         h.flash_success("Usuario creado")
         status_code = status.HTTP_200_OK
+        return redirect(url_for("admin.users_get"))
     else:
         status_code = status.HTTP_400_BAD_REQUEST
 
@@ -75,46 +76,57 @@ def users_get():
     return render_template("admin/users.html", users=users)
 
 
-@bp.route("/edit_user/<int:user_id>", methods=["GET", "POST"])
-def edit_user(user_id: int):
-    """Edit an existing user"""
+@bp.get("/user/<int:user_id>/edit")
+def user_edit_get(user_id: int):
+    """Show the edit user form with his actual values"""
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.show_users"))
+        return redirect(url_for("admin.users_get"))
 
-    form = UserUpdateForm(request.form, obj=user)
+    form = UserUpdateForm(obj=user)
+    return render_template("admin/edit_user.html", user=user, form=form)
 
-    if request.method == "POST" and form.validate():
+
+@bp.post("/user/<int:user_id>/edit")
+def edit_user_post(user_id: int):
+    """Edit the user with the new values"""
+    user = UserService.get_user(user_id)
+    if not user:
+        flash("Usuario no encontrado.", "error")
+        return redirect(url_for("admin.users_get"))
+
+    form = UserUpdateForm(request.form)
+    if form.validate():
         UserService.update_user(user_id, **form.values())
         flash("Usuario actualizado con éxito.", "success")
-        return redirect(url_for("admin.show_users"))
+        return redirect(url_for("admin.users_get"))
 
     return render_template("admin/edit_user.html", user=user, form=form)
 
 
-@bp.route("/delete_user/<int:user_id>", methods=["GET"])
-def delete_user(user_id: int):
+@bp.post("/user/<int:user_id>/delete")
+def user_delete_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.show_users"))
+        return redirect(url_for("admin.users_get"))
     else:
         UserService.delete_user(user_id)
         flash("Usuario eliminado con éxito.", "success")
-    return redirect(url_for("admin.show_users"))
+    return redirect(url_for("admin.users_get"))
 
 
-@bp.route("/toggle_active/<int:user_id>", methods=["GET"])
+@bp.post("/user/<int:user_id>/toggle_active")
 def toggle_active(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.show_users"))
+        return redirect(url_for("admin.users_get"))
     else:
         UserService.toggle_active(user_id)
         if user.is_active:
             flash("Usuario activado con éxito.", "success")
         else:
             flash("Usuario desactivado con éxito.", "success")
-    return redirect(url_for("admin.show_users"))
+    return redirect(url_for("admin.users_get"))

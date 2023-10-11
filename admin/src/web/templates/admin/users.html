@@ -11,25 +11,33 @@
 
   <ul>
     {% for user in users %}
-        <li>
-            {{ user.email }}
-            {{ user.username }}
-            {{ user.firstname }}
-            {{ user.lastname }}
-            
-            <!-- Botón para Editar -->
-            <a href="edit_user/{{ user.id }}" class="ml-2 text-blue-500">Editar</a>
-            
-            <!-- Botón para Activar/Desactivar -->
-            {% if user.is_active %}
-                <a href="toggle_active/{{ user.id }}" class="ml-2 text-red-400">Desactivar</a>
-            {% else %}
-                <a href="toggle_active/{{ user.id }}" class="ml-2 text-green-500">Activar</a>
-            {% endif %}
-            
-            <!-- Botón para Eliminar -->
-            <a href="delete_user/{{ user.id }}" class="ml-2 text-red-500">Eliminar</a>
-        </li>
+      <li>
+          {{ user.email }}
+          {{ user.username }}
+          {{ user.firstname }}
+          {{ user.lastname }}
+          
+          <!-- Edit -->
+          <a href="/admin/user/{{ user.id }}/edit" class="ml-2 text-blue-500">Editar</a>
+          
+          <!-- Activate/Deactivate -->
+    
+          <form method="POST" action="/admin/user/{{ user.id }}/toggle_active" style="display: inline;">
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+              <button type="submit" class="ml-2 text-{{ 'red' if user.is_active else 'green' }}-500">
+                  {{ 'Desactivar' if user.is_active else 'Activar' }}
+              </button>
+          </form>
+          
+          <!-- Delete -->
+          
+          <form method="POST" action="/admin/user/{{ user.id }}/delete" style="display: inline;">
+              <input type="hidden" name="_method" value="DELETE"> 
+              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+              <button type="submit" class="ml-2 text-red-500">Eliminar</button>
+          </form>
+
+      </li>
     {% endfor %}
   </ul>
 </main>
