@@ -23,7 +23,7 @@ def index():
     return render_template("index.html")
 
 
-@bp.route("/logout", methods=["GET"])  # that should be done with a post
+@bp.route("/logout", methods=["POST"])
 def logout():
     if session.get("user"):
         del session["user"]

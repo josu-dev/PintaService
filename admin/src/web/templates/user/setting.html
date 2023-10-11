@@ -1,0 +1,34 @@
+{% extends "layout.html" %}
+{% import "_macros/form.html" as Form %}
+
+{% block head %}
+<title>Pinta Service</title>
+
+<script src="{{ url_for('static', filename='js/user_setting.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col items-center my-4">
+    <form class="flex flex-col items-center gap-6 md:max-w-sm " method="post">
+        {{ Form.render_field(form.firstname) }}
+        {{ Form.render_field(form.lastname) }}
+        {{ Form.render_field(form.document_number) }}
+        {{ Form.render_field(form.address) }}
+        {{ Form.render_field(form.phone) }}
+        <div class="flex items-center flex-col">
+            <label class="mb-2">Genero</label>
+            <select name="gender" id="select" value="pene">
+                <option value="current_gender" hidden>{{user.gender}}</option>
+                {% for gender in genders %}
+                <option value={{gender[0]}}>{{gender[1]}}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="flex flex-row gap-x-4">
+            <button type="reset" class="bg-red-500 px-10 py-2">Cancelar</button>
+            <button class="bg-red-500 px-10 py-2">Confirmar</button>
+        </div>
+    </form>
+</main>
+{% endblock %}
