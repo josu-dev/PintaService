@@ -1,6 +1,7 @@
-from src.web.controllers import admin, index
+from src.web.controllers import admin, api, index
 
 blueprints = (
     index.bp,
     admin.bp,
+    api.bp,
 )
