@@ -49,12 +49,12 @@ Some of the most important files/folders are:
     - [Using pgadmin](#using-pgadmin)
     - [Resetting the database](#resetting-the-database)
   - [Editor setup (VSCode)](#editor-setup-vscode)
-    - [Recommend extensions](#recommend-extensions)
-    - [Settings for extensions](#settings-for-extensions)
   - [pre-commit](#pre-commit)
-  - [Dev server](#dev-server)
-    - [Build for production](#build-for-production)
+  - [Development server](#development-server)
+  - [Build for production](#build-for-production)
+  - [Development Mail server](#development-mail-server)
 - [Project layout](#project-layout)
+- [Questions and Answers](#questions-and-answers)
 
 
 <br/>
@@ -122,6 +122,15 @@ SECRET_KEY='development key'
 # WTForms
 WTF_CSRF_ENABLED='True'
 WTF_CSRF_SECRET_KEY='development key'
+
+# Flask-Mail config
+MAIL_SERVER="localhost"
+MAIL_PORT=1025
+MAIL_USE_SSL=False
+MAIL_USE_TLS=False
+MAIL_USERNAME="development username"
+MAIL_PASSWORD="development password"
+MAIL_DEFAULT_SENDER="development@mail.com"
 ```
 
 Optional enviroment variables:
@@ -343,6 +352,35 @@ flask-livetw build
 
 <br/>
 
+### Development Mail server
+
+The development mail server is used to test the email functionality of the project when developing locally.
+
+The suggested mail server is [NodemailerApp](https://nodemailer.com/app/).
+
+Download and install the mail server.
+
+Once installed, open the mail server and click on the "+" button.
+
+Enter the name for the server, for example "service_search".
+
+Once created go to "Local Server" and copy the information into the `.env` file:
+
+```ini
+# Flask-mail
+MAIL_SERVER=
+MAIL_PORT=
+MAIL_USERNAME=
+MAIL_PASSWORD=
+```
+
+> **Note:** The values above are the defaults, if you changed the values in the mail server, you must use the new values instead.
+
+After adding the mail server information it can be started in the app on the "server" tab in the top menu using the "start server" button.
+
+
+<br/>
+
 ## Project layout:
 
 The backend is located in the `admin/` folder.
@@ -358,8 +396,9 @@ The backend is located in the `admin/` folder.
 ┃ ┃ ┃ ┣ 📄 model...
 ┃ ┃ ┃ ┗ 📄 util.py
 ┃ ┃ ┣ 📄 __init__.py
-┃ ┃ ┣ 📄 csrf.py
+┃ ┃ ┣ 📄 bcrypt.py
 ┃ ┃ ┣ 📄 config.py
+┃ ┃ ┣ 📄 csrf.py
 ┃ ┃ ┣ 📄 db.py
 ┃ ┃ ┗ 📄 seed.py
 ┃ ┣ 📁 services/
@@ -426,8 +465,10 @@ Folder and files description:
     This folder contains the models for the project, the `base.py` file contains the base model class and the `util.py` file contains the utilities for working with the models.
 
     > **Note:** The `base.py` file contains the `BaseModel` class that is used as the base class for all the models in the project. This class is used to add common fields and methods to all the models.
+  - `core/bcrypt.py`:
+    This file contains the bcrypt setup for the project.
   - `core/config.py`:
-    This file contains the configuratio setup for the project.
+    This file contains the configuration setup for the project.
   - `core/csrf.py`:
     This file contains the CSRF protection for the project.
   - `core/db.py`:

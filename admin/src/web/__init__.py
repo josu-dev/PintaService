@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request
+from flask import Flask, g, render_template, request
 from werkzeug import exceptions
 
 from flask_session import Session
@@ -30,23 +30,24 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
 
     @app.before_request
     def hook():
-        if (
-            not SiteService.maintenance_active()
-            or request.path.startswith("/api")
-            or request.args.get("maintenance") != "true"
+        if request.path.startswith("/login") or request.path.startswith(
+            "/static"
         ):
             return None
 
-        if request.method == "GET" and (
-            request.path.startswith("/login")
-            or request.path.startswith("/static")
+        site_config = SiteService.get_site_config()
+        if (
+            not site_config.maintenance_active
+            or request.path.startswith("/api")
+            or request.args.get("maintenance") != "true"
         ):
+            g.site_config = site_config
             return None
 
         return (
             render_template(
                 "maintenance.html",
-                maintenance_message=SiteService.maintenance_message(),
+                maintenance_message=site_config.maintenance_message,
             ),
             503,
         )

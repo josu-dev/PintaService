@@ -4,7 +4,6 @@ import jinja2
 from flask import Flask, render_template_string
 from flask_mail import Mail, Message
 
-from src.core.config import Config
 from src.services.base import BaseService, BaseServiceError
 
 EMAIL_RENDERING_ERROR = "El renderizado del template para el body fallo"
@@ -42,7 +41,6 @@ class MailService(BaseService):
             raise MailServiceError(e.message or EMAIL_RENDERING_ERROR)
         msg = Message(
             subject=subject,
-            sender=Config.MAIL_USERNAME,
             recipients=[recipients],
             html=html,
         )
