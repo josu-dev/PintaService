@@ -21,7 +21,7 @@ class UserCreateForm(FlaskForm):
     )
     email = EmailField(
         "Email",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[v.DataRequired(), v.Length(min=0, max=64)],
     )
     username = StringField(
         "Nombre de usuario",
@@ -31,7 +31,9 @@ class UserCreateForm(FlaskForm):
         "Tipo de documento",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
-    IntegerField("Número de documento", [v.NumberRange(min=0, max=8)])
+    document_number = IntegerField(
+        "Número de documento", [v.NumberRange(min=0, max=8)]
+    )
     gender = StringField(
         "Género",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
@@ -44,7 +46,7 @@ class UserCreateForm(FlaskForm):
         "Dirección",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
-    IntegerField("Telefono", [v.NumberRange(min=0)])
+    phone = IntegerField("Telefono", [v.NumberRange(min=0)])
 
     def values(self) -> PartialUserConfig:
         data = self.data  # type: ignore
