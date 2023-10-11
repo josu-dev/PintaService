@@ -7,6 +7,9 @@ from src.services.site import SiteService
 from src.services.user import UserService
 from src.web.controllers import _helpers as h
 
+# from web.forms.service import ServiceUpdateForm
+
+
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
@@ -52,3 +55,24 @@ def show_users():
     """Show all users in the database"""
     users = UserService.get_users()
     return render_template("admin/users.html", users=users)
+
+
+from web.forms.service import ServiceForm
+
+from src.services.service import ServiceService
+
+
+@bp.route("/create_service", methods=["GET", "POST"])
+def create_service():
+    """Create a service form page"""
+    form = ServiceForm(request.form)
+    if request.method == "POST":
+        ServiceService.create_service(**form.values())
+    return render_template("admin/create_service.html", form=form)
+
+
+@bp.route("/services", methods=["GET"])
+def show_services():
+    """Show all services in the database"""
+    services = ServiceService.get_services()
+    return render_template("admin/services.html", services=services)
