@@ -9,6 +9,7 @@ from flask import (
     url_for,
 )
 
+from src.core.enums import DocumentTypes, GenderOptions
 from src.services.auth import AuthService
 from src.services.user import UserService
 from src.web.controllers import _helpers as h
@@ -23,7 +24,7 @@ def index():
     return render_template("index.html")
 
 
-@bp.route("/logout", methods=["GET"])  # that should be done with a post
+@bp.route("/logout", methods=["POST"])
 def logout():
     if session.get("user"):
         del session["user"]
@@ -44,6 +45,7 @@ def login():
             user = UserService.validate_email_password(**form.values())
             if user:
                 session["user"] = user.email
+                session["id"] = user.id
                 h.flash_success("Se inicio sesion correctamente")
                 return redirect(url_for("root.index"))
 
@@ -111,9 +113,9 @@ def register():
         **user.asdict(
             ("email", "firstname", "lastname"),
         ),
-        document_type="",
+        document_type=DocumentTypes.DNI,
         document_number="",
-        gender="",
+        gender=GenderOptions.NOT_SPECIFIED,
         gender_other="",
         address="",
         phone="",

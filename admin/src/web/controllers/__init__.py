@@ -3,12 +3,13 @@ from sqlalchemy.exc import SQLAlchemyError
 from werkzeug import exceptions
 
 from src.services import base
-from src.web.controllers import admin, api, root
+from src.web.controllers import admin, api, root, user
 
 _blueprints = (
     admin.bp,
     api.bp,
     root.bp,
+    user.bp,
 )
 
 
