@@ -1,5 +1,5 @@
 from core.enums import GenderOptions
-from flask import Blueprint, flash, redirect, render_template, request, url_for
+from flask import Blueprint, flash, redirect, render_template, request
 
 from src.services.database import DatabaseService
 from src.services.site import SiteService
@@ -50,7 +50,6 @@ def check_db_get():
 
 @bp.get("/users")
 def users_get():
-    # Maneja la carga inicial de la página sin filtrado
     users = UserService.get_users()
     return render_template("admin/users.html", users=users)
 
@@ -70,11 +69,11 @@ def user_edit_get(user_id: int):
     genders = [(choice.name, choice.value) for choice in GenderOptions]
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.users_get"))
+        return redirect("/admin/users")
 
     form = ProfileUpdateForm(obj=user)
     return render_template(
-        "admin/edit_user.html", user=user, genders=genders, form=form
+        "user/setting.html", user=user, genders=genders, form=form
     )
 
 
@@ -84,15 +83,15 @@ def edit_user_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.users_get"))
+        return redirect("/admin/users")
 
     form = ProfileUpdateForm(request.form)
     if form.validate():
         UserService.update_user(user_id, **form.values())
         flash("Usuario actualizado con éxito.", "success")
-        return redirect(url_for("admin.users_get"))
+        return redirect("/admin/users")
 
-    return render_template("admin/edit_user.html", user=user, form=form)
+    return render_template("user/setting.html", user=user, form=form)
 
 
 @bp.post("/user/<int:user_id>/delete")
@@ -100,11 +99,11 @@ def user_delete_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.users_get"))
+        return redirect("/admin/users")
     else:
         UserService.delete_user(user_id)
         flash("Usuario eliminado con éxito.", "success")
-    return redirect(url_for("admin.users_get"))
+    return redirect("/admin/users")
 
 
 @bp.post("/user/<int:user_id>/toggle_active")
@@ -112,11 +111,11 @@ def toggle_active(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
         flash("Usuario no encontrado.", "error")
-        return redirect(url_for("admin.users_get"))
+        return redirect("/admin/users")
     else:
         UserService.toggle_active(user_id)
         if user.is_active:
             flash("Usuario activado con éxito.", "success")
         else:
             flash("Usuario desactivado con éxito.", "success")
-    return redirect(url_for("admin.users_get"))
+    return redirect("/admin/users")
