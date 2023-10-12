@@ -12,6 +12,7 @@ const labelOtherGender = document.createElement('label');
 
 inputOtherGender.type = "text"
 inputOtherGender.id = "gender_other"
+inputOtherGender.name = "gender_other"
 inputOtherGender.classList.add("mt-2")
 inputOtherGender.required = true
 inputOtherGender.minLength = 4
@@ -27,7 +28,7 @@ otherGender.appendChild(labelOtherGender)
 otherGender.appendChild(inputOtherGender)
 
 select.addEventListener('click', () => {
-    if (select.value === "other") {
+    if (select.value === "OTHER") {
         select.parentElement.appendChild(otherGender)
     } else {
         if (select.parentElement.contains(otherGender)) {

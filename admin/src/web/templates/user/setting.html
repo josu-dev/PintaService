@@ -1,5 +1,6 @@
 {% extends "layout.html" %}
 {% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
 
 {% block head %}
 <title>Pinta Service</title>
@@ -12,22 +13,24 @@
     <form class="flex flex-col items-center gap-6 md:max-w-sm " method="post">
         {{ Form.render_field(form.firstname) }}
         {{ Form.render_field(form.lastname) }}
+        {{ Form.render_field(form.document_type) }}
         {{ Form.render_field(form.document_number) }}
         {{ Form.render_field(form.address) }}
         {{ Form.render_field(form.phone) }}
         <div class="flex items-center flex-col">
             <label class="mb-2">Genero</label>
-            <select name="gender" id="select" value="pene">
-                <option value="current_gender" hidden>{{user.gender}}</option>
+            <select name="gender" id="select" required>
+                <option value="" hidden></option>
                 {% for gender in genders %}
-                <option value={{gender[0]}}>{{gender[1]}}</option>
+                <option value={{gender[0]}} {% if gender[0]==user.gender %} selected {%endif%}>{{gender[1]}}</option>
                 {% endfor %}
             </select>
         </div>
 
         <div class="flex flex-row gap-x-4">
-            <button type="reset" class="bg-red-500 px-10 py-2">Cancelar</button>
-            <button class="bg-red-500 px-10 py-2">Confirmar</button>
+
+            {{Button.primary("Cancelar","reset")}}
+            {{Button.success("Confirmar","submit")}}
         </div>
     </form>
 </main>

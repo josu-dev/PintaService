@@ -1,34 +1,60 @@
 import typing as t
 
-from flask import Blueprint, render_template, session
+from flask import Blueprint, redirect, render_template, request, session
 
+from src.core.enums import GenderOptions
 from src.services.user import UserService
+from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.user import UserUpdateForm
+from src.web.forms.user import ProfileUpdateForm
 
 bp = Blueprint("user", __name__, url_prefix="/user")
 
 
-@bp.route("/setting", methods=["GET", "POST"])
+@bp.get("/setting")
 @h.login_required()
-def user_setting():
-    # if request.method == "GET":
-
+def user_setting_get():
     user = UserService.get_by_email(t.cast(str, session["user"]))
-    form = UserUpdateForm(obj=user)
-    genders = (
-        ("male", "Hombre"),
-        ("female", "Mujer"),
-        ("other", "Otro"),
-        ("none", "Prefiero no elegir"),
-    )
+    form = ProfileUpdateForm(obj=user)
+
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
     return render_template(
         "user/setting.html",
         user=user,
         genders=genders,
         form=form,
     )
-    # if not form.validate():
-    #     h.flash_error("Los datos ingresados son invalidos")
-    #     return render_template("search_user.html")
-    # UserService.update_user(**form.values())
+
+
+@bp.post("/setting")
+@h.login_required()
+def user_setting_post():
+    form = ProfileUpdateForm(request.form)
+    user_setting = UserService.get_by_email(t.cast(str, session.get("user")))
+    if form.validate():
+        try:
+            id_user = t.cast(int, session.get("id"))
+            user_setting = UserService.update_user(id_user, **form.values())
+            if user_setting is None:
+                return redirect("/login")
+            form.process(obj=user_setting)
+            h.flash_success("Configuracion actualizada")
+            status_code = status.HTTP_200_OK
+        except UserService.UserServiceError as e:
+            h.flash_error(e.message)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    else:
+        print(form.errors, flush=True)
+        status_code = status.HTTP_400_BAD_REQUEST
+
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+    return (
+        render_template(
+            "user/setting.html",
+            user=user_setting,
+            genders=genders,
+            form=form,
+        ),
+        status_code,
+    )
