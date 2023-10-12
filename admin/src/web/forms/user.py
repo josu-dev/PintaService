@@ -55,3 +55,10 @@ class ProfileUpdateForm(FlaskForm):
             "address": self.address.data,  # type: ignore
             "phone": self.phone.data,  # type: ignore
         }
+
+
+class UserSearchForm(FlaskForm):
+    email = StringField("Correo Electrónico")
+    is_active = SelectField(
+        "Estado", choices=[("", "Todos"), ("1", "Activo"), ("0", "No Activo")]
+    )

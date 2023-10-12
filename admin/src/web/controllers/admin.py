@@ -1,3 +1,4 @@
+from core.enums import GenderOptions
 from flask import Blueprint, flash, redirect, render_template, request, url_for
 
 from src.services.database import DatabaseService
@@ -49,7 +50,16 @@ def check_db_get():
 
 @bp.get("/users")
 def users_get():
+    # Maneja la carga inicial de la página sin filtrado
     users = UserService.get_users()
+    return render_template("admin/users.html", users=users)
+
+
+@bp.post("/users")
+def users_post():
+    email = request.form.get("email")
+    active = request.form.get("active")
+    users = UserService.filter_users_by_email_and_active(email, active)
     return render_template("admin/users.html", users=users)
 
 
@@ -57,12 +67,15 @@ def users_get():
 def user_edit_get(user_id: int):
     """Show the edit user form with his actual values"""
     user = UserService.get_user(user_id)
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
     if not user:
         flash("Usuario no encontrado.", "error")
         return redirect(url_for("admin.users_get"))
 
     form = ProfileUpdateForm(obj=user)
-    return render_template("admin/edit_user.html", user=user, form=form)
+    return render_template(
+        "admin/edit_user.html", user=user, genders=genders, form=form
+    )
 
 
 @bp.post("/user/<int:user_id>/edit")

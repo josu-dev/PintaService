@@ -1,16 +1,37 @@
 {% extends "layout.html" %}
 {% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
 
 {% block head %}
-<title>Editar Usuario</title>
+<title>Pinta Service</title>
+
+<script src="{{ url_for('static', filename='js/user_setting.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col">
-  <h1 class="text-3xl font-semibold mt-[1em] ml-2">Editar usuario</h1>
+<main class="flex-1 flex flex-col items-center my-4">
+    <form class="flex flex-col items-center gap-6 md:max-w-sm " method="post">
+        {{ Form.render_field(form.firstname) }}
+        {{ Form.render_field(form.lastname) }}
+        {{ Form.render_field(form.document_type) }}
+        {{ Form.render_field(form.document_number) }}
+        {{ Form.render_field(form.address) }}
+        {{ Form.render_field(form.phone) }}
+        <div class="flex items-center flex-col">
+            <label class="mb-2">Genero</label>
+            <select name="gender" id="select" required>
+                <option value="" hidden></option>
+                {% for gender in genders %}
+                <option value={{gender[0]}} {% if gender[0]==user.gender %} selected {%endif%}>{{gender[1]}}</option>
+                {% endfor %}
+            </select>
+        </div>
 
-  {% call Form.render_form(form) %}
-  {{ Form.button_submit("Editar") }}
-  {% endcall %}
+        <div class="flex flex-row gap-x-4">
+
+            {{Button.primary("Cancelar","reset")}}
+            {{Button.success("Confirmar","submit")}}
+        </div>
+    </form>
 </main>
 {% endblock %}

@@ -1,4 +1,4 @@
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, Union
 
 from typing_extensions import Unpack
 
@@ -139,4 +139,19 @@ class UserService(BaseService):
             is not None
         )
 
-    # TODO Filter by email and Active/unactive
+    @classmethod
+    def filter_users_by_email_and_active(
+        cls, email: Union[str, None], active: Union[str, None]
+    ) -> List[User]:
+        query = db.session.query(User)
+
+        if email:
+            query = query.filter(User.email.ilike(f"%{email}%"))
+
+        if active == "1":
+            query = query.filter(User.is_active)
+        elif active == "0":
+            query = query.filter(~User.is_active)
+
+        users = query.all()
+        return users
