@@ -1,7 +1,10 @@
+import typing as t
+
 from flask_wtf import FlaskForm
-from wtforms import EmailField, PasswordField, StringField
+from wtforms import EmailField, PasswordField, SelectField, StringField
 from wtforms import validators as v
 
+from src.core.enums import DocumentTypes, GenderOptions
 from src.services.user import UpdateUserConfig, UserConfig
 
 
@@ -26,17 +29,17 @@ class UserCreateForm(FlaskForm):
         "Nombre de usuario",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
-    document_type = StringField(
-        "Tipo de documento",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+    document_type = SelectField(
+        "Tipo de Documento",
+        choices=[(choice.name, choice.value) for choice in DocumentTypes],
     )
     document_number = StringField(
         "Número de documento",
         validators=[v.DataRequired(), v.Length(min=8, max=8)],
     )
-    gender = StringField(
+    gender = SelectField(
         "Género",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        choices=[(choice.name, choice.value) for choice in GenderOptions],
     )
     gender_other = StringField(
         "Otro género",
@@ -49,18 +52,20 @@ class UserCreateForm(FlaskForm):
     phone = StringField("Telefono", [v.Length(min=0, max=16)])
 
     def values(self) -> UserConfig:
+        """Return form values as a dictionary"""
+
         return {
             "firstname": self.firstname.data,
             "lastname": self.lastname.data,
             "password": self.password.data,
             "email": self.email.data,
             "username": self.username.data,
-            "document_type": self.document_type.data,
+            "document_type": t.cast(DocumentTypes, self.document_type.data),
             "document_number": self.document_number.data,
-            "gender": self.gender.data,
+            "gender": t.cast(GenderOptions, self.gender.data),
+            "gender_other": self.gender_other.data,
             "address": self.address.data,
             "phone": self.phone.data,
-            "gender_other": self.gender_other.data,
         }
 
 
@@ -73,17 +78,17 @@ class UserUpdateForm(FlaskForm):
         "Apellido",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
-    document_type = StringField(
-        "Tipo de documento",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+    document_type = SelectField(
+        "Tipo de Documento",
+        choices=[(choice.name, choice.value) for choice in DocumentTypes],
     )
     document_number = StringField(
         "Número de documento",
         validators=[v.DataRequired(), v.Length(min=0, max=8)],
     )
-    gender = StringField(
+    gender = SelectField(
         "Género",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        choices=[(choice.name, choice.value) for choice in GenderOptions],
     )
     gender_other = StringField(
         "Otro género",
@@ -99,10 +104,10 @@ class UserUpdateForm(FlaskForm):
         return {
             "firstname": self.firstname.data,
             "lastname": self.lastname.data,
-            "document_type": self.document_type.data,
+            "document_type": t.cast(DocumentTypes, self.document_type.data),
             "document_number": self.document_number.data,
-            "gender": self.gender.data,
-            "gender_other": self.gender_other.data,
+            "gender": t.cast(GenderOptions, self.gender.data),
             "address": self.address.data,
             "phone": self.phone.data,
+            "gender_other": t.Optional[str],
         }

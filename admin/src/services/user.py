@@ -4,6 +4,7 @@ from typing_extensions import Unpack
 
 from src.core.bcrypt import bcrypt
 from src.core.db import db
+from src.core.enums import DocumentTypes, GenderOptions
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
@@ -14,9 +15,9 @@ class UserConfig(TypedDict):
     password: str
     email: str
     username: str
-    document_type: str
+    document_type: DocumentTypes
     document_number: str
-    gender: str
+    gender: GenderOptions
     address: str
     phone: str
     gender_other: Optional[str]
@@ -45,6 +46,8 @@ class UserService(BaseService):
     @classmethod
     def get_users(cls) -> List[User]:
         """Get all users from database"""
+        aux = db.session.query(User).all()
+        print(aux, flush=True)
         return db.session.query(User).all()
 
     @classmethod
