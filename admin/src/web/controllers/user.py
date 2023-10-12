@@ -45,7 +45,6 @@ def user_setting_post():
             h.flash_error(e.message)
             status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     else:
-        print(form.errors, flush=True)
         status_code = status.HTTP_400_BAD_REQUEST
 
     genders = [(choice.name, choice.value) for choice in GenderOptions]

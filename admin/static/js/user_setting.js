@@ -1,38 +1,45 @@
+/** @type {HTMLDivElement} */
+const fieldGender = document.getElementById("field_select");
+
 /** @type {HTMLSelectElement} */
 const select = document.getElementById('select');
 
 /** @type {HTMLDivElement} */
-const otherGender = document.createElement('div');
+const fieldOtherGender = document.getElementById('field_gender_other');
 
 /** @type {HTMLInputElement} */
-const inputOtherGender = document.createElement('input');
+const inputOtherGender = document.getElementById('gender_other');
 
-/** @type {HTMLLabelElement} */
-const labelOtherGender = document.createElement('label');
+/** @type {HTMLFormElement} */
+const form = select.parentElement.parentElement;
+const originalFormData = new FormData(form);
+const originalOtherGenderValue = originalFormData.get("gender_other") ?? "";
 
-inputOtherGender.type = "text"
-inputOtherGender.id = "gender_other"
-inputOtherGender.name = "gender_other"
-inputOtherGender.classList.add("mt-2")
-inputOtherGender.required = true
-inputOtherGender.minLength = 4
-inputOtherGender.maxLength = 32
-
-labelOtherGender.classList.add("mt-2")
-labelOtherGender.textContent = "Especifique como se identifica"
-
-otherGender.classList.add("flex")
-otherGender.classList.add("flex-col")
-
-otherGender.appendChild(labelOtherGender)
-otherGender.appendChild(inputOtherGender)
+if (select.value !== "OTHER") {
+  form.removeChild(fieldOtherGender);
+}
 
 select.addEventListener('click', () => {
-    if (select.value === "OTHER") {
-        select.parentElement.appendChild(otherGender)
-    } else {
-        if (select.parentElement.contains(otherGender)) {
-            select.parentElement.removeChild(otherGender)
-        }
+  if (select.value === "OTHER") {
+    fieldGender.after(fieldOtherGender);
+  }
+  else {
+    if (form.contains(fieldOtherGender)) {
+      form.removeChild(fieldOtherGender)
     }
+  }
 })
+
+form.addEventListener('reset', () => {
+  const originalGender = originalFormData.get("gender");
+  fieldOtherGender.value = originalOtherGenderValue;
+
+  if (originalGender !== "OTHER") {
+    if (form.contains(fieldOtherGender)) {
+      form.removeChild(fieldOtherGender)
+    }
+  }
+  else {
+    fieldGender.after(fieldOtherGender);
+  }
+});
