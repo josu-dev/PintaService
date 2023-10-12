@@ -222,7 +222,6 @@ class Config:
 def init_app(app: Flask, env: str) -> None:
     if env == "development":
         load_dotenv()
-        set_env_default("LIVETW_DEV", "true")
     else:
         load_db_dotenv()
 

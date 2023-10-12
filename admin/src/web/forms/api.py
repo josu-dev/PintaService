@@ -20,8 +20,8 @@ class AuthForm(FlaskForm):
 
     def values(self) -> AuthFormValues:
         return {
-            "password": self.password.data,
-            "email": self.user.data,
+            "password": self.password.data,  # type: ignore
+            "email": self.user.data,  # type: ignore
         }
 
 

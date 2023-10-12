@@ -55,17 +55,17 @@ class UserCreateForm(FlaskForm):
         """Return form values as a dictionary"""
 
         return {
-            "firstname": self.firstname.data,
-            "lastname": self.lastname.data,
-            "password": self.password.data,
-            "email": self.email.data,
-            "username": self.username.data,
+            "firstname": self.firstname.data,  # type: ignore
+            "lastname": self.lastname.data,  # type: ignore
+            "password": self.password.data,  # type: ignore
+            "email": self.email.data,  # type: ignore
+            "username": self.username.data,  # type: ignore
             "document_type": t.cast(DocumentTypes, self.document_type.data),
-            "document_number": self.document_number.data,
+            "document_number": self.document_number.data,  # type: ignore
             "gender": t.cast(GenderOptions, self.gender.data),
-            "gender_other": self.gender_other.data,
-            "address": self.address.data,
-            "phone": self.phone.data,
+            "gender_other": self.gender_other.data,  # type: ignore
+            "address": self.address.data,  # type: ignore
+            "phone": self.phone.data,  # type: ignore
         }
 
 

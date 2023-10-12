@@ -173,13 +173,13 @@ Flask = "*"
 
 [[package]]
 name = "flask-livetw"
-version = "0.3.1"
+version = "0.3.3"
 description = "A simple package that enables livereload and tailwindcss for flask templates."
 optional = false
 python-versions = ">=3.8,<4.0"
 files = [
-    {file = "flask_livetw-0.3.1-py3-none-any.whl", hash = "sha256:8f30f125bcaa4049a46e0ed218de1cd89617680d5fdeb84fc72ccb9987a61394"},
-    {file = "flask_livetw-0.3.1.tar.gz", hash = "sha256:b0afeccf090c07da5834e935c1fc3bed23136141c48b2cbd60ba4a0de46306af"},
+    {file = "flask_livetw-0.3.3-py3-none-any.whl", hash = "sha256:c32a0e6dbe2f945ec13379d7e5cf3cd1e02adb9adbf63cecbe5161ca90345d1c"},
+    {file = "flask_livetw-0.3.3.tar.gz", hash = "sha256:1f43f4fc0efde33a485ad7dfca70b18d2e424631e9012f36a4c41814aa18bca7"},
 ]
 
 [package.dependencies]
