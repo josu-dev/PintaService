@@ -30,8 +30,8 @@ class UserLogin(FlaskForm):
 
     def values(self) -> FullLoginUser:
         return {
-            "email": self.email.data,
-            "password": self.password.data,
+            "email": self.email.data,  # type: ignore
+            "password": self.password.data,  # type: ignore
         }
 
 
@@ -55,9 +55,9 @@ class UserPreRegister(FlaskForm):
 
     def values(self) -> FullPreRegisterUser:
         return {
-            "firstname": self.firstname.data,
-            "lastname": self.lastname.data,
-            "email": self.email.data,
+            "firstname": self.firstname.data,  # type: ignore
+            "lastname": self.lastname.data,  # type: ignore
+            "email": self.email.data,  # type: ignore
         }
 
 
@@ -81,7 +81,7 @@ class UserRegister(FlaskForm):
 
     def values(self) -> FullRegisterUser:
         return {
-            "username": self.username.data,
-            "password": self.password.data,
-            "password_con": self.password_con.data,
+            "username": self.username.data,  # type: ignore
+            "password": self.password.data,  # type: ignore
+            "password_con": self.password_con.data,  # type: ignore
         }

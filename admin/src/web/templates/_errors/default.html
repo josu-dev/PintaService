@@ -1,0 +1,27 @@
+{% extends "base_layout.html" %}
+{% block head %}
+<title>{{ error_code }}{%if error_page_title %} - {{ error_page_title }}{%endif %}</title>
+{% endblock %}
+{% block body %}
+<main class="flex flex-coll items-center justify-center h-full">
+  <section class="">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+      <div class="mx-auto max-w-screen-sm text-center">
+        <h1
+          class="mb-4 text-7xl tracking-tight font-extrabold md:text-8xl xl:text-9xl text-orange-600 dark:text-orange-500">
+          {{ error_code }}
+        </h1>
+        <p class="mb-4 text-3xl tracking-tight font-bold text-zinc-900 md:text-4xl">{{ error_title }}</p>
+        <p class="mb-4 text-base md:text-lg font-light text-zinc-500">{{ error_message }}</p>
+        <p class="mb-4 text-sm md:text-base font-light text-zinc-500">
+          Por favor, recargue la página o intente más tarde si el problema persiste
+        </p>
+        <a href="/"
+          class="inline-flex text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-orange-900 my-4">
+          Volver al inicio
+        </a>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
