@@ -24,7 +24,7 @@ class SiteUpdateForm(FlaskForm):
     def values(self) -> SiteConfigParams:
         return {
             "page_size": te.cast(int, self.page_size.data),
-            "contact_info": self.contact_info.data,
+            "contact_info": self.contact_info.data,  # type: ignore
             "maintenance_active": self.maintenance_active.data,
-            "maintenance_message": self.maintenance_message.data,
+            "maintenance_message": self.maintenance_message.data,  # type: ignore # noqa E501
         }

@@ -1,0 +1,28 @@
+{% extends "base_layout.html" %}
+{% block head %}<title>Problema con el servidor</title>{% endblock %}
+{% block body %}
+<main class="flex flex-coll items-center justify-center h-full">
+  <section class="">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+      <div class="mx-auto max-w-screen-sm text-center">
+        <h1
+          class="mb-4 text-7xl tracking-tight font-extrabold md:text-8xl lg:text-9xl text-orange-600 dark:text-orange-500">
+          {% if error_code %}{{ error_code }}{% else %}500{% endif %}
+        </h1>
+        <p class="mb-4 text-3xl tracking-tight font-bold text-zinc-900 md:text-4xl">
+          {% if error_title %}{{ error_title }}{% else %}Ocurrió un problema en el servidor{% endif %}
+        </p>
+        <p class="mb-4 text-base md:text-lg font-light text-zinc-500">
+          {% if error_message is defined %}{{ error_message }}
+          {% else %}Lo sentimos, pero ocurrió un problema inesperado en el servidor{% endif %}
+          <br />
+          Por favor, intente nuevamente más tarde
+        </p>
+        <a href="/"
+          class="inline-flex text-white bg-orange-600 hover:bg-orange-800 focus:ring-4 focus:outline-none focus:ring-orange-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:focus:ring-orange-900 my-4">Volver
+          al inicio</a>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
