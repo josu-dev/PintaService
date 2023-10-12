@@ -26,9 +26,9 @@ class UserConfig(TypedDict):
 class UpdateUserConfig(TypedDict):
     firstname: str
     lastname: str
-    document_type: str
+    document_type: DocumentTypes
     document_number: str
-    gender: str
+    gender: GenderOptions
     address: str
     phone: str
     gender_other: Optional[str]
@@ -46,8 +46,6 @@ class UserService(BaseService):
     @classmethod
     def get_users(cls) -> List[User]:
         """Get all users from database"""
-        aux = db.session.query(User).all()
-        print(aux, flush=True)
         return db.session.query(User).all()
 
     @classmethod
