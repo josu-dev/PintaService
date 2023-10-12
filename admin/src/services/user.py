@@ -1,4 +1,4 @@
-from typing import List, Optional, TypedDict
+from typing import List, Optional, TypedDict, Union
 
 from typing_extensions import Unpack
 
@@ -9,12 +9,23 @@ from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 
-class PartialUserConfig(TypedDict):
+class UserConfig(TypedDict):
     firstname: str
     lastname: str
     password: str
     email: str
     username: str
+    document_type: DocumentTypes
+    document_number: str
+    gender: GenderOptions
+    address: str
+    phone: str
+    gender_other: Optional[str]
+
+
+class UpdateUserConfig(TypedDict):
+    firstname: str
+    lastname: str
     document_type: DocumentTypes
     document_number: str
     gender: GenderOptions
@@ -35,17 +46,15 @@ class UserService(BaseService):
     @classmethod
     def get_users(cls) -> List[User]:
         """Get all users from database"""
-        aux = db.session.query(User).all()
-        print(aux, flush=True)
         return db.session.query(User).all()
 
     @classmethod
     def get_user(cls, user_id: int):
         """Get an user from database"""
-        db.session.get(User, user_id)
+        return db.session.get(User, user_id)
 
     @classmethod
-    def update_user(cls, user_id: int, **kwargs: Unpack[PartialUserConfig]):
+    def update_user(cls, user_id: int, **kwargs: Unpack[UpdateUserConfig]):
         """Update user in the database"""
         user = db.session.query(User).get(user_id)
         if user:
@@ -66,7 +75,7 @@ class UserService(BaseService):
     @classmethod
     def create_user(
         cls,
-        **kwargs: Unpack[PartialUserConfig],
+        **kwargs: Unpack[UserConfig],
     ):
         """Create user in database"""
         if UserService.get_by_username(kwargs["username"]):
@@ -89,6 +98,16 @@ class UserService(BaseService):
     def get_by_username(cls, username: str):
         """Get user by username"""
         return db.session.query(User).filter(User.username == username).first()
+
+    @classmethod
+    def toggle_active(cls, id: int):
+        """Toggle user active status"""
+        user = db.session.query(User).get(id)
+        if user:
+            user.is_active = not user.is_active
+            db.session.commit()
+            return user
+        return None
 
     @classmethod
     def validate_email_password(cls, email: str, password: str):
@@ -120,4 +139,19 @@ class UserService(BaseService):
             is not None
         )
 
-    # TODO Filter by email and Active/unactive
+    @classmethod
+    def filter_users_by_email_and_active(
+        cls, email: Union[str, None], active: Union[str, None]
+    ) -> List[User]:
+        query = db.session.query(User)
+
+        if email:
+            query = query.filter(User.email.ilike(f"%{email}%"))
+
+        if active == "1":
+            query = query.filter(User.is_active)
+        elif active == "0":
+            query = query.filter(~User.is_active)
+
+        users = query.all()
+        return users
