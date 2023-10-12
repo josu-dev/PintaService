@@ -241,12 +241,14 @@ Required settings:
     "editor.codeActionsOnSave": {
       "source.organizeImports": "always"
     },
-    "editor.defaultFormatter": "ms-python.black-formatter"
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.tabSize": 4
   },
   "black-formatter.args": [
     "--line-length=79",
   ],
   "editor.formatOnSave": true,
+  "editor.tabSize": 2,
   "emmet.includeLanguages": {
     "jinja-html": "html"
   },
