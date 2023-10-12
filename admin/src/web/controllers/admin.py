@@ -6,7 +6,7 @@ from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
 from src.web.forms.site import SiteUpdateForm
-from src.web.forms.user import UserCreateForm, UserUpdateForm
+from src.web.forms.user import ProfileUpdateForm
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -47,29 +47,6 @@ def check_db_get():
     return "Database is not running", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@bp.get("/user")
-def user_get():
-    form = UserCreateForm(request.form)
-    return render_template("admin/user.html", form=form)
-
-
-@bp.post("/user")
-def user_post():
-    form = UserCreateForm(request.form)
-    if form.validate():
-        UserService.create_user(**form.values())
-        h.flash_success("Usuario creado")
-        status_code = status.HTTP_200_OK
-        return redirect(url_for("admin.users_get"))
-    else:
-        status_code = status.HTTP_400_BAD_REQUEST
-
-    return (
-        render_template("admin/user.html", form=form),
-        status_code,
-    )
-
-
 @bp.get("/users")
 def users_get():
     users = UserService.get_users()
@@ -84,7 +61,7 @@ def user_edit_get(user_id: int):
         flash("Usuario no encontrado.", "error")
         return redirect(url_for("admin.users_get"))
 
-    form = UserUpdateForm(obj=user)
+    form = ProfileUpdateForm(obj=user)
     return render_template("admin/edit_user.html", user=user, form=form)
 
 
@@ -96,7 +73,7 @@ def edit_user_post(user_id: int):
         flash("Usuario no encontrado.", "error")
         return redirect(url_for("admin.users_get"))
 
-    form = UserUpdateForm(request.form)
+    form = ProfileUpdateForm(request.form)
     if form.validate():
         UserService.update_user(user_id, **form.values())
         flash("Usuario actualizado con éxito.", "success")
