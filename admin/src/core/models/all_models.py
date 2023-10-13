@@ -1,4 +1,5 @@
 from src.core.models import (
+    auth,
     institution,
     institution_service,
     institution_user,
@@ -18,4 +19,5 @@ __all__ = [
     "user",
     "institution_user",
     "institution_service",
+    "auth",
 ]

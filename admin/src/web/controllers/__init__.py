@@ -1,4 +1,4 @@
-from flask import Flask, g, render_template, request
+from flask import Flask, g, render_template, request, session
 from sqlalchemy.exc import SQLAlchemyError
 from werkzeug import exceptions
 
@@ -107,13 +107,48 @@ def init_app(app: Flask):
     for bp in _blueprints:
         app.register_blueprint(bp)
 
+    from src.services.auth import AuthService
     from src.services.site import SiteService
+    from src.services.user import UserService
 
     def before_request_hook():
         if request.path.startswith("/login") or request.path.startswith(
             "/static"
         ):
             return None
+
+        user_email = session.get("user")  # type: ignore
+        if user_email is not None:
+            user = UserService.get_by_email(user_email)  # type: ignore
+            if user is not None:
+                g.user = user
+
+                if session.get("is_admin"):
+                    g.user_permissions = (
+                        AuthService.get_site_admin_permissions(user.id)
+                    )
+                else:
+                    current_institution = session.get(  # type: ignore
+                        "current_institution"
+                    )
+                    if current_institution:
+                        g.user_permissions = AuthService.get_user_permissions(
+                            user.id, current_institution  # type: ignore
+                        )
+                    else:
+                        g.user_permissions = None
+            else:
+                g.user = None
+                g.user_permissions = None
+        else:
+            g.user = None
+            g.user_permissions = None
+
+        # print(
+        #     g.user.username if g.user else "No user",
+        #     session.get("current_institution"),  # type: ignore
+        #     g.user_permissions,
+        # )
 
         site_config = SiteService.get_site_config()
         if (

@@ -18,8 +18,8 @@ from src.web.forms.auth import UserLogin, UserPreRegister, UserRegister
 bp = Blueprint("root", __name__)
 
 
-@bp.route("/", methods=["GET"])
-@h.login_required()
+@bp.get("/")
+@h.authenticated_route()
 def index():
     return render_template("index.html")
 
@@ -28,6 +28,8 @@ def index():
 def logout():
     if session.get("user"):
         del session["user"]
+        if session.get("is_admin"):
+            del session["is_admin"]
         session.clear()
         h.flash_info("La sesion se cerro correctamente")
         return redirect(url_for("root.login"))
@@ -46,6 +48,8 @@ def login():
             if user:
                 session["user"] = user.email
                 session["id"] = user.id
+                if AuthService.user_is_site_admin(user.id):
+                    session["is_admin"] = True
                 h.flash_success("Se inicio sesion correctamente")
                 return redirect(url_for("root.index"))
 
