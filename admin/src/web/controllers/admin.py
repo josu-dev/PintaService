@@ -1,6 +1,6 @@
-from core.enums import GenderOptions
-from flask import Blueprint, flash, redirect, render_template, request
+from flask import Blueprint, flash, g, redirect, render_template, request
 
+from src.core.enums import GenderOptions
 from src.services.database import DatabaseService
 from src.services.site import SiteService
 from src.services.user import UserService
@@ -48,18 +48,25 @@ def check_db_get():
     return "Database is not running", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@bp.get("/users")
-def users_get():
-    users = UserService.get_users()
-    return render_template("admin/users.html", users=users)
-
-
-@bp.post("/users")
-def users_post():
-    email = request.form.get("email")
-    active = request.form.get("active")
-    users = UserService.filter_users_by_email_and_active(email, active)
-    return render_template("admin/users.html", users=users)
+@bp.route("/users", methods=["GET", "POST"])
+def users():
+    site_config_pages = g.site_config.page_size
+    page = request.values.get("page", 1, type=int)
+    per_page = request.values.get("per_page", site_config_pages, type=int)
+    email = request.values.get("email")
+    active = request.values.get("active")
+    users, total = UserService.filter_users_by_email_and_active(
+        email, active, page, per_page  # type: ignore
+    )
+    return render_template(
+        "admin/users.html",
+        users=users,
+        page=page,
+        per_page=per_page,
+        total=total,
+        email=email,
+        active=active,
+    )
 
 
 @bp.get("/user/<int:user_id>/edit")

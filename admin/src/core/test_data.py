@@ -1,3 +1,6 @@
+from src.core.enums import DocumentTypes, GenderOptions
+
+
 def load_test_data():
     import sqlalchemy as sa
 
@@ -57,6 +60,32 @@ def load_test_data():
         document_type=enums.DocumentTypes.DNI,
         document_number="40188236",
         gender=enums.GenderOptions.FEMALE,
+        gender_other="",
+        address="155",
+        phone="2213169050",
+    )
+    UserService.create_user(
+        firstname="Franco",
+        lastname="Cirielli",
+        password="1234",
+        email="franco@hotmail.com",
+        username="francry",
+        document_type=DocumentTypes.DNI,
+        document_number="25683652",
+        gender=GenderOptions.FEMALE,
+        gender_other="tal vez",
+        address="15 y 47",
+        phone="2355572726",
+    )
+    UserService.create_user(
+        firstname="Bolivia",
+        lastname="Nose",
+        password="1234",
+        email="inaki@gmail.com",
+        username="Vargas",
+        document_type=DocumentTypes.DNI,
+        document_number="40188236",
+        gender=GenderOptions.FEMALE,
         gender_other="",
         address="155",
         phone="2213169050",

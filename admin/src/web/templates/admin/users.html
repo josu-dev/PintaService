@@ -3,10 +3,14 @@
 
 {% block head %}
 <title>Pinta Service</title>
+<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
+<script src="{{ url_for('static', filename='js/confirm_delete.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 flex flex-col">
+  
+
   <h1 class="text-3xl font-semibold mt-[1em] ml-2">Usuarios</h1>
 
   <form method="POST" action="/admin/users">
@@ -16,38 +20,73 @@
         <option value="1">Activos</option>
         <option value="0">No Activos</option>
     </select>
-    <button type="submit">Filtrar</button>
+    <button type="submit" class="filter-button">Filtrar</button>
   </form> 
-  <ul>
-    {% for user in users %}
-      <li>
-          {{ user.email }}
-          {{ user.username }}
-          {{ user.firstname }}
-          {{ user.lastname }}
-          
-          <!-- Edit -->
-          <a href="/admin/user/{{ user.id }}/edit" class="ml-2 text-blue-500">Editar</a>
-          
-          <!-- Activate/Deactivate -->
+  <table>
+    <thead>
+        <tr>
+            <th>Email</th>
+            <th>Nombre de usuario</th>
+            <th>Nombre </th>
+            <th>Apellido</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% if users|length == 0 %}
+            <tr>
+                <td colspan="5">No se encontraron usuarios</td>
+            </tr>
+        {% else %}
+            {% for user in users %}
+            <tr>
+                <td>{{ user.email }}</td>
+                <td>{{ user.username }}</td>
+                <td>{{ user.firstname }}</td>
+                <td>{{ user.lastname }}</td>
+                <td>
+                    <!-- Edit -->
+                    <a href="/admin/user/{{ user.id }}/edit" class="ml-2 text-blue-500">Editar</a>
     
-          <form method="POST" action="/admin/user/{{ user.id }}/toggle_active" style="display: inline;">
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
-              <button type="submit" class="ml-2 text-{{ 'red' if user.is_active else 'green' }}-500">
-                  {{ 'Desactivar' if user.is_active else 'Activar' }}
-              </button>
-          </form>
-          
-          <!-- Delete -->
-          
-          <form method="POST" action="/admin/user/{{ user.id }}/delete" style="display: inline;">
-              <input type="hidden" name="_method" value="DELETE"> 
-              <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
-              <button type="submit" class="ml-2 text-red-500">Eliminar</button>
-          </form>
+                    <!-- Activate/Deactivate -->
+                    <form method="POST" action="/admin/user/{{ user.id }}/toggle_active" style="display: inline;">
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+                        <button type="submit" class="ml-2 text-{{ 'red' if user.is_active else 'green' }}-500">
+                            {{ 'Desactivar' if user.is_active else 'Activar' }}
+                        </button>
+                    </form>
+    
+                    <!-- Delete -->
+                    <form method="POST" action="/admin/user/{{ user.id }}/delete" style="display: inline;">
+                        <input type="hidden" name="_method" value="DELETE"> 
+                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}"> 
+                        <button type="submit" class="ml-2 text-red-500 delete-button" data-user="{{ user.username }}">Eliminar</button>
 
-      </li>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        {% endif %}
+    </tbody>
+  
+    </table>
+
+  <ul class="pagination">
+    {% if page > 1 %}
+      <a href="?page={{ page - 1 }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">Anterior</a>
+    {% endif %}
+    {% set num_pages = total // per_page + (total % per_page > 0) %}
+    {% for i in range(1, num_pages + 1) %}
+        {% if i == page %}
+            <span class="current-page">{{ i }}</span>
+        {% else %}
+          <a href="?page={{ i }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">{{ i }}</a>
+        {% endif %}
     {% endfor %}
+    {% if page * per_page < total %}
+      <a href="?page={{ page + 1 }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">Siguiente</a>
+    {% endif %}
   </ul>
+  
 </main>
 {% endblock %}
