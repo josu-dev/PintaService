@@ -2,6 +2,7 @@ import secrets
 from datetime import datetime, timedelta
 from typing import TypedDict
 
+import sqlalchemy as sa
 from flask import request
 from typing_extensions import Unpack
 
@@ -9,6 +10,8 @@ from src.core.db import db
 from src.core.models.pre_regis_user import PreRegisterUser
 from src.services.base import BaseService, BaseServiceError
 from src.services.mail import MailService
+
+# flake8: noqa E501
 
 
 class FullPreRegisterUser(TypedDict):
@@ -81,3 +84,52 @@ class AuthService(BaseService):
         difference = current_date - token_date
         one_day = timedelta(days=1)
         return difference > one_day
+
+    @classmethod
+    def get_user_permissions(cls, user_id: int, institution_id: int):
+        stmt = sa.text(
+            """
+            SELECT
+                permissions.name
+            FROM
+                users
+                INNER JOIN users_institutions_roles ON users.id = users_institutions_roles.user_id
+                INNER JOIN roles ON users_institutions_roles.role_id = roles.id
+                INNER JOIN roles_permissions ON roles.id = roles_permissions.role_id
+                INNER JOIN permissions ON roles_permissions.permission_id = permissions.id
+            WHERE
+                users.id = :user_id AND users_institutions_roles.institution_id = :institution_id
+            """
+        )
+        result = db.session.scalars(
+            stmt, {"user_id": user_id, "institution_id": institution_id}
+        ).all()
+
+        return result
+
+    @classmethod
+    def user_is_site_admin(cls, user_id: int):
+        stmt = sa.text("SELECT * FROM site_admins WHERE user_id = :user_id")
+        result = db.session.scalars(stmt, {"user_id": user_id}).first()
+
+        return result is not None
+
+    @classmethod
+    def get_site_admin_permissions(cls, user_id: int):
+        stmt = sa.text(
+            """
+            SELECT
+                permissions.name
+            FROM
+                users
+                INNER JOIN site_admins ON users.id = site_admins.user_id
+                INNER JOIN roles ON site_admins.role_id = roles.id
+                INNER JOIN roles_permissions ON roles.id = roles_permissions.role_id
+                INNER JOIN permissions ON roles_permissions.permission_id = permissions.id
+            WHERE
+                users.id = :user_id
+            """
+        )
+        result = db.session.scalars(stmt, {"user_id": user_id}).all()
+
+        return result
