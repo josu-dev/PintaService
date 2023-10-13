@@ -43,3 +43,16 @@ def load_test_data():
         address="15 y 47",
         phone="2355572726",
     )
+    UserService.create_user(
+        firstname="Bolivia",
+        lastname="Nose",
+        password="1234",
+        email="inaki@gmail.com",
+        username="Vargas",
+        document_type=DocumentTypes.DNI,
+        document_number="40188236",
+        gender=GenderOptions.FEMALE,
+        gender_other="",
+        address="155",
+        phone="2213169050",
+    )

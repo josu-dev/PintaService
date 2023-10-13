@@ -1,4 +1,4 @@
-from typing import List, Optional, TypedDict, Union
+from typing import List, Optional, Tuple, TypedDict, Union
 
 from typing_extensions import Unpack
 
@@ -44,9 +44,18 @@ class UserService(BaseService):
     UserServiceError = UserServiceError
 
     @classmethod
-    def get_users(cls) -> List[User]:
-        """Get all users from database"""
-        return db.session.query(User).all()
+    def get_users(
+        cls, page: int = 1, per_page: int = 10
+    ) -> Tuple[List[User], int]:
+        """Get  users from database"""
+        users = (
+            db.session.query(User)
+            .offset((page - 1) * per_page)
+            .limit(per_page)
+            .all()
+        )
+        total = db.session.query(User).count()
+        return users, total
 
     @classmethod
     def get_user(cls, user_id: int):
@@ -141,8 +150,12 @@ class UserService(BaseService):
 
     @classmethod
     def filter_users_by_email_and_active(
-        cls, email: Union[str, None], active: Union[str, None]
-    ) -> List[User]:
+        cls,
+        email: Union[str, None],
+        active: Union[str, None],
+        page: int = 1,
+        per_page: int = 10,
+    ) -> Tuple[List[User], int]:
         query = db.session.query(User)
 
         if email:
@@ -153,5 +166,7 @@ class UserService(BaseService):
         elif active == "0":
             query = query.filter(~User.is_active)
 
-        users = query.all()
-        return users
+        total = query.count()
+        users = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return users, total
