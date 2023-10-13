@@ -4,7 +4,7 @@ from flask_wtf import FlaskForm
 from wtforms import EmailField, PasswordField, StringField
 from wtforms import validators as v
 
-from src.services.auth import FullPreRegisterUser
+from src.services.auth import PreRegisterUserParams
 
 
 class FullRegisterUser(TypedDict):
@@ -53,7 +53,7 @@ class UserPreRegister(FlaskForm):
         ],
     )
 
-    def values(self) -> FullPreRegisterUser:
+    def values(self) -> PreRegisterUserParams:
         return {
             "firstname": self.firstname.data,  # type: ignore
             "lastname": self.lastname.data,  # type: ignore

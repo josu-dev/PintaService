@@ -20,35 +20,31 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     MailService.init_app(app)
     controllers.init_app(app)
 
-    @app.cli.command("reset_db")
+    @app.cli.command("reset-db")
     def reset_db():
-        """
-        Reset the database.
-        Clear all tables and create them again.
-        """
+        """Clear all tables and create them again."""
         db.reset_db()
 
-    @app.cli.command("seed_db")
+    @app.cli.command("seed-db")
     def seed_db():
-        """
-        Seed the database.
-        """
+        """Seed the database with initial data."""
         from src.core import seed
 
         seed.seed_db()
 
-    @app.cli.command("test_data")
+    @app.cli.command("test-data")
     def load_test_data():
-        """
-        Cositas que pasan si lees esto agustin aprobame
-        soy el que se paso por vos en el stream de Fabo <3
-        """
+        """Load test data for development."""
         from src.core import test_data
 
         test_data.load_test_data()
 
     @app.cli.command("full-reset")
     def full_reset():
+        """
+        Drops all tables, creates them again and seeds the database.
+        Also loads test data for development.
+        """
         from src.core import seed, test_data
 
         db.reset_db()

@@ -13,12 +13,14 @@ class UserInstitutionRole(base.BaseModel):
     institution_id: sao.Mapped[int]
     role_id: sao.Mapped[int]
 
+    __table_args__ = (sa.UniqueConstraint("user_id", "institution_id"),)
+
 
 class SiteAdmin(base.BaseModel):
     __tablename__ = "site_admins"
 
     id: sao.Mapped[int] = sao.mapped_column(primary_key=True, init=False)
-    user_id: sao.Mapped[int]
+    user_id: sao.Mapped[int] = sao.mapped_column(unique=True)
     role_id: sao.Mapped[int]
 
 
