@@ -33,7 +33,7 @@ class ServiceForm(FlaskForm):
         validators=[v.DataRequired()],
     )
 
-    def values(self) -> PartialServiceConfig:
+    def values(self) -> PartialServiceConfig:  # Service Algo
         data = self.data
         data["service_type"] = ServiceType(data["service_type"])
         data.pop("csrf_token")
