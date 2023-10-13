@@ -1,6 +1,6 @@
-from core.enums import GenderOptions
 from flask import Blueprint, flash, g, redirect, render_template, request
 
+from src.core.enums import GenderOptions
 from src.services.database import DatabaseService
 from src.services.site import SiteService
 from src.services.user import UserService
@@ -67,46 +67,6 @@ def users():
         email=email,
         active=active,
     )
-
-
-# @bp.get("/users")
-# def users_get():
-#     site_config_pages = g.site_config.page_size
-#     page = request.args.get("page", 1, type=int)
-#     per_page = request.args.get("per_page", site_config_pages, type=int)
-#     users, total = UserService.get_users(page, per_page)
-#     email = request.args.get("email", "")
-#     active = request.args.get("active", "")
-#     return render_template(
-#         "admin/users.html",
-#         users=users,
-#         page=page,
-#         per_page=per_page,
-#         total=total,
-#         email=email,
-#         active=active,
-#     )
-
-
-# @bp.post("/users")
-# def users_post():
-#     site_config_pages = g.site_config.page_size
-#     page = request.args.get("page", 1, type=int)
-#     per_page = request.args.get("per_page", site_config_pages, type=int)
-#     email = request.form.get("email")
-#     active = request.form.get("active")
-#     users, total = UserService.filter_users_by_email_and_active(
-#         email, active, page, per_page
-#     )
-#     return render_template(
-#         "admin/users.html",
-#         users=users,
-#         page=page,
-#         per_page=per_page,
-#         total=total,
-#         email=email,
-#         active=active,
-#     )
 
 
 @bp.get("/user/<int:user_id>/edit")
