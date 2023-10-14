@@ -5,10 +5,24 @@
 {% endblock %}
 {% block base_body %}
 <div class="relative bodyContainer h-full flex flex-col overflow-hidden">
-  <header class="flex-none flex justify-between p-2 border-b shadow border-zinc-900">
-    <div class="ml-2">
-      <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
-        alt="cidepint logo" class='w-12 h-12'>
+  <header class="flex-none flex justify-between p-2 md:px-3 border-b shadow border-zinc-900">
+    <div class="ml-2 flex items-center gap-4">
+      <a href="/">
+        <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
+          alt="cidepint logo" class='w-10 h-10' />
+      </a>
+      {% if g.user and g.user_has_permissions(["setting_show", "setting_update"]) %}
+      <a href="/admin">
+        <span class="sr-only md:not-sr-only text-xl font-medium">Panel admin</span>
+        <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+          class="lucide lucide-layout-panel-left">
+          <rect width="7" height="18" x="3" y="3" rx="1" />
+          <rect width="7" height="7" x="14" y="3" rx="1" />
+          <rect width="7" height="7" x="14" y="14" rx="1" />
+        </svg>
+      </a>
+      {% endif %}
     </div>
 
     <nav class="flex md:mr-2">
@@ -18,35 +32,63 @@
             <span>Menu</span>
           </button>
         </li>
+        {% if g.user %}
+        {% if g.user_has_permissions(["setting_show", "setting_update"]) %}
         <li class="hidden xs:block ">
-          <a href="/institutions">
-            <span class="">Instituciones</span>
-            {# <svg class="w-12 h-12" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16">
-              <path fill="currentColor"
-                d="M3 0v16h4v-3h2v3h4V0H3zm3 12H4v-2h2v2zm0-3H4V7h2v2zm0-3H4V4h2v2zm0-3H4V1h2v2zm3 9H7v-2h2v2zm0-3H7V7h2v2zm0-3H7V4h2v2zm0-3H7V1h2v2zm3 9h-2v-2h2v2zm0-3h-2V7h2v2zm0-3h-2V4h2v2zm0-3h-2V1h2v2z" />
-            </svg> #}
+          <a href="/admin/site_config">
+            <span class="sr-only md:not-sr-only">Configurarion</span>
+            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-settings-2">
+              <path d="M20 7h-9" />
+              <path d="M14 17H5" />
+              <circle cx="17" cy="17" r="3" />
+              <circle cx="7" cy="7" r="3" />
+            </svg>
           </a>
         </li>
+        {% endif %}
+        <li class="hidden xs:block ">
+          <a href="/institutions">
+            <span class="sr-only md:not-sr-only">Instituciones</span>
+            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-building">
+              <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
+              <path d="M9 22v-4h6v4" />
+              <path d="M8 6h.01" />
+              <path d="M16 6h.01" />
+              <path d="M12 6h.01" />
+              <path d="M12 10h.01" />
+              <path d="M12 14h.01" />
+              <path d="M16 10h.01" />
+              <path d="M16 14h.01" />
+              <path d="M8 10h.01" />
+              <path d="M8 14h.01" />
+            </svg>
+          </a>
+        </li>
+        {% if g.user_has_permissions([service_index]) %}
         <li class="hidden xs:block ">
           <a href="/tracking">
             <span class="sr-only md:not-sr-only">Seguimientos</span>
-            <svg class="w-10 h-10 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
+            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
               viewBox="0 0 24 24">
               <path fill="currentColor"
                 d="M13.09 20c.12.72.37 1.39.72 2H6c-1.11 0-2-.89-2-2V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9.09c-.33-.05-.66-.09-1-.09c-.34 0-.67.04-1 .09V4h-5v8l-2.5-2.25L8 12V4H6v16h7.09M20 18v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3Z" />
             </svg>
           </a>
         </li>
-        <li>
-          <button id="openPerfil" class="px-3 py-1.5 text-lg text-zinc-950" data-toggle="tab">
-            <span>
-              <svg class="w-12 h-12 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-                viewBox="0 0 24 24">
-                <path fill="currentColor"
-                  d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z" />
-              </svg>
-              <span class="hidden md:inline-block">Perfil</span>
-            </span>
+        {% endif %}
+        <li class="hidden xs:flex">
+          <button id="openPerfil" class="text-zinc-950 inline-block" data-toggle="tab">
+            <span class="sr-only md:not-sr-only">Perfil</span>
+            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
+              class="lucide lucide-user">
+              <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
           </button>
           <div id="perfilContainer"
             class="absolute box-content md:border md:border-black w-full md:w-fit top-0 md:top-14 right-0 md:right-4 hidden">
@@ -67,30 +109,32 @@
                   <button
                     class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
                     <span>Cerrar Sesion</span>
+                  </button>
                 </form>
                 </a>
               </li>
             </ul>
           </div>
-
-          {#<span class="sr-only md:not-sr-only">Perfil</span>#}
-          {#<svg class="w-12 h-12 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-            viewBox="0 0 24 24">
-            <path fill="currentColor"
-              d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-7 3c1.93 0 3.5 1.57 3.5 3.5S13.93 13 12 13s-3.5-1.57-3.5-3.5S10.07 6 12 6zm7 13H5v-.23c0-.62.28-1.2.76-1.58C7.47 15.82 9.64 15 12 15s4.53.82 6.24 2.19c.48.38.76.97.76 1.58V19z" />
-          </svg>#}
-
         </li>
+        {% else %}
+        <li class="hidden xs:block">
+          <a href="/login">
+            <span class="">Iniciar sesion</span>
+          </a>
+        </li>
+        {% endif %}
       </ul>
 
-      <div id="mainMenuContainer" class="hidden fixed top-0 left-0 right-0 bg-zinc-200 xs:hidden">
+      <div id="mainMenuContainer"
+        class="hidden fixed top-0 left-0 right-0 bg-orange-200 border-b border-b-zinc-950 xs:hidden">
         <div class='relative'>
           <div class="absolute top-0 right-0">
-            <button id="closeMainMenu" class=" px-3 py-2 ml-auto my-4 mr-4 bg-zinc-200 rounded text-xl font-medium">
+            <button id="closeMainMenu"
+              class=" px-3 py-2 ml-auto my-4 mr-4 bg-zinc-50/90 hover:bg-zinc-50 rounded text-xl font-medium">
               Cerrar
             </button>
           </div>
-          <ul class="flex  flex-col gap-8 items-center text-3xl font-semibold pt-32 pb-24">
+          <ul class="flex  flex-col gap-4 items-center text-xl font-semibold pt-24 pb-24">
             <li class="w-[16ch] flex shadow">
               <a href="/profile"
                 class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
@@ -104,11 +148,21 @@
               </a>
             </li>
             <li class="w-[16ch] flex shadow">
-              <a href="/profile"
+              <a href="/user/setting"
                 class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
                 <span>Perfil</span>
               </a>
             </li>
+            {% if g.user %}
+            <li class="w-[16ch] flex shadow">
+              <form class="w-full" action="/logout" method="post">
+                <button
+                  class="w-full text-center hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
+                  Cerrar Sesion
+                </button>
+              </form>
+            </li>
+            {% endif %}
           </ul>
         </div>
       </div>

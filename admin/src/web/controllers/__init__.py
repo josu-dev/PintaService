@@ -117,6 +117,12 @@ def init_app(app: Flask):
         ):
             return None
 
+        g.user = None
+        g.user_permissions = None
+        g.user_has_permissions = (
+            lambda _: False  # pyright: ignore[reportUnknownLambdaType]
+        )
+
         user_email = session.get("user")  # type: ignore
         if user_email is not None:
             user = UserService.get_by_email(user_email)  # type: ignore
@@ -131,19 +137,10 @@ def init_app(app: Flask):
                     current_institution = session.get(  # type: ignore
                         "current_institution"
                     )
-                    if current_institution:
+                    if current_institution is not None:
                         g.user_permissions = AuthService.get_user_permissions(
                             user.id, current_institution  # type: ignore
                         )
-                    else:
-                        g.user_permissions = None
-            else:
-                g.user = None
-                g.user_permissions = None
-        else:
-            g.user = None
-            g.user_permissions = None
-
         # print(
         #     g.user.username if g.user else "No user",
         #     session.get("current_institution"),  # type: ignore
@@ -151,12 +148,11 @@ def init_app(app: Flask):
         # )
 
         site_config = SiteService.get_site_config()
-        if (
-            not site_config.maintenance_active
-            or request.path.startswith("/api")
-            or request.args.get("maintenance") != "true"
+        g.site_config = site_config
+
+        if not site_config.maintenance_active or (
+            g.user_permissions and ("setting_update" in g.user_permissions)
         ):
-            g.site_config = site_config
             return None
 
         return (

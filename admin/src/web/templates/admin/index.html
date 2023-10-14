@@ -1,0 +1,29 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
+
+{% block head %}
+<title>Panel administrador</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4 pt-16">
+  <h1 class="text-3xl font-semibold mt-[1em] text-center text-balance">Panel de administracion para Pinta Service</h1>
+
+  <div class="flex flex-col mt-4 md:mt-8 mx-auto">
+    <ul class="flex flex-col gap-4 mt-4">
+      <li
+        class="flex flex-col md:flex-row md:justify-between md:items-center p-4 border border-gray-200 rounded-md shadow-sm">
+        <a href="/admin/users" class="text-xl font-semibold">Usuarios</a>
+      </li>
+      <li
+        class="flex flex-col md:flex-row md:justify-between md:items-center p-4 border border-gray-200 rounded-md shadow-sm">
+        <a href="/admin" class="text-xl font-semibold">Instituciones</a>
+      </li>
+      <li
+        class="flex flex-col md:flex-row md:justify-between md:items-center p-4 border border-gray-200 rounded-md shadow-sm">
+        <a href="/admin/site_config" class="text-xl font-semibold">Configuración del sitio</a>
+      </li>
+    </ul>
+  </div>
+</main>
+{% endblock %}
