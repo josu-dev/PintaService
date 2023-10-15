@@ -21,7 +21,8 @@
           <p><strong>ID:</strong> {{ service.id }}</p>
         </div>
         <div class="flex items-center">
-          <a href="#" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Editar</a>
+          <a href="/admin/service/{{ service.id }}/edit" class="ml-2 text-blue-500">Editar</a>
+
           <form method="POST" action="/admin/service/{{ service.id }}/delete" class="inline">
             <input type="hidden" name="_method" value="DELETE">
             <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">

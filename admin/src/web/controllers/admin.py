@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request
+from flask import Blueprint, flash, redirect, render_template, request
 from web.forms.site import SiteUpdateForm
 from web.forms.user import UserUpdateForm
 
@@ -76,3 +76,55 @@ def show_services():
     """Show all services in the database"""
     services = ServiceService.get_services()
     return render_template("admin/services.html", services=services)
+
+
+@bp.post("/service/<int:service_id>/delete")
+def service_delete_post(service_id: int):
+    service = ServiceService.get_service(service_id)
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+    else:
+        ServiceService.delete_service(service_id)
+        flash("Servicio eliminado con éxito.", "success")
+    return redirect("/admin/services")
+
+
+# Esto no funciona de momento
+@bp.post("/service/<int:service_id>/edit")
+def edit_service_post(service_id: int):
+    """Edit the service with the new values"""
+    service = ServiceService.get_service(service_id)
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+
+    form = ServiceForm(request.form)
+    if form.validate():
+        ServiceService.update_service(service_id, **form.values())
+        flash("Servicio actualizado con éxito.", "success")
+        return redirect("/admin/services")
+
+    return render_template("admin/edit_user", service=service, form=form)
+
+
+from src.core.models.service import ServiceType
+
+
+@bp.get("/service/<int:service_id>/edit")
+def service_edit_get(service_id: int):
+    """Show the edit service form with its actual values"""
+    service = ServiceService.get_service(service_id)
+
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+
+    categories = [(choice.name, choice.value) for choice in ServiceType]
+    form = ServiceForm(obj=service)
+    return render_template(
+        "service/setting.html",
+        service=service,
+        categories=categories,
+        form=form,
+    )
