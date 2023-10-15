@@ -1,37 +1,37 @@
 {% macro render_field(field) %}
-{% if field.widget.input_type != 'hidden' %}
-<dt>{{ field.label }}</dt>
-{% endif %}
-<dd>{{ field(**kwargs)|safe }}
-  {% if field.errors %}
-  <ul class=errors>
-    {% for error in field.errors %}
-    <li>{{ error }}</li>
-    {% endfor %}
-  </ul>
-  {% endif %}
-</dd>
+<div class="flex flex-col mt-1 [&_label]:font-medium [&_label]:md:text-lg">
+  {% if field.widget.input_type != 'hidden' %}{{ field.label }}{% endif %}
+  {{ field(class="block mt-1 pt-2 pb-1 px-2 w-full text-sm md:text-base shadow-sm
+  rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
+  appearance-none focus:outline-none focus:ring-0 focus:border-orange-600",
+  **kwargs)|safe }}
+  {% if field.errors %}<ul>{% for error in field.errors %}
+    <li class="mt-[0.5em] text-red-500 text-sm md:text-base font-normal">{{ error }}</li>{% endfor %}
+  </ul>{% endif %}
+</div>
 {% endmacro %}
 
-{% macro render_fields(form) %}
-<dl class="flex flex-col gap-4">
-  {% for field in form %}
-  <div>
-    {{ render_field(field) }}
+{% macro render_field_checkbox(field) %}
+<div class="flex flex-col mt-1 [&_label]:font-medium [&_label]:md:text-lg">
+  <div class="flex gap-2 items-center">
+    {% if field.widget.input_type != 'hidden' %}{{ field.label }}{% endif %}
+    {{ field(class="w-6 h-6 text-orange-600 bg-zinc-50 rounded border border-zinc-300
+    focus:outline-none focus:ring-2 focus:ring-orange-500",
+    **kwargs)|safe }}
   </div>
-  {% endfor %}
-</dl>
+  {% if field.errors %}<ul>{% for error in field.errors %}
+    <li class="mt-[0.5em] text-red-500 text-sm md:text-base font-normal">{{ error }}</li>{% endfor %}
+  </ul>{% endif %}
+</div>
 {% endmacro %}
 
-{% macro render_form(form, method="post", action="", enctype="", class="flex flex-col p-4 md:mt-4") %}
-<form method="{{ method }}" {% if action %}action="{{ action }}" {% endif %} {% if enctype %}enctype="{{ enctype }}" {%
-  endif %} class="{{ class }}">
-  {{ render_fields(form) }}
-  {{ caller() }}
+{% macro render_fields(form) %}{% for field in form %}{% if field.type == 'BooleanField' %}{{
+render_field_checkbox(field) }}{% else %}{{ render_field(field) }}{% endif %}{% endfor %}{% endmacro %}
+
+{% macro render_form(form, method="post", class="flex flex-col gap-2 p-4 md:gap-4 md:mt-4") %}
+<form
+  method="{{ method }}" {% for key, value in kwargs.items() %}{{ key }}="{{ value }}" {% endfor %}
+  class="{{ class }}">
+  {{ render_fields(form) }}{{ caller() }}
 </form>
-{% endmacro %}
-
-{% macro button_submit(text) %}
-<button type="submit" class="mx-auto px-4 py-3 rounded border border-black bg-slate-100 hover:bg-slate-200">{{ text
-  }}</button>
 {% endmacro %}
