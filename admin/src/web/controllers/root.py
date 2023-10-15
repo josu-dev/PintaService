@@ -127,8 +127,3 @@ def register():
     AuthService.delete_pre_user(token)
     h.flash_success("Se ha registrado exitosamente")
     return redirect(url_for("root.login"))
-
-
-@bp.route("/search_user", methods=["GET"])
-def search_user():
-    return render_template("search_user.html")

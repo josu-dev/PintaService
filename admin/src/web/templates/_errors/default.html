@@ -1,8 +1,8 @@
-{% extends "base_layout.html" %}
-{% block head %}
+{% extends "_layouts/base.html" %}
+{% block base_head %}
 <title>{{ error_code }}{%if error_page_title %} - {{ error_page_title }}{%endif %}</title>
 {% endblock %}
-{% block body %}
+{% block base_body %}
 <main class="flex flex-coll items-center justify-center h-full">
   <section class="">
     <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">

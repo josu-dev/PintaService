@@ -12,7 +12,14 @@ from src.web.forms.user import ProfileUpdateForm
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
 
+@bp.get("/")
+@h.authenticated_route(module="setting", permissions=("show", "update"))
+def index_get():
+    return render_template("admin/index.html")
+
+
 @bp.get("/site_config")
+@h.authenticated_route(module="setting", permissions=("show",))
 def site_config_get():
     site_config = SiteService.get_site_config()
     form = SiteUpdateForm(request.form, obj=site_config)
@@ -20,6 +27,7 @@ def site_config_get():
 
 
 @bp.post("/site_config")
+@h.authenticated_route(module="setting", permissions=("update",))
 def site_config_post():
     form = SiteUpdateForm(request.form)
     if form.validate():
@@ -41,6 +49,7 @@ def site_config_post():
 
 
 @bp.get("/check_db")
+@h.authenticated_route()
 def check_db_get():
     if DatabaseService.health_check():
         return "Database is up and running", status.HTTP_200_OK
