@@ -168,8 +168,20 @@ class Config:
     WTF_CSRF_ENABLED: bool
     WTF_CSRF_SECRET_KEY: str
 
-    # flask-livetw config
+    # Flask-livetw config
     LIVETW_DEV: bool
+
+    # Flask session config
+    SESSION_TYPE: str
+
+    # Email credentials
+    MAIL_SERVER: str
+    MAIL_PORT: int
+    MAIL_USE_SSL: bool
+    MAIL_USE_TLS: bool
+    MAIL_USERNAME: str
+    MAIL_PASSWORD: str
+    MAIL_DEFAULT_SENDER: str
 
     @classmethod
     def load_env_config(cls) -> None:
@@ -192,11 +204,24 @@ class Config:
 
         cls.LIVETW_DEV = env_or_error("LIVETW_DEV", "false").lower() == "true"
 
+        cls.SESSION_TYPE = env_or_error("SESSION_TYPE", "filesystem")
+
+        cls.MAIL_SERVER = env_or_error("MAIL_SERVER")
+        cls.MAIL_PORT = int(env_or_error("MAIL_PORT"))
+        cls.MAIL_USE_SSL = (
+            env_or_error("MAIL_USE_SSL", "true").lower() == "true"
+        )
+        cls.MAIL_USE_TLS = (
+            env_or_error("MAIL_USE_TLS", "false").lower() == "true"
+        )
+        cls.MAIL_USERNAME = env_or_error("MAIL_USERNAME")
+        cls.MAIL_PASSWORD = env_or_error("MAIL_PASSWORD")
+        cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
+
 
 def init_app(app: Flask, env: str) -> None:
     if env == "development":
         load_dotenv()
-        set_env_default("LIVETW_DEV", "true")
     else:
         load_db_dotenv()
 

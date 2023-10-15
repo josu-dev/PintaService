@@ -1,9 +1,8 @@
 """Model for service."""
-from enum import Enum
-
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
+from src.core.enums import ServiceType
 from src.core.models.base import (
     BaseModel,
     CreatedAt,
@@ -13,12 +12,6 @@ from src.core.models.base import (
     Str512,
     UpdatedAt,
 )
-
-
-class ServiceType(Enum):
-    ANALYSIS = "analysis"
-    CONSULTANCY = "consultancy"
-    DEVELOPMENT = "development"
 
 
 class Service(BaseModel):
