@@ -3,15 +3,14 @@
 {% import "_macros/button.html" as Button %}
 
 {% block head %}
-<title>Mi Página de Servicio</title>
+<title>Service</title>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col">
-  <h1 class="text-3xl font-semibold mt-[1em] ml-2">Creación de Servicio</h1>
-
-  {% call Form.render_form(form) %}
+<main class="flex-1 flex flex-col items-center my-4">
+    <h2>Hola</h2>
+    {% call Form.render_form(form) %}
     {{ Button.primary("Crear", type='submit') }}
-  {% endcall %}
+    {% endcall %}
 </main>
 {% endblock %}

@@ -185,7 +185,7 @@ def edit_service_post(service_id: int):
         flash("Servicio actualizado con éxito.", "success")
         return redirect("/admin/services")
 
-    return render_template("admin/edit_user", service=service, form=form)
+    return render_template("service/setting.html", service=service, form=form)
 
 
 from src.core.models.service import ServiceType

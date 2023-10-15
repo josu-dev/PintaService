@@ -1,0 +1,19 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+
+{% block head %}
+<title>Service</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col items-center my-4">
+    <h2>Holaaaa</h2>
+    {% call Form.render_form(form) %}
+    <div class="flex flex-row gap-x-4">
+        {{Button.primary("Cancelar","reset")}}
+        {{Button.success("Confirmar","submit")}}
+    </div>
+    {% endcall %}
+</main>
+{% endblock %}
