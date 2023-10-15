@@ -1,92 +1,82 @@
 {% extends "_layouts/app.html" %}
 {% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% import "_macros/table.html" as Table %}
+{% from "_macros/pagination.html" import Pagination %}
 
 {% block head %}
 <title>Pinta Service</title>
-<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='styles.css') }}">
-<script src="{{ url_for('static', filename='js/confirm_delete.js') }}"></script>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 flex flex-col">
-
-
   <h1 class="text-3xl font-semibold mt-[1em] ml-2">Usuarios</h1>
 
   <form method="POST" action="/admin/users">
     <input type="text" name="email" placeholder="Filtrar por correo electrónico">
     <select name="active">
-        <option value="">Todos</option>
-        <option value="1">Activos</option>
-        <option value="0">No Activos</option>
+      <option value="">Todos</option>
+      <option value="1">Activos</option>
+      <option value="0">No Activos</option>
     </select>
     <button type="submit" class="filter-button">Filtrar</button>
   </form>
-  <table>
-    <thead>
-        <tr>
-            <th>Email</th>
-            <th>Nombre de usuario</th>
-            <th>Nombre </th>
-            <th>Apellido</th>
-            <th>Acciones</th>
-        </tr>
-    </thead>
+
+  <div class="mt-4 mx-auto md:max-h-[48rem]">
+    {% call Table.Table() %}
+    {{ Table.TableHead(("Email", "Nombre de usuario", "Nombre", "Apellido", "Acciones")) }}
     <tbody>
-        {% if users|length == 0 %}
-            <tr>
-                <td colspan="5">No se encontraron usuarios</td>
-            </tr>
-        {% else %}
-            {% for user in users %}
-            <tr>
-                <td>{{ user.email }}</td>
-                <td>{{ user.username }}</td>
-                <td>{{ user.firstname }}</td>
-                <td>{{ user.lastname }}</td>
-                <td>
-                    <!-- Edit -->
-                    <a href="/admin/user/{{ user.id }}/edit" class="ml-2 text-blue-500">Editar</a>
-
-                    <!-- Activate/Deactivate -->
-                    <form method="POST" action="/admin/user/{{ user.id }}/toggle_active" style="display: inline;">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="ml-2 text-{{ 'red' if user.is_active else 'green' }}-500">
-                            {{ 'Desactivar' if user.is_active else 'Activar' }}
-                        </button>
-                    </form>
-
-                    <!-- Delete -->
-                    <form method="POST" action="/admin/user/{{ user.id }}/delete" style="display: inline;">
-                        <input type="hidden" name="_method" value="DELETE">
-                        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}">
-                        <button type="submit" class="ml-2 text-red-500 delete-button" data-user="{{ user.username }}">Eliminar</button>
-
-                    </form>
-                </td>
-            </tr>
-            {% endfor %}
-        {% endif %}
+      {% if users|length == 0 %}
+      <tr>
+        <td class="text-center font-medium" colspan="5">No se encontraron usuarios</td>
+      </tr>
+      {% endif %}
+      {% for user in users %}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.firstname }}</td>
+        <td>{{ user.lastname }}</td>
+        <td>
+          <div class="flex gap-2">
+            {{ LinkButton.info("Editar", "/admin/user/" ~ user.id ~ "/edit") }}
+            <form method="POST" action="/admin/user/{{ user.id }}/toggle_active" style="display: inline;">
+              {% if user.is_active %}
+              {{ Button.warning("Desactivar", type="submit") }}
+              {% else %}
+              {{ Button.success("Activar", type="submit") }}
+              {% endif %}
+            </form>
+            <form method="POST" action="/admin/user/{{ user.id }}/delete" style="display: inline;">
+              {% set props = {"data-button-delete-user": "", "data-username": user.username} %}
+              {{ Button.danger("Eliminar", type="submit", **props) }}
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
     </tbody>
+    {% endcall %}
+  </div>
 
-    </table>
-
-  <ul class="pagination">
-    {% if page > 1 %}
-      <a href="?page={{ page - 1 }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">Anterior</a>
-    {% endif %}
-    {% set num_pages = total // per_page + (total % per_page > 0) %}
-    {% for i in range(1, num_pages + 1) %}
-        {% if i == page %}
-            <span class="current-page">{{ i }}</span>
-        {% else %}
-          <a href="?page={{ i }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">{{ i }}</a>
-        {% endif %}
-    {% endfor %}
-    {% if page * per_page < total %}
-      <a href="?page={{ page + 1 }}{% if email %}&email={{ email }}{% endif %}{% if active is not none %}&active={{ active }}{% endif %}">Siguiente</a>
-    {% endif %}
-  </ul>
-
+  <div class="mt-4 flex-none">
+    {% set query_args = (["email=" ~ email] if email else []) + (["active=" ~ active] if active else []) %}
+    {{ Pagination(page, per_page, total, query_args) }}
+  </div>
 </main>
+
+<script>
+  /** @type {NodeListOf<HTMLButtonElement>} */
+  const deleteUserButtons = document.querySelectorAll('[data-button-delete-user]');
+
+  deleteUserButtons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const username = event.target.getAttribute('data-username');
+      if (!confirm(`¿Estás seguro de que quieres eliminar al usuario ${username}?`)) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
 {% endblock %}
