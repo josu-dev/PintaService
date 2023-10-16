@@ -170,7 +170,6 @@ def service_delete_post(service_id: int):
     return redirect("/admin/services")
 
 
-# Esto no funciona de momento
 @bp.post("/service/<int:service_id>/edit")
 def edit_service_post(service_id: int):
     """Edit the service with the new values"""
@@ -206,5 +205,72 @@ def service_edit_get(service_id: int):
         "service/setting.html",
         service=service,
         categories=categories,
+        form=form,
+    )
+
+
+from web.forms.institution import InstitutionForm
+
+from src.services.institution import InstitutionService
+
+
+@bp.route("/create_institution", methods=["GET", "POST"])
+def create_institution():
+    form = InstitutionForm(request.form)
+    if request.method == "POST":
+        InstitutionService.create_institution(**form.values())
+    return render_template("admin/create_institution.html", form=form)
+
+
+@bp.route("/institutions", methods=["GET"])
+def show_institutions():
+    institutions = InstitutionService.get_institutions()
+    return render_template(
+        "admin/institutions.html", institutions=institutions
+    )
+
+
+@bp.post("/institution/<int:institution_id>/delete")
+def institution_delete_post(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+    else:
+        InstitutionService.delete_institution(institution_id)
+        flash("Institución eliminada con éxito.", "success")
+    return redirect("/admin/institutions")
+
+
+@bp.post("/institution/<int:institution_id>/edit")
+def edit_institution_post(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+
+    form = InstitutionForm(request.form)
+    if form.validate():
+        InstitutionService.update_institution(institution_id, **form.values())
+        flash("Institución actualizada con éxito.", "success")
+        return redirect("/admin/institutions")
+
+    return render_template(
+        "institution/setting.html", institution=institution, form=form
+    )
+
+
+@bp.get("/institution/<int:institution_id>/edit")
+def institution_edit_get(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+
+    form = InstitutionForm(obj=institution)
+    return render_template(
+        "institution/setting.html",
+        institution=institution,
         form=form,
     )
