@@ -1,11 +1,16 @@
 from flask import Blueprint, flash, g, redirect, render_template, request
 
 from src.core.enums import GenderOptions
+from src.core.models.service import ServiceType
 from src.services.database import DatabaseService
+from src.services.institution import InstitutionService
+from src.services.service import ServiceService
 from src.services.site import SiteService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
+from src.web.forms.institution import InstitutionForm
+from src.web.forms.service import ServiceForm
 from src.web.forms.site import SiteUpdateForm
 from src.web.forms.user import ProfileUpdateForm
 
@@ -135,3 +140,132 @@ def toggle_active(user_id: int):
         else:
             flash("Usuario desactivado con éxito.", "success")
     return redirect("/admin/users")
+
+
+@bp.route("/create_service", methods=["GET", "POST"])
+def create_service():
+    """Create a service form page"""
+    form = ServiceForm(request.form)
+    if request.method == "POST":
+        ServiceService.create_service(**form.values())
+        flash("Servicio creado con exito", "success")
+        return redirect("/admin/services")
+    return render_template("admin/create_service.html", form=form)
+
+
+@bp.route("/services", methods=["GET"])
+def show_services():
+    """Show all services in the database"""
+    services = ServiceService.get_services()
+    return render_template("admin/services.html", services=services)
+
+
+@bp.post("/service/<int:service_id>/delete")
+def service_delete_post(service_id: int):
+    service = ServiceService.get_service(service_id)
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+    else:
+        ServiceService.delete_service(service_id)
+        flash("Servicio eliminado con éxito.", "success")
+    return redirect("/admin/services")
+
+
+@bp.post("/service/<int:service_id>/edit")
+def edit_service_post(service_id: int):
+    """Edit the service with the new values"""
+    service = ServiceService.get_service(service_id)
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+
+    form = ServiceForm(request.form)
+    if form.validate():
+        ServiceService.update_service(service_id, **form.values())
+        flash("Servicio actualizado con éxito.", "success")
+        return redirect("/admin/services")
+
+    return render_template("service/setting.html", service=service, form=form)
+
+
+@bp.get("/service/<int:service_id>/edit")
+def service_edit_get(service_id: int):
+    """Show the edit service form with its actual values"""
+    service = ServiceService.get_service(service_id)
+
+    if not service:
+        flash("Servicio no encontrado.", "error")
+        return redirect("/admin/services")
+
+    categories = [(choice.name, choice.value) for choice in ServiceType]
+    form = ServiceForm(obj=service)
+    return render_template(
+        "service/setting.html",
+        service=service,
+        categories=categories,
+        form=form,
+    )
+
+
+@bp.route("/create_institution", methods=["GET", "POST"])
+def create_institution():
+    form = InstitutionForm(request.form)
+    if request.method == "POST":
+        InstitutionService.create_institution(**form.values())
+        return redirect("/admin/institutions")
+    return render_template("admin/create_institution.html", form=form)
+
+
+@bp.route("/institutions", methods=["GET"])
+def show_institutions():
+    institutions = InstitutionService.get_institutions()
+    return render_template(
+        "admin/institutions.html", institutions=institutions
+    )
+
+
+@bp.post("/institution/<int:institution_id>/delete")
+def institution_delete_post(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+    else:
+        InstitutionService.delete_institution(institution_id)
+        flash("Institución eliminada con éxito.", "success")
+    return redirect("/admin/institutions")
+
+
+@bp.post("/institution/<int:institution_id>/edit")
+def edit_institution_post(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+
+    form = InstitutionForm(request.form)
+    if form.validate():
+        InstitutionService.update_institution(institution_id, **form.values())
+        flash("Institución actualizada con éxito.", "success")
+        return redirect("/admin/institutions")
+
+    return render_template(
+        "institution/setting.html", institution=institution, form=form
+    )
+
+
+@bp.get("/institution/<int:institution_id>/edit")
+def institution_edit_get(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+
+    form = InstitutionForm(obj=institution)
+    return render_template(
+        "institution/setting.html",
+        institution=institution,
+        form=form,
+    )
