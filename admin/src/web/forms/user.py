@@ -51,7 +51,7 @@ class ProfileUpdateForm(FlaskForm):
             "document_type": t.cast(DocumentTypes, self.document_type.data),
             "document_number": self.document_number.data,  # type: ignore
             "gender": t.cast(GenderOptions, self.gender.data),
-            "gender_other": self.gender_other.data,  # type: ignore
+            "gender_other": self.gender_other.data or "",  # type: ignore
             "address": self.address.data,  # type: ignore
             "phone": self.phone.data,  # type: ignore
         }
