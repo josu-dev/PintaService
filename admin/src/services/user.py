@@ -1,10 +1,12 @@
 from typing import List, Optional, Tuple, TypedDict, Union
 
+from sqlalchemy import and_
 from typing_extensions import Unpack
 
 from src.core.bcrypt import bcrypt
 from src.core.db import db
 from src.core.enums import DocumentTypes, GenderOptions
+from src.core.models.auth import SiteAdmin
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
@@ -48,13 +50,15 @@ class UserService(BaseService):
         cls, page: int = 1, per_page: int = 10
     ) -> Tuple[List[User], int]:
         """Get  users from database"""
+        subquery = db.session.query(SiteAdmin.user_id)
         users = (
             db.session.query(User)
+            .filter(~User.id.in_(subquery))
             .offset((page - 1) * per_page)
             .limit(per_page)
             .all()
         )
-        total = db.session.query(User).count()
+        total = db.session.query(User).count() - subquery.count()
         return users, total
 
     @classmethod
@@ -165,6 +169,8 @@ class UserService(BaseService):
             query = query.filter(User.is_active)
         elif active == "0":
             query = query.filter(~User.is_active)
+
+        query = query.join(SiteAdmin, and_(User.id != SiteAdmin.user_id))
 
         total = query.count()
         users = query.offset((page - 1) * per_page).limit(per_page).all()
