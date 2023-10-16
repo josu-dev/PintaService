@@ -4,7 +4,7 @@ from src.core.db import db
 from src.core.models.institution import Institution
 
 
-class PartialInstitutionConfig(TypedDict):
+class InstitutionConfig(TypedDict):
     name: str
     information: str
     address: str
@@ -29,7 +29,7 @@ class InstitutionService:
         return db.session.query(Institution).get(institution_id)
 
     @classmethod
-    def create_institution(cls, **kwargs: PartialInstitutionConfig):
+    def create_institution(cls, **kwargs: InstitutionConfig):
         """Create a new institution in the database."""
         institution = Institution(**kwargs)
         if InstitutionService.get_institution(institution.id):
@@ -39,7 +39,7 @@ class InstitutionService:
 
     @classmethod
     def update_institution(
-        cls, institution_id: int, **kwargs: PartialInstitutionConfig
+        cls, institution_id: int, **kwargs: InstitutionConfig
     ):
         """Update an existing institution in the database."""
         institution = db.session.query(Institution).get(institution_id)

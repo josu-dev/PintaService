@@ -1,8 +1,8 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, TextAreaField
+from wtforms import EmailField, StringField, TextAreaField
 from wtforms import validators as v
 
-from src.services.institution import PartialInstitutionConfig
+from src.services.institution import InstitutionConfig
 
 
 class InstitutionForm(FlaskForm):
@@ -30,7 +30,7 @@ class InstitutionForm(FlaskForm):
         "Palabras clave",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
-    email = StringField(
+    email = EmailField(
         "Correo electrónico",
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
@@ -39,7 +39,14 @@ class InstitutionForm(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
 
-    def values(self) -> PartialInstitutionConfig:  # Service Algo
-        data = self.data
-        data.pop("csrf_token")
-        return PartialInstitutionConfig(**data)
+    def values(self) -> InstitutionConfig:  # Service Algo
+        return {  # type: ignore
+            "name": self.name.data,
+            "information": self.information.data,
+            "address": self.address.data,
+            "location": self.location.data,
+            "web": self.web.data,
+            "keywords": self.keywords.data,
+            "email": self.email.data,
+            "days_and_opening_hours": self.days_and_opening_hours.data,
+        }
