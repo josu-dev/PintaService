@@ -7,7 +7,7 @@ from src.core.models.service import Service
 from src.services.base import BaseService
 
 
-class PartialServiceConfig(TypedDict):
+class ServiceConfig(TypedDict):
     name: str
     laboratory: str
     description: str
@@ -29,9 +29,7 @@ class ServiceService(BaseService):
         return db.session.query(Service).get(service_id)
 
     @classmethod
-    def update_service(
-        cls, service_id: int, **kwargs: Unpack[PartialServiceConfig]
-    ):
+    def update_service(cls, service_id: int, **kwargs: Unpack[ServiceConfig]):
         """Update service in the database."""
         service = db.session.query(Service).get(service_id)
         if service:
@@ -50,7 +48,7 @@ class ServiceService(BaseService):
             db.session.commit()
 
     @classmethod
-    def create_service(cls, **kwargs: Unpack[PartialServiceConfig]):
+    def create_service(cls, **kwargs: Unpack[ServiceConfig]):
         """Create service in the database."""
         service = Service(**kwargs)
         if ServiceService.get_service(service.id):

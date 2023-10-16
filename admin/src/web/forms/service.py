@@ -1,9 +1,11 @@
+import typing as t
+
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, SelectField, StringField, TextAreaField
+from wtforms import SelectField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.core.models.service import ServiceType
-from src.services.service import PartialServiceConfig
+from src.services.service import ServiceConfig
 
 
 class ServiceForm(FlaskForm):
@@ -25,16 +27,15 @@ class ServiceForm(FlaskForm):
     )
     service_type = SelectField(
         "Tipo de Servicio",
-        choices=[
-            (ServiceType.ANALYSIS.value, "Análisis"),
-            (ServiceType.CONSULTANCY.value, "Consulta"),
-            (ServiceType.DEVELOPMENT.value, "Desarrollo"),
-        ],
+        choices=[(choice.name, choice.value) for choice in ServiceType],
         validators=[v.DataRequired()],
     )
 
-    def values(self) -> PartialServiceConfig:  # Service Algo
-        data = self.data
-        data["service_type"] = ServiceType(data["service_type"])
-        data.pop("csrf_token")
-        return PartialServiceConfig(**data)
+    def values(self) -> ServiceConfig:  # Service Algo
+        return {  # type:ignore
+            "name": self.name.data,
+            "laboratory": self.laboratory.data,
+            "description": self.description.data,
+            "keywords": self.keywords.data,
+            "service_type": t.cast(ServiceType, self.service_type.data),
+        }
