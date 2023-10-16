@@ -13,6 +13,20 @@ _blueprints = (
 )
 
 
+def handle_forbidden_error(e: exceptions.Forbidden):
+    print(e.args, flush=True)
+    return (
+        render_template(
+            "_errors/default.html",
+            error_code="403",
+            error_title="Acceso denegado",
+            error_message=f"El método \
+                {request.method} no está permitido en esta página",
+        ),
+        405,
+    )
+
+
 def handle_not_found_error(e: exceptions.NotFound):
     if request.path.startswith("/api"):
         return api.API_NOT_FOUND_RESPONSE
@@ -87,6 +101,8 @@ def register_error_handlers(app: Flask) -> None:
 
     if False or app.config["LIVETW_DEV"]:
         return
+
+    app.register_error_handler(exceptions.Forbidden, handle_forbidden_error)
 
     app.register_error_handler(
         exceptions.MethodNotAllowed, handle_method_not_allowed_error
