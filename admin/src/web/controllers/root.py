@@ -20,86 +20,114 @@ bp = Blueprint("root", __name__)
 
 @bp.get("/")
 @h.authenticated_route()
-def index():
+def index_get():
     return render_template("index.html")
 
 
-@bp.route("/logout", methods=["POST"])
-def logout():
+@bp.post("/logout")
+def logout_get():
     if session.get("user"):
         del session["user"]
         if session.get("is_admin"):
             del session["is_admin"]
         session.clear()
         h.flash_info("La sesion se cerro correctamente")
-        return redirect(url_for("root.login"))
+        return redirect(url_for("root.login_get"))
 
     h.flash_info("No hay una sesion iniciada")
-    return redirect(url_for("root.login"))
+    return redirect(url_for("root.login_get"))
 
 
-@bp.route("/login", methods=["GET", "POST"])
+@bp.get("/login")
 @h.unauthenticated_route()
-def login():
-    if request.method == "POST":
-        form = UserLogin(request.form)
-        if form.validate():
-            user = UserService.validate_email_password(**form.values())
-            if user:
-                session["user"] = user.email
-                session["id"] = user.id
-                if AuthService.user_is_site_admin(user.id):
-                    session["is_admin"] = True
-                h.flash_success("Se inicio sesion correctamente")
-                return redirect(url_for("root.index"))
+def login_get():
+    return render_template("login.html")
 
-        h.flash_error("Los datos ingresados son invalidos")
+
+@bp.post("/login")
+@h.unauthenticated_route()
+def login_post():
+    form = UserLogin(request.form)
+    if form.validate():
+        user = UserService.validate_email_password(**form.values())
+        if user:
+            session["user"] = user.email
+            session["user_id"] = user.id
+            if AuthService.user_is_site_admin(user.id):
+                session["is_admin"] = True
+
+            h.flash_success("Se inicio sesion correctamente")
+            return redirect(url_for("root.index_get"))
+
+    h.flash_error("Los datos ingresados son invalidos")
 
     return render_template("login.html")
 
 
-@bp.route("/pre_register", methods=["GET", "POST"])
+@bp.get("/pre_register")
 @h.unauthenticated_route()
-def pre_register():
-    form = UserPreRegister(request.form)
-    if request.method == "POST":
-        if not form.validate():
-            h.flash_error("Los datos ingresados son invalidos")
-            return render_template("pre_register.html")
-
-        email = t.cast(str, form.email.data)
-        if AuthService.exist_pre_user_with_email(
-            email
-        ) or UserService.get_by_email(email):
-            h.flash_error("el mail ya esta registrado")
-            return render_template("pre_register.html")
-
-        AuthService.create_pre_user(**form.values())
-        h.flash_success("verifique su casilla de correo electronico")
-
+def pre_register_get():
     return render_template("pre_register.html")
 
 
-@bp.route("/register", methods=["GET", "POST"])
+@bp.post("/pre_register")
 @h.unauthenticated_route()
-def register():
+def pre_register_post():
+    form = UserPreRegister(request.form)
+    if not form.validate():
+        h.flash_error("Los datos ingresados son invalidos")
+        return render_template("pre_register.html")
+
+    email = t.cast(str, form.email.data)
+    if AuthService.exist_pre_user_with_email(
+        email
+    ) or UserService.get_by_email(email):
+        h.flash_error("el mail ya esta registrado")
+        return render_template("pre_register.html")
+
+    AuthService.create_pre_user(**form.values())
+    h.flash_success("verifique su casilla de correo electronico")
+    return render_template("pre_register.html")
+
+
+@bp.get("/register")
+@h.unauthenticated_route()
+def register_get():
     token = request.args.get("token")
     if not token:
         h.flash_info("realice el registro o revise su casilla de email")
-        return redirect(url_for("root.pre_register"))
+        return redirect(url_for("root.login_get"))
 
     user = AuthService.get_pre_user_by_token(token)
     if user is None:
         h.flash_info("realice el registro o revise su casilla de email")
-        return redirect(url_for("root.pre_register"))
+        return redirect(url_for("root.login_get"))
 
     if AuthService.token_expired(user.created_at):
         AuthService.delete_pre_user(token)
         h.flash_info("El token expiro, realice el registro nuevamente")
-        return redirect(url_for("root.pre_register"))
+        return redirect(url_for("root.pre_register_get"))
 
-    if request.method == "GET":
-        return render_template("register.html")
+    return render_template("register.html")
+
+
+@bp.post("/register")
+@h.unauthenticated_route()
+def register_post():
+    token = request.args.get("token")
+    if not token:
+        h.flash_info("realice el registro o revise su casilla de email")
+        return redirect(url_for("root.login_get"))
+
+    user = AuthService.get_pre_user_by_token(token)
+    if user is None:
+        h.flash_info("realice el registro o revise su casilla de email")
+        return redirect(url_for("root.login_get"))
+
+    if AuthService.token_expired(user.created_at):
+        AuthService.delete_pre_user(token)
+        h.flash_info("El token expiro, realice el registro nuevamente")
+        return redirect(url_for("root.pre_register_get"))
 
     form = UserRegister(request.form)
     if not form.validate():
@@ -126,10 +154,10 @@ def register():
     )
     AuthService.delete_pre_user(token)
     h.flash_success("Se ha registrado exitosamente")
-    return redirect(url_for("root.login"))
+    return redirect(url_for("root.login_get"))
 
 
-@bp.route("/account_disabled", methods=["GET"])
+@bp.get("/account_disabled")
 @h.login_required()
-def account_disabled():
+def account_disabled_get():
     return render_template("account_disabled.html")

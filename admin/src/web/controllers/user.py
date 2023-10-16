@@ -34,7 +34,7 @@ def user_setting_post():
     user_setting = UserService.get_by_email(t.cast(str, session.get("user")))
     if form.validate():
         try:
-            id_user = t.cast(int, session.get("id"))
+            id_user = t.cast(int, session.get("user_id"))
             user_setting = UserService.update_user(id_user, **form.values())
             if user_setting is None:
                 return redirect("/login")
