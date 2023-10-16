@@ -12,7 +12,7 @@ bp = Blueprint("user", __name__, url_prefix="/user")
 
 
 @bp.get("/setting")
-@h.login_required()
+@h.authenticated_route()
 def user_setting_get():
     user = UserService.get_by_email(t.cast(str, session["user"]))
     form = ProfileUpdateForm(obj=user)
@@ -28,7 +28,7 @@ def user_setting_get():
 
 
 @bp.post("/setting")
-@h.login_required()
+@h.authenticated_route()
 def user_setting_post():
     form = ProfileUpdateForm(request.form)
     user_setting = UserService.get_by_email(t.cast(str, session.get("user")))

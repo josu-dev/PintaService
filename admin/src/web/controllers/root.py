@@ -127,3 +127,9 @@ def register():
     AuthService.delete_pre_user(token)
     h.flash_success("Se ha registrado exitosamente")
     return redirect(url_for("root.login"))
+
+
+@bp.route("/account_disabled", methods=["GET"])
+@h.login_required()
+def account_disabled():
+    return render_template("account_disabled.html")
