@@ -91,6 +91,13 @@ def authenticated_route(
             if flask.session.get("user") is None:
                 return flask.redirect("/login")
 
+            if (
+                flask.g.user is not None
+                and not flask.g.user.is_active
+                and not has_permissions(("user_update",))
+            ):
+                return flask.redirect("/account_disabled")
+
             flask.g.user_has_permissions = has_permissions
 
             if not has_permissions(_permissions):
