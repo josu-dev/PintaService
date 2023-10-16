@@ -3,6 +3,7 @@ static/.dev/tailwind.css
 
 # envs
 .env*
+!.env.example
 
 #flask_session
 flask_session/
