@@ -1,35 +1,21 @@
 {% extends "_layouts/auth.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
 
 {% block head %}
 <title>Pre registro</title>
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:basis-1/2 items-center">
-  <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
-    alt="cidepint logo" class='w-20 md:w-72 h-20 md:h-72 my-6 xs:p-2'>
-  <p class="sr-only xs:not-sr-only xs:m-2 md:mx-16 text-center text-balance">
-    Lorem ipsum dolor sit amet, consectetuer adipiscing elit.
-    Aenean commodo ligula eget dolor.
-  </p>
-</div>
 <div class="flex flex-col items-center md:basis-1/2">
   <form class="flex flex-col w-9/12 gap-5 md:max-w-sm" method="post">
-    <div class="flex flex-col">
-      <label class="mb-2">Nombre/s</label>
-      <input type="text" id="firstname" name="firstname">
-    </div>
-    <div class="flex flex-col">
-      <label class="mb-2">Apellido/s</label>
-      <input type="text" id="lastname" name="lastname">
-    </div>
-    <div class="flex flex-col">
-      <label class="mb-2">Email</label>
-      <input type="text" id="email" name="email">
-    </div>
-    <button class="bg-red-500 py-2 xs:mx-5">Registrarme</button>
-    <button class="bg-red-500 py-2 xs:mx-5">Registrarme con
-      Google</button>
+    {{ Form.render_field(form.firstname) }}
+    {{ Form.render_field(form.lastname) }}
+    {{ Form.render_field(form.email) }}
+
+    {{Button.success("Registrarme","submit")}}
+    {{Button.default("Registrarme con
+    Google")}}
   </form>
   <div class="flex flex-row gap-2 mt-2">
     <p>¿Tienes cuenta?</p>

@@ -1,0 +1,25 @@
+{% extends "_layouts/base.html" %}
+{% block base_head %}
+<title>Pre registro</title>
+{% endblock %}
+{% block base_body %}
+<main class="flex flex-coll items-center justify-center h-full">
+  <section class="">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+      <div class="mx-auto max-w-screen-sm text-center">
+        <h1
+          class="mb-4 text-5xl tracking-tight font-extrabold md:text-5xl lg:text-5xl text-orange-600 dark:text-orange-500">
+          Verifique su casilla de correo electronico
+        </h1>
+        <p class="mb-4 text-xl tracking-tight font-bold text-zinc-900 md:text-xl">
+          Para completar el registro revise su casilla de correo electronico y siga los pasos.
+        </p>
+        <div class="flex flex-row gap-2 items-center justify-center h-full mt-10">
+          <p>¿Tienes cuenta?</p>
+          <a href="{{ url_for('root.index_get')}}" class="text-blue-700">Inicia sesion</a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}

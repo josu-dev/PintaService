@@ -48,7 +48,8 @@ def logout_post():
 @bp.get("/login")
 @h.require_no_session()
 def login_get():
-    return render_template("login.html")
+    form = UserLogin()
+    return render_template("login.html", form=form)
 
 
 @bp.post("/login")
@@ -74,7 +75,8 @@ def login_post():
 @bp.get("/pre_register")
 @h.require_no_session()
 def pre_register_get():
-    return render_template("pre_register.html")
+    form = UserPreRegister()
+    return render_template("pre_register.html", form=form)
 
 
 @bp.post("/pre_register")
@@ -83,18 +85,17 @@ def pre_register_post():
     form = UserPreRegister(request.form)
     if not form.validate():
         h.flash_error("Los datos ingresados son invalidos")
-        return render_template("pre_register.html")
+        return render_template("pre_register.html", form=form)
 
     email = t.cast(str, form.email.data)
     if AuthService.exist_pre_user_with_email(
         email
     ) or UserService.get_by_email(email):
-        h.flash_error("el mail ya esta registrado")
-        return render_template("pre_register.html")
+        h.flash_error("El mail ya esta registrado")
+        return render_template("pre_register.html", form=form)
 
     AuthService.create_pre_user(**form.values())
-    h.flash_success("verifique su casilla de correo electronico")
-    return render_template("pre_register.html")
+    return render_template("info_register.html")
 
 
 @bp.get("/register")
@@ -102,12 +103,12 @@ def pre_register_post():
 def register_get():
     token = request.args.get("token")
     if not token:
-        h.flash_info("realice el registro o revise su casilla de email")
+        h.flash_info("Realice el registro o revise su casilla de email")
         return redirect(url_for("root.login_get"))
 
     user = AuthService.get_pre_user_by_token(token)
     if user is None:
-        h.flash_info("realice el registro o revise su casilla de email")
+        h.flash_info("Realice el registro o revise su casilla de email")
         return redirect(url_for("root.login_get"))
 
     if AuthService.token_expired(user.created_at):
@@ -115,7 +116,8 @@ def register_get():
         h.flash_info("El token expiro, realice el registro nuevamente")
         return redirect(url_for("root.pre_register_get"))
 
-    return render_template("register.html")
+    form = UserRegister()
+    return render_template("register.html", form=form)
 
 
 @bp.post("/register")
@@ -123,12 +125,12 @@ def register_get():
 def register_post():
     token = request.args.get("token")
     if not token:
-        h.flash_info("realice el registro o revise su casilla de email")
+        h.flash_info("Realice el registro o revise su casilla de email")
         return redirect(url_for("root.login_get"))
 
     user = AuthService.get_pre_user_by_token(token)
     if user is None:
-        h.flash_info("realice el registro o revise su casilla de email")
+        h.flash_info("Realice el registro o revise su casilla de email")
         return redirect(url_for("root.login_get"))
 
     if AuthService.token_expired(user.created_at):
@@ -139,12 +141,12 @@ def register_post():
     form = UserRegister(request.form)
     if not form.validate():
         h.flash_info("Los datos ingresados son invalidos")
-        return render_template("register.html")
+        return render_template("register.html", form=form)
 
     form_values = form.values()
     if UserService.exist_user_with_username(form_values["username"]):
         h.flash_info("El nombre de usuario esta utilizado")
-        return render_template("register.html")
+        return render_template("register.html", form=form)
 
     UserService.create_user(
         username=form_values["username"],
