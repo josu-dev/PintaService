@@ -21,9 +21,8 @@
           , si crees que ha sido un error contactate con el servicio al cliente
           {{g.site_config.contact_info}}
           {% endif %}
-          <br />
         </p>
-        <form method="POST" action="/logout_post">
+        <form method="POST" action="/logout">
           {{ Button.primary("Cerrar sesion", type="submit") }}
         </form>
       </div>

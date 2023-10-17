@@ -1,9 +1,9 @@
+import functools
 import typing as t
-from functools import wraps
 
-from flask import request
+import flask
+import flask_wtf
 from flask import typing as tf
-from flask_wtf import FlaskForm  # pyright: ignore[reportMissingTypeStubs]
 
 from src.utils import status
 
@@ -54,20 +54,27 @@ class BaseAPIError(Exception):
         return rv
 
 
+def handle_api_error(e: BaseAPIError):
+    return (
+        e.asdict(),
+        e.status_code,
+    )
+
+
 TRoute = t.TypeVar("TRoute", bound=t.Callable[..., t.Any])
 
 
 def validation(
-    schema: t.Type[FlaskForm],
+    schema: t.Type[flask_wtf.FlaskForm],
     method: t.Literal["GET", "POST"] = "POST",
     content_type: t.Literal["json", False] = "json",
     auth_required: bool = False,
     debug: bool = False,
 ) -> t.Callable[[TRoute], TRoute]:
     def decorator(func: TRoute) -> TRoute:
-        @wraps(func)
+        @functools.wraps(func)
         def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
-            if content_type == "json" and not request.is_json:
+            if content_type == "json" and not flask.request.is_json:
                 return API_BAD_REQUEST_RESPONSE
 
             if auth_required:
@@ -76,7 +83,7 @@ def validation(
                 ...
 
             if method == "GET":
-                form = schema(request.args, csrf_enabled=False)
+                form = schema(flask.request.args, csrf_enabled=False)
                 res_kwarg = "args"
             else:
                 form = schema(csrf_enabled=False)
@@ -84,13 +91,13 @@ def validation(
 
             if not form.validate():
                 if debug:
-                    print(form.errors, flush=True)  # pyright: ignore
+                    print(form.errors, flush=True)
                 return API_BAD_REQUEST_RESPONSE
 
             kwargs[res_kwarg] = form.values()  # pyright: ignore
 
             return func(*args, **kwargs)
 
-        return t.cast(TRoute, wrapper)
+        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator

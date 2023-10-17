@@ -1,0 +1,11 @@
+{% extends "_layouts/app.html" %}
+
+{% block head %}
+<title>{{ institution.name }}</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4 pt-16">
+  <h1 class="text-3xl font-semibold mt-[1em] text-center text-balance">{{ institution.name }}</h1>
+</main>
+{% endblock %}

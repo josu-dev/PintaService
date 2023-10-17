@@ -1,178 +1,108 @@
-from flask import Flask, g, render_template, request, session
-from sqlalchemy.exc import SQLAlchemyError
-from werkzeug import exceptions
+import typing as t
 
-from src.services import base
-from src.web.controllers import admin, api, root, user
+import flask
+
+from src.web.controllers import (
+    admin,
+    api,
+    institution,
+    request,
+    root,
+    service,
+    user,
+)
+
+service.bp.register_blueprint(
+    request.bp, url_prefix="/<int:service_id>/requests"
+)
+institution.bp.register_blueprint(
+    service.bp, url_prefix="/<int:institution_id>/services"
+)
 
 _blueprints = (
     admin.bp,
     api.bp,
     root.bp,
     user.bp,
+    institution.bp,
 )
 
 
-def handle_forbidden_error(e: exceptions.Forbidden):
-    print(e.args, flush=True)
-    return (
-        render_template(
-            "_errors/default.html",
-            error_code="403",
-            error_title="Acceso denegado",
-            error_message=f"El método \
-                {request.method} no está permitido en esta página",
-        ),
-        405,
-    )
+def init_app(app: flask.Flask):
+    from src.web.controllers import _errors
 
+    _errors.register_error_handlers(app)
 
-def handle_not_found_error(e: exceptions.NotFound):
-    if request.path.startswith("/api"):
-        return api.API_NOT_FOUND_RESPONSE
-
-    return (render_template("_errors/404.html"), 404)
-
-
-def handle_method_not_allowed_error(e: exceptions.MethodNotAllowed):
-    if request.path.startswith("/api"):
-        return api.API_METHOD_NOT_ALLOWED_RESPONSE
-
-    return (
-        render_template(
-            "_errors/default.html",
-            error_code="405",
-            error_title="Método http no permitido",
-            error_message=f"El método \
-                {request.method} no está permitido en esta página",
-        ),
-        405,
-    )
-
-
-def handle_service_error(e: base.BaseServiceError):
-    return (
-        render_template(
-            "_errors/500.html",
-            error_code="500",
-            error_title="Error interno del servidor",
-            error_message=e.message or "Se ha producido un error inesperado",
-        ),
-        500,
-    )
-
-
-def handle_sqlalchemy_error(e: SQLAlchemyError):
-    return (
-        render_template(
-            "_errors/500.html",
-            error_code="500",
-            error_title="Error interno del servidor",
-            error_message=f"Se ha producido un error inesperado \
-                con la base de datos{(', ' + e.code) if e.code else ''}",
-        ),
-        500,
-    )
-
-
-def handle_internal_server_error(e: exceptions.InternalServerError):
-    error_code = 500 if e.code is None else e.code
-    error_message = "Se ha producido un error inesperado"
-    if (
-        e.original_exception
-        and hasattr(e.original_exception, "message")
-        and isinstance(e.original_exception.message, str)  # type: ignore
-        and len(e.original_exception.message) > 0  # type: ignore
-    ):
-        error_message = e.original_exception.message  # type: ignore
-
-    return (
-        render_template(
-            "_errors/500.html",
-            error_code=error_code,
-            error_message=error_message,
-        ),
-        error_code,
-    )
-
-
-def register_error_handlers(app: Flask) -> None:
-    app.register_error_handler(exceptions.NotFound, handle_not_found_error)
-
-    if False or app.config["LIVETW_DEV"]:
-        return
-
-    app.register_error_handler(exceptions.Forbidden, handle_forbidden_error)
-
-    app.register_error_handler(
-        exceptions.MethodNotAllowed, handle_method_not_allowed_error
-    )
-
-    app.register_error_handler(api.APIError, api.handle_api_error)
-
-    app.register_error_handler(base.BaseServiceError, handle_service_error)
-
-    app.register_error_handler(SQLAlchemyError, handle_sqlalchemy_error)
-
-    app.register_error_handler(
-        exceptions.InternalServerError, handle_internal_server_error
-    )
-
-
-def init_app(app: Flask):
     for bp in _blueprints:
         app.register_blueprint(bp)
 
     from src.services.auth import AuthService
+    from src.services.institution import InstitutionService
     from src.services.site import SiteService
     from src.services.user import UserService
 
-    def before_request_hook():
-        if request.path.startswith("/login") or request.path.startswith(
-            "/static"
-        ):
+    def user_has_permissions(_: t.Tuple[str, ...]) -> bool:
+        return False
+
+    def get_institution_id(url_path: str) -> t.Union[int, None]:
+        if not url_path.startswith("/institutions/"):
             return None
 
-        g.user = None
-        g.user_permissions = None
-        g.user_has_permissions = (
-            lambda _: False  # pyright: ignore[reportUnknownLambdaType]
-        )
+        institution_id = url_path.split("/")[2]
+        if institution_id.isdigit():
+            return int(institution_id)
 
-        user_email = session.get("user")  # type: ignore
-        if user_email is not None:
-            user = UserService.get_by_email(user_email)  # type: ignore
+        return None
+
+    def before_request_hook():
+        if flask.request.path.startswith("/static"):
+            return None
+
+        flask.g.user = None
+        flask.g.user_permissions = tuple()
+        flask.g.user_has_permissions = user_has_permissions
+        flask.g.institution_id = None
+        flask.g.institutions = tuple()
+
+        user_id = flask.session.get("user_id")  # type: ignore
+        if user_id is not None:
+            user = UserService.get_user(user_id)  # type: ignore
             if user is not None:
-                g.user = user
+                flask.g.user = user
 
-                if session.get("is_admin"):
-                    g.user_permissions = (
+                if flask.session.get("is_admin"):
+                    flask.g.user_permissions = (
                         AuthService.get_site_admin_permissions(user.id)
                     )
-                else:
-                    current_institution = session.get(  # type: ignore
-                        "current_institution"
+                    flask.g.institutions = (
+                        InstitutionService.get_institutions()
                     )
-                    if current_institution is not None:
-                        g.user_permissions = AuthService.get_user_permissions(
-                            user.id, current_institution  # type: ignore
+                else:
+                    institution_id = get_institution_id(flask.request.path)
+                    flask.g.instituin_id = institution_id
+
+                    if institution_id is not None:
+                        flask.g.user_permissions = (
+                            AuthService.get_user_permissions(
+                                user.id, institution_id
+                            )
                         )
-        # print(
-        #     g.user.username if g.user else "No user",
-        #     session.get("current_institution"),  # type: ignore
-        #     g.user_permissions,
-        # )
+                    flask.g.institutions = (
+                        InstitutionService.get_user_institutions(user.id)
+                    )
 
         site_config = SiteService.get_site_config()
-        g.site_config = site_config
+        flask.g.site_config = site_config
 
-        if not site_config.maintenance_active or (
-            g.user_permissions and ("setting_update" in g.user_permissions)
+        if (
+            not site_config.maintenance_active
+            or ("setting_update" in flask.g.user_permissions)
+            or flask.request.path.startswith("/login")
         ):
             return None
 
         return (
-            render_template(
+            flask.render_template(
                 "maintenance.html",
                 maintenance_message=site_config.maintenance_message,
             ),
@@ -181,4 +111,13 @@ def init_app(app: Flask):
 
     app.before_request(before_request_hook)
 
-    register_error_handlers(app)
+    @app.context_processor
+    def inject_template_variables() -> t.Dict[str, t.Any]:
+        if flask.request.view_args is None:
+            return {}
+
+        res = {
+            f"param_{key}": value
+            for key, value in flask.request.view_args.items()
+        }
+        return res

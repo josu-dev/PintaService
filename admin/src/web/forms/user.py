@@ -5,7 +5,7 @@ from wtforms import SelectField, StringField
 from wtforms import validators as v
 
 from src.core.enums import DocumentTypes, GenderOptions
-from src.services.user import UpdateUserConfig
+from src.services.user import UserUpdateParams
 
 
 class ProfileUpdateForm(FlaskForm):
@@ -42,7 +42,7 @@ class ProfileUpdateForm(FlaskForm):
         validators=[v.DataRequired()],
     )
 
-    def values(self) -> UpdateUserConfig:
+    def values(self) -> UserUpdateParams:
         """Return form values as a dictionary"""
 
         return {

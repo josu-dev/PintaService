@@ -1,0 +1,25 @@
+{% macro inst_dropdown(url_preffix, current_institution_id, url_suffix) %}
+<div data class="flex items-center flex-col min-w-[16ch]">
+  <label for="institution-dropdown-select" class="sr-only">Genero</label>
+  <select
+    id="institution-dropdown-select"
+    name="gender"
+    class="block mt-1 pt-2 pb-1 px-2 w-full text-sm md:text-base shadow-sm
+    rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
+    appearance-none focus:outline-none focus:ring-0 focus:border-orange-600">
+    <option value="" hidden>Institucion</option>
+    {% for inst in g.institutions %}
+    <option value="{{ inst.id }}" {% if current_institution_id==inst.id %}selected{%endif%}>{{ inst.name }}</option>
+    {% endfor %}
+  </select>
+</div>
+<script>
+  /** @type {HTMLSelectElement} */
+  const institutionDropdownSelect = document.getElementById('institution-dropdown-select');
+  const initialIntitutionValue = institutionDropdownSelect.value;
+  institutionDropdownSelect.addEventListener('change', (event) => {
+    const value = event.target.value;
+    window.location.href = `{{ url_preffix }}/${value}{{ "/" ~ url_suffix if url_suffix else "" }}`;
+  });
+</script>
+{% endmacro %}

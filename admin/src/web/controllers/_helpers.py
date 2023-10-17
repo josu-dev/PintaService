@@ -3,7 +3,6 @@ from functools import wraps
 
 import flask
 from flask import typing as tf
-from flask.sessions import SessionMixin
 
 
 def flash_info(message: str):
@@ -22,14 +21,10 @@ def flash_error(message: str):
     flask.flash(message, "error")
 
 
-def is_authenticated(session: SessionMixin):
-    return session.get("user") is not None
-
-
 TRoute = t.TypeVar("TRoute", bound=t.Callable[..., t.Any])
 
 
-def login_required(
+def require_session(
     message: t.Union[
         str, t.Literal[False]
     ] = "Debes iniciar sesion para acceder",
@@ -37,32 +32,34 @@ def login_required(
     def decorator(func: TRoute) -> TRoute:
         @wraps(func)
         def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
-            if not is_authenticated(flask.session):
+            if flask.session.get("user_id") is None:
                 if message:
                     flash_info(message)
-                return flask.redirect(flask.url_for("root.login"))
+
+                return flask.redirect("/login")
 
             return func(*args, **kwargs)
 
-        return t.cast(TRoute, wrapper)
+        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator
 
 
-def unauthenticated_route(
+def require_no_session(
     message: t.Union[str, t.Literal[False]] = "",
 ) -> t.Callable[[TRoute], TRoute]:
     def decorator(func: TRoute) -> TRoute:
         @wraps(func)
         def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
-            if is_authenticated(flask.session):
+            if flask.session.get("user_id") is not None:
                 if message:
                     flash_info(message)
+
                 return flask.redirect("/")
 
             return func(*args, **kwargs)
 
-        return t.cast(TRoute, wrapper)
+        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator
 
@@ -88,13 +85,11 @@ def authenticated_route(
     def decorator(func: TRoute) -> TRoute:
         @wraps(func)
         def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
-            if flask.session.get("user") is None:
+            if flask.g.user is None:
                 return flask.redirect("/login")
 
-            if (
-                flask.g.user is not None
-                and not flask.g.user.is_active
-                and not has_permissions(("user_update",))
+            if not flask.g.user.is_active and not has_permissions(
+                ("user_update",)
             ):
                 return flask.redirect("/account_disabled")
 
@@ -105,6 +100,6 @@ def authenticated_route(
 
             return func(*args, **kwargs)
 
-        return wrapper  # type: ignore
+        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator

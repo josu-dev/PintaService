@@ -217,11 +217,29 @@ def create_institution():
     return render_template("admin/create_institution.html", form=form)
 
 
-@bp.route("/institutions", methods=["GET"])
+@bp.get("/institutions")
+@h.authenticated_route(module="institution", permissions=("index",))
 def show_institutions():
     institutions = InstitutionService.get_institutions()
     return render_template(
         "admin/institutions.html", institutions=institutions
+    )
+
+
+@bp.get("/institutions/<int:institution_id>")
+@h.authenticated_route(module="institution", permissions=("show",))
+def institutions_dynamic_get(institution_id: int):
+    institution = InstitutionService.get_institution(institution_id)
+
+    if not institution:
+        flash("Institución no encontrada.", "error")
+        return redirect("/admin/institutions")
+
+    form = InstitutionForm(obj=institution)
+    return render_template(
+        "institutions/edit.html",
+        institution=institution,
+        form=form,
     )
 
 
@@ -251,11 +269,12 @@ def edit_institution_post(institution_id: int):
         return redirect("/admin/institutions")
 
     return render_template(
-        "institution/setting.html", institution=institution, form=form
+        "institutions/edit.html", institution=institution, form=form
     )
 
 
 @bp.get("/institution/<int:institution_id>/edit")
+@h.authenticated_route()
 def institution_edit_get(institution_id: int):
     institution = InstitutionService.get_institution(institution_id)
 
@@ -265,7 +284,7 @@ def institution_edit_get(institution_id: int):
 
     form = InstitutionForm(obj=institution)
     return render_template(
-        "institution/setting.html",
+        "institutions/edit.html",
         institution=institution,
         form=form,
     )

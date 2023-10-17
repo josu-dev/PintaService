@@ -15,13 +15,7 @@ from src.services.mail import MailService
 
 # flake8: noqa E501
 
-
-InstitutionsRoles = t.TypeVar(
-    "InstitutionsRoles",
-    t.Literal["OWNER"],
-    t.Literal["MANAGER"],
-    t.Literal["OPERATOR"],
-)
+InstitutionsRoles = t.Literal["OWNER", "MANAGER", "OPERATOR"]
 
 
 class PreRegisterUserParams(t.TypedDict):
@@ -35,6 +29,8 @@ class AuthServiceError(BaseServiceError):
 
 
 class AuthService(BaseService):
+    AuthServiceError = AuthServiceError
+
     @classmethod
     def get_pre_user_by_email(cls, email: str):
         """returns the user according to email"""
@@ -49,6 +45,7 @@ class AuthService(BaseService):
         """Create parcial user in database"""
         if AuthService.get_pre_user_by_email(kwargs["email"]):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
+
         token = secrets.token_urlsafe(64)
         user = PreRegisterUser(**kwargs, token=token)
         db.session.add(user)
