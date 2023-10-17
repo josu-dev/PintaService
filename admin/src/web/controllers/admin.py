@@ -94,7 +94,7 @@ def user_edit_get(user_id: int):
 
     form = ProfileUpdateForm(obj=user)
     return render_template(
-        "user/setting.html", user=user, genders=genders, form=form
+        "profile.html", user=user, genders=genders, form=form
     )
 
 
@@ -112,7 +112,7 @@ def edit_user_post(user_id: int):
         flash("Usuario actualizado con éxito.", "success")
         return redirect("/admin/users")
 
-    return render_template("user/setting.html", user=user, form=form)
+    return render_template("profile.html", user=user, form=form)
 
 
 @bp.post("/user/<int:user_id>/delete")

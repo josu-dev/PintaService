@@ -2,15 +2,7 @@ import typing as t
 
 import flask
 
-from src.web.controllers import (
-    admin,
-    api,
-    institution,
-    request,
-    root,
-    service,
-    user,
-)
+from src.web.controllers import admin, api, institution, request, root, service
 
 service.bp.register_blueprint(
     request.bp, url_prefix="/<int:service_id>/requests"
@@ -23,7 +15,6 @@ _blueprints = (
     admin.bp,
     api.bp,
     root.bp,
-    user.bp,
     institution.bp,
 )
 
