@@ -3,15 +3,15 @@
 {% import "_macros/button.html" as Button %}
 
 {% block head %}
-<title>Mi Página de Institucion</title>
+<title>Nueva institucion</title>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 flex flex-col">
-    <h1 class="text-3xl font-semibold mt-[1em] ml-2">Creación de Institucion</h1>
+  <h1 class="text-3xl font-semibold mt-[1em] ml-2">Creación de Institucion</h1>
 
-    {% call Form.render_form(form) %}
-    {{ Button.primary("Crear", type='submit') }}
-    {% endcall %}
+  {% call Form.render_form(form) %}
+  {{ Button.primary("Crear", type='submit') }}
+  {% endcall %}
 </main>
 {% endblock %}

@@ -13,8 +13,10 @@ from flask import (
 from src.core.enums import DocumentTypes, GenderOptions
 from src.services.auth import AuthService
 from src.services.user import UserService
+from src.utils import status
 from src.web.controllers import _helpers as h
 from src.web.forms.auth import UserLogin, UserPreRegister, UserRegister
+from src.web.forms.user import ProfileUpdateForm
 
 bp = Blueprint("root", __name__)
 
@@ -170,3 +172,51 @@ def register_post():
 @h.require_session()
 def account_disabled_get():
     return render_template("account_disabled.html")
+
+
+@bp.get("/profile")
+@h.authenticated_route()
+def user_setting_get():
+    user = UserService.get_by_email(t.cast(str, session["user"]))
+    form = ProfileUpdateForm(obj=user)
+
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+    return render_template(
+        "profile.html",
+        user=user,
+        genders=genders,
+        form=form,
+    )
+
+
+@bp.post("/profile")
+@h.authenticated_route()
+def user_setting_post():
+    form = ProfileUpdateForm(request.form)
+    user_setting = UserService.get_by_email(t.cast(str, session.get("user")))
+    if form.validate():
+        try:
+            id_user = t.cast(int, session.get("user_id"))
+            user_setting = UserService.update_user(id_user, **form.values())
+            if user_setting is None:
+                return redirect("/login")
+            form.process(obj=user_setting)
+            h.flash_success("Configuracion actualizada")
+            status_code = status.HTTP_200_OK
+        except UserService.UserServiceError as e:
+            h.flash_error(e.message)
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    else:
+        status_code = status.HTTP_400_BAD_REQUEST
+
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+    return (
+        render_template(
+            "profile.html",
+            user=user_setting,
+            genders=genders,
+            form=form,
+        ),
+        status_code,
+    )

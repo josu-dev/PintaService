@@ -1,6 +1,7 @@
 import typing as t
 
 import sqlalchemy as sa
+import sqlalchemy.exc as sa_exc
 import typing_extensions as te
 
 from src.core.db import db
@@ -18,6 +19,18 @@ class InstitutionParams(t.TypedDict):
     keywords: str
     email: str
     days_and_opening_hours: str
+
+
+class InstitutionPartialParams(t.TypedDict):
+    name: te.NotRequired[str]
+    information: te.NotRequired[str]
+    address: te.NotRequired[str]
+    location: te.NotRequired[str]
+    web: te.NotRequired[str]
+    keywords: te.NotRequired[str]
+    email: te.NotRequired[str]
+    days_and_opening_hours: te.NotRequired[str]
+    enabled: te.NotRequired[bool]
 
 
 class InstitutionServiceError(BaseServiceError):
@@ -40,15 +53,23 @@ class InstitutionService(BaseService):
         return db.session.query(Institution).get(institution_id)
 
     @classmethod
-    def create_institution(cls, **kwargs: te.Unpack[InstitutionParams]):
-        """Create a new institution in the database."""
+    def create_institution(
+        cls, **kwargs: te.Unpack[InstitutionParams]
+    ) -> Institution:
         institution = Institution(**kwargs)
-        db.session.add(institution)
-        db.session.commit()
+        try:
+            db.session.add(institution)
+            db.session.commit()
+            return institution
+        except sa_exc.SQLAlchemyError as e:
+            db.session.rollback()
+            raise InstitutionServiceError(
+                f"Could not create institution: {e.code}"
+            )
 
     @classmethod
     def update_institution(
-        cls, institution_id: int, **kwargs: te.Unpack[InstitutionParams]
+        cls, institution_id: int, **kwargs: te.Unpack[InstitutionPartialParams]
     ):
         """Update an existing institution in the database."""
         institution = db.session.query(Institution).get(institution_id)
@@ -60,12 +81,15 @@ class InstitutionService(BaseService):
         return None
 
     @classmethod
-    def delete_institution(cls, institution_id: int):
+    def delete_institution(cls, institution_id: int) -> bool:
         """Delete an institution from the database."""
-        institution = db.session.query(Institution).get(institution_id)
-        if institution:
-            db.session.delete(institution)
-            db.session.commit()
+        delete_count = (
+            db.session.query(Institution)
+            .filter(Institution.id == institution_id)
+            .delete()
+        )
+        db.session.commit()
+        return delete_count == 1
 
     @classmethod
     def get_user_institutions(cls, user_id: int) -> t.List[Institution]:
