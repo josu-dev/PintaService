@@ -188,6 +188,14 @@ def load_test_data():
         status=RequestStatus.IN_PROCESS,
     )
 
+    RequestService.create_request(
+        1,
+        2,
+        1,
+        title="Pelea5",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
     # UserService.create_user(
     #     firstname="test",
     #     lastname="test",
