@@ -1,29 +1,15 @@
 {% extends "_layouts/auth.html" %}
-
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
 {% block head %}
 <title>Iniciar sesion</title>
 {% endblock %}
 
 {% block content %}
-<div class="flex flex-col md:basis-1/2 items-center">
-  <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
-    alt="cidepint logo" class='w-20 md:w-72 h-20 md:h-72 my-6 xs:p-2'>
-  <p class="sr-only xs:not-sr-only xs:m-2 md:mx-16 text-center text-balance">
-    Lorem ipsum dolor sitamet, consectetuer adipiscing elit.
-  </p>
-</div>
 <div class="flex flex-col items-center md:basis-1/2">
-  <form class="flex flex-col w-9/12 gap-6 md:max-w-sm" method="post">
-    <div class="flex flex-col">
-      <label class="mb-2">Email</label>
-      <input type="text" id="email" name="email">
-    </div>
-    <div class="flex flex-col">
-      <label class="mb-2">Contraseña</label>
-      <input type="text" id="password" name="password">
-    </div>
-    <button class="bg-red-500 px-10 py-2">Confirmar</button>
-  </form>
+  {% call Form.render_form(form) %}
+  {{Button.success("Confirmar","submit")}}
+  {% endcall %}
   <div class="flex flex-row gap-2 mt-2">
     <p>¿No tienes cuenta?</p>
     <a href="{{ url_for('root.pre_register_get')}}" class="text-blue-700">Registrate</a>

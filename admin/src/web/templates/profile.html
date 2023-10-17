@@ -11,6 +11,7 @@
 {% block content %}
 <main class="flex-1 flex flex-col items-center my-4">
   <form class="flex flex-col items-center gap-6 md:max-w-sm " method="post">
+    {{ form.csrf_token }}
     {{ Form.render_field(form.firstname) }}
     {{ Form.render_field(form.lastname) }}
     {{ Form.render_field(form.document_type) }}

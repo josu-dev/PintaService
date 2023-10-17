@@ -10,6 +10,7 @@ from src.core.models.base import (
     IntPK,
     Str32,
     Str512,
+    Timestamp,
     UpdatedAt,
 )
 
