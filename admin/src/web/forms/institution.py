@@ -2,7 +2,7 @@ from flask_wtf import FlaskForm
 from wtforms import EmailField, StringField, TextAreaField
 from wtforms import validators as v
 
-from src.services.institution import InstitutionConfig
+from src.services.institution import InstitutionParams
 
 
 class InstitutionForm(FlaskForm):
@@ -39,7 +39,7 @@ class InstitutionForm(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=256)],
     )
 
-    def values(self) -> InstitutionConfig:  # Service Algo
+    def values(self) -> InstitutionParams:
         return {  # type: ignore
             "name": self.name.data,
             "information": self.information.data,

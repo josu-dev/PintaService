@@ -7,13 +7,13 @@ from wtforms import validators as v
 from src.services.auth import PreRegisterUserParams
 
 
-class FullRegisterUser(TypedDict):
+class RegisterFormValues(TypedDict):
     username: str
     password: str
     password_con: str
 
 
-class FullLoginUser(TypedDict):
+class LoginFormValues(TypedDict):
     email: str
     password: str
 
@@ -28,7 +28,7 @@ class UserLogin(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
 
-    def values(self) -> FullLoginUser:
+    def values(self) -> LoginFormValues:
         return {
             "email": self.email.data,  # type: ignore
             "password": self.password.data,  # type: ignore
@@ -79,7 +79,7 @@ class UserRegister(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
 
-    def values(self) -> FullRegisterUser:
+    def values(self) -> RegisterFormValues:
         return {
             "username": self.username.data,  # type: ignore
             "password": self.password.data,  # type: ignore

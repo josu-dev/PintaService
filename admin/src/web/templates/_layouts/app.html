@@ -1,4 +1,5 @@
 {% extends "_layouts/base.html" %}
+{% from "_macros/inst_dropdown.html" import inst_dropdown %}
 {% block base_head %}
 <script src="{{ url_for('static', filename='js/layout.js') }}" defer></script>
 {% block head %}{% endblock %}
@@ -48,26 +49,14 @@
           </a>
         </li>
         {% endif %}
+        {% if g.institutions|length %}
         <li class="hidden xs:block ">
-          <a href="/institutions">
-            <span class="sr-only md:not-sr-only">Instituciones</span>
-            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-building">
-              <rect width="16" height="20" x="4" y="2" rx="2" ry="2" />
-              <path d="M9 22v-4h6v4" />
-              <path d="M8 6h.01" />
-              <path d="M16 6h.01" />
-              <path d="M12 6h.01" />
-              <path d="M12 10h.01" />
-              <path d="M12 14h.01" />
-              <path d="M16 10h.01" />
-              <path d="M16 14h.01" />
-              <path d="M8 10h.01" />
-              <path d="M8 14h.01" />
-            </svg>
-          </a>
+          {{ inst_dropdown(
+          "/admin/institutions" if g.user_has_permissions(("institution_index",)) else
+          "/institutions", param_institution_id
+          ) }}
         </li>
+        {% endif %}
         {% if g.user_has_permissions([service_index]) %}
         <li class="hidden xs:block ">
           <a href="/tracking">

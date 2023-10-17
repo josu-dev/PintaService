@@ -5,7 +5,7 @@ from wtforms import SelectField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.core.models.service import ServiceType
-from src.services.service import ServiceConfig
+from src.services.service import ServiceParams
 
 
 class ServiceForm(FlaskForm):
@@ -31,7 +31,7 @@ class ServiceForm(FlaskForm):
         validators=[v.DataRequired()],
     )
 
-    def values(self) -> ServiceConfig:  # Service Algo
+    def values(self) -> ServiceParams:
         return {  # type:ignore
             "name": self.name.data,
             "laboratory": self.laboratory.data,

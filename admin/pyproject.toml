@@ -27,7 +27,7 @@ flask-mail = "^0.9.1"
 pytest = "^7.4.1"
 python-dotenv = "^1.0.0"
 pre-commit = "^3.4.0"
-flask-livetw = "^0.3.1"
+flask-livetw = "^0.3.3"
 
 
 [build-system]

@@ -1,7 +1,7 @@
-from typing import List, Optional, Tuple, TypedDict, Union
+import typing as t
 
+import typing_extensions as te
 from sqlalchemy import and_
-from typing_extensions import Unpack
 
 from src.core.bcrypt import bcrypt
 from src.core.db import db
@@ -11,7 +11,7 @@ from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 
-class UserConfig(TypedDict):
+class UserParams(t.TypedDict):
     firstname: str
     lastname: str
     password: str
@@ -22,10 +22,10 @@ class UserConfig(TypedDict):
     gender: GenderOptions
     address: str
     phone: str
-    gender_other: Optional[str]
+    gender_other: te.NotRequired[str]
 
 
-class UpdateUserConfig(TypedDict):
+class UserUpdateParams(t.TypedDict):
     firstname: str
     lastname: str
     document_type: DocumentTypes
@@ -33,7 +33,7 @@ class UpdateUserConfig(TypedDict):
     gender: GenderOptions
     address: str
     phone: str
-    gender_other: Optional[str]
+    gender_other: te.NotRequired[str]
 
 
 class UserServiceError(BaseServiceError):
@@ -48,7 +48,7 @@ class UserService(BaseService):
     @classmethod
     def get_users(
         cls, page: int = 1, per_page: int = 10
-    ) -> Tuple[List[User], int]:
+    ) -> t.Tuple[t.List[User], int]:
         """Get  users from database"""
         subquery = db.session.query(SiteAdmin.user_id)
         users = (
@@ -67,7 +67,7 @@ class UserService(BaseService):
         return db.session.get(User, user_id)
 
     @classmethod
-    def update_user(cls, user_id: int, **kwargs: Unpack[UpdateUserConfig]):
+    def update_user(cls, user_id: int, **kwargs: te.Unpack[UserUpdateParams]):
         """Update user in the database"""
         user = db.session.query(User).get(user_id)
         if user:
@@ -88,7 +88,7 @@ class UserService(BaseService):
     @classmethod
     def create_user(
         cls,
-        **kwargs: Unpack[UserConfig],
+        **kwargs: te.Unpack[UserParams],
     ):
         """Create user in database"""
         if UserService.get_by_username(kwargs["username"]):
@@ -155,11 +155,11 @@ class UserService(BaseService):
     @classmethod
     def filter_users_by_email_and_active(
         cls,
-        email: Union[str, None],
-        active: Union[str, None],
+        email: t.Union[str, None],
+        active: t.Union[str, None],
         page: int = 1,
         per_page: int = 10,
-    ) -> Tuple[List[User], int]:
+    ) -> t.Tuple[t.List[User], int]:
         query = db.session.query(User)
 
         if email:

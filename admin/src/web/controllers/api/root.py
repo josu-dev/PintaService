@@ -1,14 +1,14 @@
 from flask import Blueprint
 
 from src.services.user import UserService
-from src.web.controllers.api import _base
+from src.web.controllers.api import base
 from src.web.forms import api as api_forms
 
 bp = Blueprint("root", __name__)
 
 
 @bp.post("/auth")
-@_base.validation(api_forms.AuthForm)
+@base.validation(api_forms.AuthForm)
 def auth_post(body: api_forms.AuthFormValues):
     user = UserService.validate_email_password(body["email"], body["password"])
     if not user:
@@ -34,7 +34,7 @@ def get_institutions(offset: int, limit: int):
 
 
 @bp.get("/institutions")
-@_base.validation(api_forms.InstitutionsForm, "GET", content_type=False)
+@base.validation(api_forms.InstitutionsForm, "GET", content_type=False)
 def institutions_get(args: api_forms.InstitutionsFormValues):
     page = args["page"]
     per_page = args["per_page"]
@@ -43,7 +43,7 @@ def institutions_get(args: api_forms.InstitutionsFormValues):
         # TODO: change this to a real implementation
         institutions = get_institutions(offset, per_page)
     except Exception:
-        return _base.API_INTERNAL_SERVER_ERROR_RESPONSE
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     total = 80
     return {

@@ -1,36 +1,44 @@
-from typing import List, Optional, TypedDict
+import typing as t
 
-from typing_extensions import Unpack
+import sqlalchemy as sa
+import typing_extensions as te
 
 from src.core.db import db
+from src.core.enums import ServiceType
+from src.core.models.institution_service import InstitutionService
 from src.core.models.service import Service
-from src.services.base import BaseService
+from src.services.base import BaseService, BaseServiceError
 
 
-class ServiceConfig(TypedDict):
+class ServiceParams(t.TypedDict):
     name: str
     laboratory: str
     description: str
     keywords: str
-    service_type: str
+    service_type: ServiceType
+
+
+class ServiceServiceError(BaseServiceError):
+    pass
 
 
 class ServiceService(BaseService):
     """Service for handling services."""
 
+    ServiceServiceError = ServiceServiceError
+
     @classmethod
-    def get_services(cls) -> List[Service]:
-        """Get all services from the database."""
+    def get_services(cls) -> t.List[Service]:
         return db.session.query(Service).all()
 
     @classmethod
-    def get_service(cls, service_id: int) -> Optional[Service]:
-        """Get a service by its ID."""
+    def get_service(cls, service_id: int) -> t.Optional[Service]:
         return db.session.query(Service).get(service_id)
 
     @classmethod
-    def update_service(cls, service_id: int, **kwargs: Unpack[ServiceConfig]):
-        """Update service in the database."""
+    def update_service(
+        cls, service_id: int, **kwargs: te.Unpack[ServiceParams]
+    ):
         service = db.session.query(Service).get(service_id)
         if service:
             for key, value in kwargs.items():
@@ -41,17 +49,27 @@ class ServiceService(BaseService):
 
     @classmethod
     def delete_service(cls, service_id: int):
-        """Delete service from the database."""
         service = db.session.query(Service).get(service_id)
         if service:
             db.session.delete(service)
             db.session.commit()
 
     @classmethod
-    def create_service(cls, **kwargs: Unpack[ServiceConfig]):
-        """Create service in the database."""
+    def create_service(cls, **kwargs: te.Unpack[ServiceParams]):
         service = Service(**kwargs)
-        if ServiceService.get_service(service.id):
-            raise Exception("Service already exists")
         db.session.add(service)
         db.session.commit()
+
+    @classmethod
+    def get_institution_services(cls, institution_id: int) -> t.List[Service]:
+        return (
+            db.session.query(Service)
+            .join(
+                InstitutionService,
+                sa.and_(
+                    Service.id == InstitutionService.service_id,
+                    InstitutionService.institution_id == institution_id,
+                ),
+            )
+            .all()
+        )

@@ -2,6 +2,7 @@ import typing as t
 
 from flask import (
     Blueprint,
+    g,
     redirect,
     render_template,
     request,
@@ -21,31 +22,37 @@ bp = Blueprint("root", __name__)
 @bp.get("/")
 @h.authenticated_route()
 def index_get():
+    if len(g.institutions) > 0 and g.user_has_permissions(
+        ("institution_index",)
+    ):
+        return redirect("/admin/institutions")
+
     return render_template("index.html")
 
 
 @bp.post("/logout")
-def logout_get():
+def logout_post():
     if session.get("user"):
         del session["user"]
+        del session["user_id"]
         if session.get("is_admin"):
             del session["is_admin"]
         session.clear()
         h.flash_info("La sesion se cerro correctamente")
         return redirect(url_for("root.login_get"))
-
+    session.clear()
     h.flash_info("No hay una sesion iniciada")
     return redirect(url_for("root.login_get"))
 
 
 @bp.get("/login")
-@h.unauthenticated_route()
+@h.require_no_session()
 def login_get():
     return render_template("login.html")
 
 
 @bp.post("/login")
-@h.unauthenticated_route()
+@h.require_no_session()
 def login_post():
     form = UserLogin(request.form)
     if form.validate():
@@ -65,13 +72,13 @@ def login_post():
 
 
 @bp.get("/pre_register")
-@h.unauthenticated_route()
+@h.require_no_session()
 def pre_register_get():
     return render_template("pre_register.html")
 
 
 @bp.post("/pre_register")
-@h.unauthenticated_route()
+@h.require_no_session()
 def pre_register_post():
     form = UserPreRegister(request.form)
     if not form.validate():
@@ -91,7 +98,7 @@ def pre_register_post():
 
 
 @bp.get("/register")
-@h.unauthenticated_route()
+@h.require_no_session()
 def register_get():
     token = request.args.get("token")
     if not token:
@@ -112,7 +119,7 @@ def register_get():
 
 
 @bp.post("/register")
-@h.unauthenticated_route()
+@h.require_no_session()
 def register_post():
     token = request.args.get("token")
     if not token:
@@ -158,6 +165,6 @@ def register_post():
 
 
 @bp.get("/account_disabled")
-@h.login_required()
+@h.require_session()
 def account_disabled_get():
     return render_template("account_disabled.html")
