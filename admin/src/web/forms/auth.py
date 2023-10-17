@@ -63,7 +63,7 @@ class UserPreRegister(FlaskForm):
 
 class UserRegister(FlaskForm):
     username = StringField(
-        "Username",
+        "Nombre de usuario",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
     password = PasswordField(
@@ -71,11 +71,13 @@ class UserRegister(FlaskForm):
         validators=[
             v.DataRequired(),
             v.Length(min=0, max=32),
-            v.EqualTo("password_con", message="Las contraseñas no coinciden"),
+            v.EqualTo(
+                "password_confirmation", message="Las contraseñas no coinciden"
+            ),
         ],
     )
-    password_con = PasswordField(
-        "Contraseña_con",
+    password_confirmation = PasswordField(
+        "Confirmar contraseña",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
 
@@ -83,5 +85,5 @@ class UserRegister(FlaskForm):
         return {
             "username": self.username.data,  # type: ignore
             "password": self.password.data,  # type: ignore
-            "password_con": self.password_con.data,  # type: ignore
+            "password_confirmation": self.password_confirmation.data,  # type: ignore # noqa: E501
         }
