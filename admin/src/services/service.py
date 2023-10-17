@@ -6,8 +6,7 @@ import typing_extensions as te
 from src.core.db import db
 from src.core.enums import ServiceType
 from src.core.models.institution import Institution
-from src.core.models.institution_service import InstitutionService
-from src.core.models.service import Service
+from src.core.models.service import InstitutionService, Service
 from src.services.base import BaseService, BaseServiceError
 
 

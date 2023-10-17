@@ -1,4 +1,5 @@
 """Model for service."""
+from sqlalchemy import Column, ForeignKey, Integer
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from sqlalchemy.sql import func
 
@@ -10,6 +11,7 @@ from src.core.models.base import (
     Str32,
     Str256,
     Str512,
+    Timestamp,
     UpdatedAt,
 )
 
@@ -33,5 +35,19 @@ class Service(BaseModel):
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
+        init=False, onupdate=func.current_timestamp()
+    )
+
+
+class InstitutionService(BaseModel):
+    __tablename__ = "institution_service"
+
+    id: Mapped[IntPK] = mapped_column(init=False)
+
+    service_id = Column(Integer, ForeignKey("services.id"))
+    institution_id = Column(Integer, ForeignKey("institutions.id"))
+
+    created_at: Mapped[Timestamp] = mapped_column(init=False)
+    updated_at: Mapped[Timestamp] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )

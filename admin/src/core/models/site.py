@@ -14,9 +14,7 @@ class SiteConfig(BaseModel):
     contact_info: Mapped[Str256]
     maintenance_active: Mapped[bool]
     maintenance_message: Mapped[Str512]
-    # maintenance_finished_at: Mapped[Timestamp] = mapped_column(
-    #     init=False, nullable=True
-    # )
+
     created_at: Mapped[Timestamp] = mapped_column(init=False)
     updated_at: Mapped[Timestamp] = mapped_column(
         init=False, onupdate=func.current_timestamp()

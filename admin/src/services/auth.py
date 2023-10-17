@@ -9,7 +9,7 @@ from typing_extensions import Unpack
 
 from src.core import permissions
 from src.core.db import db
-from src.core.models.pre_regis_user import PreRegisterUser
+from src.core.models.user import PreRegisterUser
 from src.services.base import BaseService, BaseServiceError
 from src.services.mail import MailService
 

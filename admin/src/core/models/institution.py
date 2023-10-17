@@ -29,9 +29,6 @@ class Institution(BaseModel):
 
     enabled: Mapped[bool] = mapped_column(init=False, default=True)
 
-    users = relationship(  # type:ignore
-        "User", secondary="institution_user", back_populates="institutions"
-    )
     services = relationship(  # type:ignore
         "Service",
         secondary="institution_service",

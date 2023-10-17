@@ -1,7 +1,7 @@
 """Model for user."""
 from typing import Optional
 
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.core.enums import DocumentTypes, GenderOptions
@@ -10,6 +10,7 @@ from src.core.models.base import (
     IntPK,
     Str32,
     Str64,
+    Str128,
     Str256,
     Timestamp,
 )
@@ -36,9 +37,20 @@ class User(BaseModel):
     phone: Mapped[Str32]
     is_active: Mapped[bool] = mapped_column(init=False, default=True)
 
-    institutions = relationship(  # type: ignore
-        "Institution", secondary="institution_user", back_populates="users"
+    created_at: Mapped[Timestamp] = mapped_column(init=False)
+    updated_at: Mapped[Timestamp] = mapped_column(
+        init=False, onupdate=func.current_timestamp()
     )
+
+
+class PreRegisterUser(BaseModel):
+    __tablename__ = "pre_register_users"
+
+    id: Mapped[IntPK] = mapped_column(init=False)
+    firstname: Mapped[Str32]
+    lastname: Mapped[Str32]
+    email: Mapped[Str64]
+    token: Mapped[Str128]
 
     created_at: Mapped[Timestamp] = mapped_column(init=False)
     updated_at: Mapped[Timestamp] = mapped_column(
