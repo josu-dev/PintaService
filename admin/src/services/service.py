@@ -5,6 +5,7 @@ import typing_extensions as te
 
 from src.core.db import db
 from src.core.enums import ServiceType
+from src.core.models.institution import Institution
 from src.core.models.institution_service import InstitutionService
 from src.core.models.service import Service
 from src.services.base import BaseService, BaseServiceError
@@ -55,8 +56,19 @@ class ServiceService(BaseService):
             db.session.commit()
 
     @classmethod
-    def create_service(cls, **kwargs: te.Unpack[ServiceParams]):
+    def create_service(
+        cls, institution_id: int, **kwargs: te.Unpack[ServiceParams]
+    ):
+        """Create service in the database."""
         service = Service(**kwargs)
+
+        institution = db.session.query(Institution).get(institution_id)
+
+        if institution is None:
+            raise ServiceServiceError("Institution not found")
+
+        service.institutions.append(institution)
+
         db.session.add(service)
         db.session.commit()
 
