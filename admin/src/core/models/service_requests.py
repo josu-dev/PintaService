@@ -1,4 +1,5 @@
 """Model for service request."""
+import typing as t
 from enum import Enum
 
 from sqlalchemy.orm import Mapped, mapped_column
@@ -10,6 +11,7 @@ from src.core.models.base import (
     IntPK,
     Str32,
     Str512,
+    Timestamp,
     UpdatedAt,
 )
 
@@ -29,6 +31,7 @@ class ServiceRequest(BaseModel):
     title: Mapped[Str32]
     description: Mapped[Str512]
     status: Mapped[Status]
+    closed_at: Mapped[t.Optional[Timestamp]]
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
