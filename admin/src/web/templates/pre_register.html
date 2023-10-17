@@ -8,15 +8,11 @@
 
 {% block content %}
 <div class="flex flex-col items-center md:basis-1/2">
-  <form class="flex flex-col w-9/12 gap-5 md:max-w-sm" method="post">
-    {{ Form.render_field(form.firstname) }}
-    {{ Form.render_field(form.lastname) }}
-    {{ Form.render_field(form.email) }}
-
-    {{Button.success("Registrarme","submit")}}
-    {{Button.default("Registrarme con
-    Google")}}
-  </form>
+  {% call Form.render_form(form) %}
+  {{Button.success("Registrarme","submit")}}
+  {{Button.default("Registrarme con
+  Google")}}
+  {% endcall %}
   <div class="flex flex-row gap-2 mt-2">
     <p>¿Tienes cuenta?</p>
     <a href="{{ url_for('root.index_get')}}" class="text-blue-700">Inicia sesion</a>

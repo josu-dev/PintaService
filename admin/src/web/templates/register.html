@@ -8,11 +8,8 @@
 
 {% block content %}
 <div class="flex flex-col items-center md:basis-1/2">
-  <form class="flex flex-col w-9/12 gap-6 md:max-w-sm" method="post">
-    {{ Form.render_field(form.username) }}
-    {{ Form.render_field(form.password) }}
-    {{ Form.render_field(form.password_confirmation) }}
-    {{Button.success("Confirmar","submit")}}
-  </form>
+  {% call Form.render_form(form) %}
+  {{Button.success("Confirmar","submit")}}
+  {% endcall %}
 </div>
 {% endblock %}

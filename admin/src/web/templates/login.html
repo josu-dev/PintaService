@@ -7,11 +7,9 @@
 
 {% block content %}
 <div class="flex flex-col items-center md:basis-1/2">
-  <form class="flex flex-col w-9/12 gap-6 md:max-w-sm" method="post">
-    {{ Form.render_field(form.email) }}
-    {{ Form.render_field(form.password) }}
-    {{Button.success("Confirmar","submit")}}
-  </form>
+  {% call Form.render_form(form) %}
+  {{Button.success("Confirmar","submit")}}
+  {% endcall %}
   <div class="flex flex-row gap-2 mt-2">
     <p>¿No tienes cuenta?</p>
     <a href="{{ url_for('root.pre_register_get')}}" class="text-blue-700">Registrate</a>
