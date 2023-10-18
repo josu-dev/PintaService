@@ -71,7 +71,7 @@ def login_post():
 
     h.flash_error("Los datos ingresados son invalidos")
 
-    return render_template("login.html")
+    return render_template("login.html", form=form)
 
 
 @bp.get("/pre_register")
