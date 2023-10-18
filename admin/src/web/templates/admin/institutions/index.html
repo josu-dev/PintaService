@@ -27,18 +27,25 @@
       <div class="flex gap-4 items-center">
         {% if institution.enabled %}
         <form method="POST" action="/admin/institutions/{{ institution.id }}/disable">
+          {{ Form.new_csrf_token() }}
           {{ Button.warning("Deshabilitar", type="submit") }}
         </form>
         {% else %}
         <form method="POST" action="/admin/institutions/{{ institution.id }}/enable">
+          {{ Form.new_csrf_token() }}
           {{ Button.primary("Habilitar", type="submit") }}
         </form>
         {% endif %}
         {{ LinkButton.info("Editar", "/admin/institutions/" ~ institution.id ) }}
         <form method="POST" action="/admin/institutions/{{ institution.id }}/delete">
-          {{ Button.danger("Eliminar", type="submit") }}
+          {{ Form.new_csrf_token() }}
+          {% set props = {"data-institution-delete-" ~ institution.id: ""} %}
+          {{ Button.danger("Eliminar", type="submit", **props) }}
         </form>
       </div>
+      {{ Form.click_confirmation("[data-institution-delete-" ~ institution.id ~ "]",
+      "¿Estás seguro que deseas eliminar la institución " ~ institution.name ~ "?\n Esta acción no se puede deshacer.")
+      }}
     </li>
     {% endfor %}
   </ul>

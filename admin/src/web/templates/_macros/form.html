@@ -35,3 +35,27 @@ render_field_checkbox(field) }}{% else %}{{ render_field(field) }}{% endif %}{% 
   {{ render_fields(form) }}{{ caller() }}
 </form>
 {% endmacro %}
+
+{% macro click_confirmation(selector, message) %}
+<script>
+  document.querySelector(`{{ selector }}`).addEventListener('click', (event) => {
+    if (!confirm(`{{ message }}`)) {
+      event.preventDefault();
+    }
+  });
+</script>
+{% endmacro %}
+
+{% macro click_confirmation_multiple(selector, message) %}
+<script>
+  document.querySelectorAll(`{{ selector }}`).forEach(button => {
+    button.addEventListener('click', (event) => {
+      if (!confirm(`{{ message }}`)) {
+        event.preventDefault();
+      }
+    })
+  });
+</script>
+{% endmacro %}
+
+{% macro new_csrf_token() %}<input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />{% endmacro %}
