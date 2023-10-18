@@ -1,8 +1,11 @@
 {% extends "_layouts/base.html" %}
+{% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+
 {% block base_head %}
-<title>Pagina no encontrada</title>
+<title>Cuenta deshabilitada</title>
 {% endblock %}
+
 {% block base_body %}
 <main class="flex flex-coll items-center justify-center h-full">
   <section class="">
@@ -13,7 +16,7 @@
           403
         </h1>
         <p class="mb-4 text-3xl tracking-tight font-bold text-zinc-900 md:text-4xl">
-          Cuenta desactivada
+          Acceso denegado
         </p>
         <p class="mb-4 text-base md:text-lg font-light text-zinc-500">
           Tu cuenta a sido deshabilitada
@@ -23,6 +26,7 @@
           {% endif %}
         </p>
         <form method="POST" action="/logout">
+          {{ Form.new_csrf_token() }}
           {{ Button.primary("Cerrar sesion", type="submit") }}
         </form>
       </div>
