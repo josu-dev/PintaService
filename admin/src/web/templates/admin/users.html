@@ -14,6 +14,7 @@
   <h1 class="text-3xl font-semibold mt-[1em] ml-2">Usuarios</h1>
 
   <form method="get" action="/admin/users">
+    {{ Form.new_csrf_token() }}
     <input type="text" name="email" placeholder="Filtrar por correo electrónico" value="{{ email or "" }}">
     <select name="active">
       <option value="">Todos</option>
@@ -42,6 +43,7 @@
           <div class="flex gap-2">
             {{ LinkButton.info("Editar", "/admin/users/" ~ user.id ) }}
             <form method="POST" action="/admin/users/{{ user.id }}/toggle_active" style="display: inline;">
+              {{ Form.new_csrf_token() }}
               {% if user.is_active %}
               {{ Button.warning("Desactivar", type="submit") }}
               {% else %}
@@ -49,6 +51,7 @@
               {% endif %}
             </form>
             <form method="POST" action="/admin/users/{{ user.id }}/delete" style="display: inline;">
+              {{ Form.new_csrf_token() }}
               {% set props = {"data-button-delete-user": "", "data-username": user.username} %}
               {{ Button.danger("Eliminar", type="submit", **props) }}
             </form>

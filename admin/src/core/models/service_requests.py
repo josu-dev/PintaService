@@ -23,7 +23,7 @@ class ServiceRequest(BaseModel):
     title: Mapped[Str32]
     description: Mapped[Str512]
     status: Mapped[RequestStatus]
-    closed_at: Mapped[t.Optional[Timestamp]]
+    closed_at: Mapped[t.Optional[Timestamp]] = mapped_column(init=False)
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
