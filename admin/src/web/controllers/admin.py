@@ -409,3 +409,32 @@ def service_edit_get(service_id: int):
         categories=categories,
         form=form,
     )
+
+
+@bp.route("/create_service/<int:institution_id>", methods=["GET", "POST"])
+def create_service_view(institution_id: int):
+    """Create a service form page"""
+    form = ServiceForm(request.form)
+    if request.method == "POST":
+        
+        service_data = form.values()
+        service_data["institution_id"] = institution_id
+        ServiceService.create_service(**service_data)
+
+        flash("Servicio creado con éxito", "success")
+        return redirect(f"/admin/services/{institution_id}")
+    return render_template("admin/create_service.html", form=form)
+
+
+@bp.route(
+    "/other_services", defaults={"institution_id": None}, methods=["GET"]
+)
+@bp.route("/other_services/<int:institution_id>", methods=["GET"])
+def show_other_services(institution_id):
+    """Show services for a specific institution or all services if no institution specified"""
+    if institution_id:
+        services = ServiceService.get_institution_services(institution_id)
+    else:
+        services = ServiceService.get_services()
+
+    return render_template("admin/services.html", services=services)
