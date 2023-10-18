@@ -18,3 +18,11 @@ class ServiceType(Enum):
     ANALYSIS = "analisis"
     CONSULTANCY = "consultoria"
     DEVELOPMENT = "desarrollo"
+
+
+class RequestStatus(Enum):
+    ACCEPTED = "Aceptada"
+    REJECTED = "Rechazada"
+    IN_PROCESS = "En Proceso"
+    FINISHED = "Finalizada"
+    CANCELED = "Cancelada"
