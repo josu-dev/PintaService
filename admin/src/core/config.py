@@ -167,6 +167,7 @@ class Config:
     # WTForms config
     WTF_CSRF_ENABLED: bool
     WTF_CSRF_SECRET_KEY: str
+    WTF_CSRF_CHECK_DEFAULT: bool
 
     # Flask-livetw config
     LIVETW_DEV: bool
@@ -201,6 +202,9 @@ class Config:
             env_or_error("WTF_CSRF_ENABLED", "true").lower() == "true"
         )
         cls.WTF_CSRF_SECRET_KEY = env_or_error("WTF_CSRF_SECRET_KEY")
+        cls.WTF_CSRF_CHECK_DEFAULT = (
+            env_or_error("WTF_CSRF_CHECK_DEFAULT", "true").lower() == "true"
+        )
 
         cls.LIVETW_DEV = env_or_error("LIVETW_DEV", "false").lower() == "true"
 
