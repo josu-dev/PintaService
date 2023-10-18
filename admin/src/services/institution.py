@@ -126,7 +126,7 @@ class InstitutionService(BaseService):
         )
 
     @classmethod
-    def get_institution_owner(cls, institution_id: int) -> t.Union[User, None]:
+    def get_institution_owners(cls, institution_id: int) -> t.List[User]:
         res = (
             db.session.query(User)
             .join(
@@ -140,6 +140,6 @@ class InstitutionService(BaseService):
                     .scalar_subquery(),
                 ),
             )
-            .first()
+            .all()
         )
         return res
