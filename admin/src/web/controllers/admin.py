@@ -2,6 +2,7 @@ from flask import Blueprint, flash, g, redirect, render_template, request
 
 from src.core.enums import GenderOptions
 from src.core.models.service import ServiceType
+from src.services.auth import AuthService
 from src.services.database import DatabaseService
 from src.services.institution import InstitutionService
 from src.services.service import ServiceService
@@ -9,7 +10,7 @@ from src.services.site import SiteService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.institution import InstitutionForm
+from src.web.forms.institution import InstitutionForm, InstitutionOwnerForm
 from src.web.forms.service import ServiceForm
 from src.web.forms.site import SiteUpdateForm
 from src.web.forms.user import ProfileUpdateForm
@@ -186,11 +187,18 @@ def institutions_id_get(institution_id: int):
         h.flash_info(f"Institución con id {institution_id} no encontrada.")
         return redirect("/admin/institutions")
 
+    institution_owner = InstitutionService.get_institution_owner(
+        institution_id
+    )
     form = InstitutionForm(obj=institution)
+    form_new_owner = InstitutionOwnerForm()
+
     return render_template(
         "admin/institutions/update.html",
         form=form,
+        form_new_owner=form_new_owner,
         institution=institution,
+        institution_owner=institution_owner,
     )
 
 
@@ -260,6 +268,72 @@ def institution_id_deactivate_post(institution_id: int):
         h.flash_error("No se pudo desactivar la institución.")
 
     return redirect("/admin/institutions")
+
+
+@bp.post("/institutions/<int:institution_id>/add_owner")
+@h.authenticated_route(module="institution", permissions=("update",))
+def institution_id_add_owner_post(institution_id: int):
+    form = InstitutionOwnerForm(request.form)
+    if not form.validate():
+        h.flash_error("Formulario invalido.")
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    new_owner = UserService.get_by_email(form.email.data)  # type: ignore
+    if not new_owner:
+        h.flash_error(f"Usuario con email {form.email.data} no encontrado.")
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    if AuthService.user_is_site_admin(new_owner.id):
+        h.flash_error(
+            f"Usuario con email {form.email.data} no puede ser dueño \
+            de una institución."
+        )
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    current_owner = InstitutionService.get_institution_owner(institution_id)
+    if current_owner:
+        h.flash_error("La institución ya tiene un dueño asignado.")
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    try:
+        result = AuthService.add_institution_role(
+            "OWNER", new_owner.id, institution_id
+        )
+    except InstitutionService.InstitutionServiceError as e:
+        # TODO: handle error on creation
+        h.flash_error(e.message)
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    if result:
+        h.flash_success("Dueño asignado con éxito.")
+    else:
+        h.flash_error("No se pudo asignar dueño a la institución.")
+
+    return redirect(f"/admin/institutions/{institution_id}")
+
+
+@bp.post("/institutions/<int:institution_id>/remove_owner/<int:owner_id>")
+@h.authenticated_route(module="institution", permissions=("update",))
+def institution_id_remove_owner_post(institution_id: int, owner_id: int):
+    current_owner = InstitutionService.get_institution_owner(institution_id)
+    if not current_owner:
+        h.flash_error("La institución no tiene un dueño asignado.")
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    if current_owner.id != owner_id:
+        h.flash_error("El usuario no es dueño de la institución.")
+        return redirect(f"/admin/institutions/{institution_id}")
+
+    result = AuthService.remove_institution_role(
+        owner_id, institution_id, "OWNER"
+    )
+
+    if result:
+        h.flash_success("Dueño removido con éxito.")
+    else:
+        h.flash_error("No se pudo remover dueño de la institución.")
+
+    return redirect(f"/admin/institutions/{institution_id}")
 
 
 @bp.route("/create_service", methods=["GET", "POST"])
