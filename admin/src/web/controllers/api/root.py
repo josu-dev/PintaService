@@ -272,3 +272,58 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
         "per_page": per_page,
         "total": total,
     }
+
+
+def get_service_id(service_id: int):
+    services = [
+        {
+            "name": "service name 1",
+            "description": "a description",
+            "laboratory": "laboratory name",
+            "keywords": "a list of keywords",
+            "enabled": False,
+        },
+        {
+            "name": "service name 2",
+            "description": "a description",
+            "laboratory": "laboratory name",
+            "keywords": "a list of keywords",
+            "enabled": False,
+        },
+        {
+            "name": "service name 3",
+            "description": "a description",
+            "laboratory": "laboratory name",
+            "keywords": "a list of keywords",
+            "enabled": False,
+        },
+    ]
+    return services[service_id]
+
+
+@bp.get("/services/<int:service_id>")
+@base.validation(content_type=False)
+def service_id_get(service_id: int):
+    try:
+        # TODO: change this to a real implementation
+        service = get_service_id(service_id)
+    except Exception:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    return service
+
+
+def get_service_types():
+    return ["Análisis", "Consultoría", "Desarrollo"]
+
+
+@bp.get("/services-types")
+@base.validation(content_type=False)
+def service_types_get():
+    try:
+        # TODO: change this to a real implementation
+        service_type = get_service_types()
+    except Exception:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    return {"data": service_type}
