@@ -416,7 +416,7 @@ def create_service_view(institution_id: int):
     """Create a service form page"""
     form = ServiceForm(request.form)
     if request.method == "POST":
-        # Intenta crear un nuevo servicio utilizando los datos del formulario y el institution_id.
+        
         service_data = form.values()
         service_data["institution_id"] = institution_id
         ServiceService.create_service(**service_data)
@@ -433,10 +433,8 @@ def create_service_view(institution_id: int):
 def show_other_services(institution_id):
     """Show services for a specific institution or all services if no institution specified"""
     if institution_id:
-        # Si se proporciona un institution_id, obtén los servicios asociados a esa institución
         services = ServiceService.get_institution_services(institution_id)
     else:
-        # Si no se proporciona un institution_id, obtén todos los servicios
         services = ServiceService.get_services()
 
     return render_template("admin/services.html", services=services)
