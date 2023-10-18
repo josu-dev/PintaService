@@ -1,4 +1,5 @@
 """Model for service request."""
+import typing as t
 
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
@@ -22,6 +23,7 @@ class ServiceRequest(BaseModel):
     title: Mapped[Str32]
     description: Mapped[Str512]
     status: Mapped[RequestStatus]
+    closed_at: Mapped[t.Optional[Timestamp]]
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
