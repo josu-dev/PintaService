@@ -159,7 +159,7 @@ def users_id_toggle_active_post(user_id: int):
 
 @bp.get("/institutions")
 @h.authenticated_route(module="institution", permissions=("index",))
-def show_institutions():
+def institutions_get():
     institutions = InstitutionService.get_institutions()
 
     return render_template(
@@ -201,7 +201,7 @@ def institutions_id_get(institution_id: int):
         h.flash_info(f"Institución con id {institution_id} no encontrada.")
         return redirect("/admin/institutions")
 
-    institution_owner = InstitutionService.get_institution_owner(
+    institution_owners = InstitutionService.get_institution_owners(
         institution_id
     )
     form = InstitutionForm(obj=institution)
@@ -212,7 +212,7 @@ def institutions_id_get(institution_id: int):
         form=form,
         form_new_owner=form_new_owner,
         institution=institution,
-        institution_owner=institution_owner,
+        institution_owners=institution_owners,
     )
 
 
@@ -239,7 +239,7 @@ def institutions_id_post(institution_id: int):
 
 @bp.post("/institutions/<int:institution_id>/delete")
 @h.authenticated_route(module="institution", permissions=("destroy",))
-def institution_delete_post(institution_id: int):
+def institutions_id_delete_post(institution_id: int):
     institution = InstitutionService.get_institution(institution_id)
     if not institution:
         h.flash_info(
@@ -258,7 +258,7 @@ def institution_delete_post(institution_id: int):
 
 @bp.post("/institutions/<int:institution_id>/enable")
 @h.authenticated_route(module="institution", permissions=("activate",))
-def institution_id_activate_post(institution_id: int):
+def institutions_id_enable_post(institution_id: int):
     result = InstitutionService.update_institution(
         institution_id, enabled=True
     )
@@ -272,7 +272,7 @@ def institution_id_activate_post(institution_id: int):
 
 @bp.post("/institutions/<int:institution_id>/disable")
 @h.authenticated_route(module="institution", permissions=("deactivate",))
-def institution_id_deactivate_post(institution_id: int):
+def institutions_id_disable_post(institution_id: int):
     result = InstitutionService.update_institution(
         institution_id, enabled=False
     )
@@ -286,7 +286,7 @@ def institution_id_deactivate_post(institution_id: int):
 
 @bp.post("/institutions/<int:institution_id>/add_owner")
 @h.authenticated_route(module="institution", permissions=("update",))
-def institution_id_add_owner_post(institution_id: int):
+def institutions_id_add_owner_post(institution_id: int):
     form = InstitutionOwnerForm(request.form)
     if not form.validate():
         h.flash_error("Formulario invalido.")
@@ -302,11 +302,6 @@ def institution_id_add_owner_post(institution_id: int):
             f"Usuario con email {form.email.data} no puede ser dueño \
             de una institución."
         )
-        return redirect(f"/admin/institutions/{institution_id}")
-
-    current_owner = InstitutionService.get_institution_owner(institution_id)
-    if current_owner:
-        h.flash_error("La institución ya tiene un dueño asignado.")
         return redirect(f"/admin/institutions/{institution_id}")
 
     try:
@@ -328,13 +323,13 @@ def institution_id_add_owner_post(institution_id: int):
 
 @bp.post("/institutions/<int:institution_id>/remove_owner/<int:owner_id>")
 @h.authenticated_route(module="institution", permissions=("update",))
-def institution_id_remove_owner_post(institution_id: int, owner_id: int):
-    current_owner = InstitutionService.get_institution_owner(institution_id)
-    if not current_owner:
+def institutions_id_remove_owner_id_post(institution_id: int, owner_id: int):
+    current_owners = InstitutionService.get_institution_owners(institution_id)
+    if len(current_owners) == 0:
         h.flash_error("La institución no tiene un dueño asignado.")
         return redirect(f"/admin/institutions/{institution_id}")
 
-    if current_owner.id != owner_id:
+    if not any(owner.id == owner_id for owner in current_owners):
         h.flash_error("El usuario no es dueño de la institución.")
         return redirect(f"/admin/institutions/{institution_id}")
 
