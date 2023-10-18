@@ -4,9 +4,11 @@ import sqlalchemy as sa
 import sqlalchemy.exc as sa_exc
 import typing_extensions as te
 
+from src.core import permissions
 from src.core.db import db
-from src.core.models.auth import UserInstitutionRole
+from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.institution import Institution
+from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -122,3 +124,22 @@ class InstitutionService(BaseService):
             .first()
             is not None
         )
+
+    @classmethod
+    def get_institution_owner(cls, institution_id: int) -> t.Union[User, None]:
+        res = (
+            db.session.query(User)
+            .join(
+                UserInstitutionRole,
+                sa.and_(
+                    User.id == UserInstitutionRole.user_id,
+                    UserInstitutionRole.institution_id == institution_id,
+                    UserInstitutionRole.role_id
+                    == db.session.query(Role.id)
+                    .filter(Role.name == permissions.RoleEnum.OWNER.value)
+                    .scalar_subquery(),
+                ),
+            )
+            .first()
+        )
+        return res

@@ -1,4 +1,5 @@
 {% extends "_layouts/base.html" %}
+{% import "_macros/form.html" as Form %}
 {% from "_macros/inst_dropdown.html" import inst_dropdown %}
 {% block base_head %}
 <script src="{{ url_for('static', filename='js/layout.js') }}" defer></script>
@@ -34,21 +35,6 @@
           </button>
         </li>
         {% if g.user %}
-        {% if g.user_has_permissions(["setting_show", "setting_update"]) %}
-        <li class="hidden xs:block ">
-          <a href="/admin/site_config">
-            <span class="sr-only md:not-sr-only">Configurarion</span>
-            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-settings-2">
-              <path d="M20 7h-9" />
-              <path d="M14 17H5" />
-              <circle cx="17" cy="17" r="3" />
-              <circle cx="7" cy="7" r="3" />
-            </svg>
-          </a>
-        </li>
-        {% endif %}
         {% if g.institutions|length %}
         <li class="hidden xs:block ">
           {{ inst_dropdown(
@@ -95,7 +81,7 @@
               </li>
               <li class="flex shadow mb-10 md:mb-2 w-[16ch]">
                 <form class="w-full" action="/logout" method="post">
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+                  {{ Form.new_csrf_token() }}
                   <button
                     class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
                     <span>Cerrar Sesion</span>
@@ -146,7 +132,6 @@
             {% if g.user %}
             <li class="w-[16ch] flex shadow">
               <form class="w-full" action="/logout" method="post">
-                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button
                   class="w-full text-center hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
                   Cerrar Sesion

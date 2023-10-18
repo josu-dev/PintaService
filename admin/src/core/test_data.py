@@ -1,4 +1,5 @@
-from src.core.enums import DocumentTypes, GenderOptions
+from src.core.enums import DocumentTypes, GenderOptions, RequestStatus
+from src.services.request import RequestService
 
 
 def load_test_data():
@@ -154,7 +155,47 @@ def load_test_data():
     AuthService.add_institution_role(
         "OWNER", user_id=3, institution_id=ins2.id
     )
+    RequestService.create_request(
+        1,
+        1,
+        1,
+        title="Pelea",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        1,
+        title="Pelea2",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        1,
+        title="Pelea3",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        1,
+        title="Pelea4",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
 
+    RequestService.create_request(
+        1,
+        2,
+        1,
+        title="Pelea5",
+        description=" pelea",
+        status=RequestStatus.IN_PROCESS,
+    )
     # UserService.create_user(
     #     firstname="test",
     #     lastname="test",

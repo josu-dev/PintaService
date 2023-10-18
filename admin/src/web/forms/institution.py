@@ -1,3 +1,5 @@
+import typing as t
+
 from flask_wtf import FlaskForm
 from wtforms import EmailField, StringField, TextAreaField
 from wtforms import validators as v
@@ -49,4 +51,24 @@ class InstitutionForm(FlaskForm):
             "keywords": self.keywords.data,
             "email": self.email.data,
             "days_and_opening_hours": self.days_and_opening_hours.data,
+        }
+
+
+class InstitutionOwnerFormValues(t.TypedDict):
+    email: str
+
+
+class InstitutionOwnerForm(FlaskForm):
+    email = EmailField(
+        "Email",
+        validators=[
+            v.DataRequired(),
+            v.Length(min=0, max=32),
+            v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
+        ],
+    )
+
+    def values(self) -> InstitutionOwnerFormValues:
+        return {
+            "email": self.email.data,  # type: ignore
         }

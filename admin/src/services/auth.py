@@ -9,6 +9,7 @@ from typing_extensions import Unpack
 
 from src.core import permissions
 from src.core.db import db
+from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.user import PreRegisterUser
 from src.services.base import BaseService, BaseServiceError
 from src.services.mail import MailService
@@ -140,6 +141,32 @@ class AuthService(BaseService):
             return False
 
         return True
+
+    @classmethod
+    def remove_institution_role(
+        cls, user_id: int, institution_id: int, role: InstitutionsRoles
+    ) -> bool:
+        role_name = permissions.RoleEnum[role].value
+        print(user_id, institution_id, role_name, flush=True)
+        try:
+            delete_count = (
+                db.session.query(UserInstitutionRole)
+                .filter(
+                    UserInstitutionRole.user_id == user_id,
+                    UserInstitutionRole.institution_id == institution_id,
+                    UserInstitutionRole.role_id
+                    == db.session.query(Role.id)
+                    .filter(Role.name == role_name)
+                    .scalar_subquery(),
+                )
+                .delete()
+            )
+            db.session.commit()
+        except sa_exc.SQLAlchemyError as e:
+            print("error", e, flush=True)
+            return False
+
+        return delete_count == 1
 
     @classmethod
     def user_is_site_admin(cls, user_id: int):
