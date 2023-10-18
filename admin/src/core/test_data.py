@@ -1,5 +1,11 @@
-from src.core.enums import DocumentTypes, GenderOptions, RequestStatus
+from src.core.enums import (
+    DocumentTypes,
+    GenderOptions,
+    RequestStatus,
+    ServiceType,
+)
 from src.services.request import RequestService
+from src.services.service import ServiceService  # MURIO CLEAN CODE
 
 
 def load_test_data():
@@ -155,6 +161,30 @@ def load_test_data():
     AuthService.add_institution_role(
         "OWNER", user_id=3, institution_id=ins2.id
     )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceType.ANALYSIS,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceType.CONSULTANCY,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceType.DEVELOPMENT,
+    )
     RequestService.create_request(
         1,
         1,
@@ -174,7 +204,7 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        1,
+        2,
         title="Pelea3",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
@@ -182,7 +212,7 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        1,
+        3,
         title="Pelea4",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
