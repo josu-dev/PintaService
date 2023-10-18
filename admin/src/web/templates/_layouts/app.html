@@ -95,6 +95,7 @@
               </li>
               <li class="flex shadow mb-10 md:mb-2 w-[16ch]">
                 <form class="w-full" action="/logout" method="post">
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                   <button
                     class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
                     <span>Cerrar Sesion</span>
@@ -145,6 +146,7 @@
             {% if g.user %}
             <li class="w-[16ch] flex shadow">
               <form class="w-full" action="/logout" method="post">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
                 <button
                   class="w-full text-center hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
                   Cerrar Sesion

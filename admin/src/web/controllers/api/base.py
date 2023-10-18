@@ -65,7 +65,7 @@ TRoute = t.TypeVar("TRoute", bound=t.Callable[..., t.Any])
 
 
 def validation(
-    schema: t.Type[flask_wtf.FlaskForm],
+    schema: t.Optional[t.Type[flask_wtf.FlaskForm]] = None,
     method: t.Literal["GET", "POST"] = "POST",
     content_type: t.Literal["json", False] = "json",
     auth_required: bool = False,
@@ -80,21 +80,26 @@ def validation(
             if auth_required:
                 # TODO: implement jwt auth
                 # if not authorized: return API_UNAUTHORIZED_RESPONSE
-                ...
+                token = flask.request.headers.get("Authorization")
+                user_id = token.lstrip("Bearer ") if token else ""
+                kwargs["user_id"] = user_id
+                if not user_id:
+                    return API_UNAUTHORIZED_RESPONSE
 
-            if method == "GET":
-                form = schema(flask.request.args, csrf_enabled=False)
-                res_kwarg = "args"
-            else:
-                form = schema(csrf_enabled=False)
-                res_kwarg = "body"
+            if schema is not None:
+                if method == "GET":
+                    form = schema(flask.request.args, meta={"csrf": False})
+                    res_kwarg = "args"
+                else:
+                    form = schema(meta={"csrf": False})
+                    res_kwarg = "body"
 
-            if not form.validate():
-                if debug:
-                    print(form.errors, flush=True)
-                return API_BAD_REQUEST_RESPONSE
+                if not form.validate():
+                    if debug:
+                        print(form.errors, flush=True)
+                    return API_BAD_REQUEST_RESPONSE
 
-            kwargs[res_kwarg] = form.values()  # pyright: ignore
+                kwargs[res_kwarg] = form.values()  # pyright: ignore
 
             return func(*args, **kwargs)
 
