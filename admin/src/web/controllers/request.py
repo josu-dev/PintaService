@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, g, redirect, render_template, request
+from flask import Blueprint, g, redirect, render_template, request
 
 from src.core.enums import RequestStatus
 from src.services.request import RequestService
@@ -66,18 +66,18 @@ def request_id_edit_post(
     requestElement = RequestService.get_request(request_id)
 
     if not requestElement:
-        flash("Solicitud no encontrada.", "error")
+        h.flash_error("Solicitud no encontrada.")
         return redirect("requests")
 
     selected_status_str = request.form.get("request")
 
     if selected_status_str is None:
-        flash("Estado no seleccionado.", "error")
+        h.flash_error("Estado no seleccionado.")
         return redirect("requests")
     else:
         selected_status = RequestStatus(selected_status_str)
         RequestService.update_state_request(request_id, selected_status)
-        flash("Solicitud actualizada correctamente.", "success")
+        h.flash_success("Solicitud actualizada correctamente.")
 
     return redirect(
         f"/institutions/{institution_id}/services/{service_id}/requests"
