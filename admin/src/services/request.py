@@ -24,12 +24,15 @@ class RequestServiceError(BaseServiceError):
 
 
 class RequestService(BaseService):
+    RequestServiceError = RequestServiceError
+
     @classmethod
     def get_request(cls, request_id: int) -> ServiceRequest:
         query = db.session.get(ServiceRequest, request_id)
         """Get request from database"""
         if query is None:
             raise RequestServiceError("Solicitud no encontrada")
+
         return query
 
     @classmethod
@@ -72,6 +75,7 @@ class RequestService(BaseService):
         )
         if request is None:
             raise RequestServiceError("Solicitud no encontrada")
+
         request.status = state
         db.session.add(request)
         db.session.commit()
