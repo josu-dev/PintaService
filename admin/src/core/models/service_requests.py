@@ -45,3 +45,4 @@ class RequestNote(BaseModel):
     )
 
     service_request_id: Mapped[int]
+    user_id: Mapped[int]

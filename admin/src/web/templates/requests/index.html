@@ -17,12 +17,19 @@
         <h2 class="text-xl font-semibold mb-2">{{ request.title }}</h2>
         <p><strong>Descripcion:</strong> {{ request.description }}</p>
       </div>
-      <form method="POST" action="/institutions/{{institution_id}}/services/{{service_id}}/requests/{{request.id}}/edit">
-        <div class="flex gap-4 items-center">
+      
+      
+      
+      <div class="flex gap-4 items-center" >
+        
+        {{ LinkButton.secondary("Ver Notas", "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request.id~"/notes") }}
+        
+        <form method="POST" action="/institutions/{{institution_id}}/services/{{service_id}}/requests/{{request.id}}/edit">
+          <div class="flex gap-4 items-center">
           <select
             id="request-dropdown-select"
             name="request"
-            class="block mt-1 pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
+            class="block  pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
             rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
             appearance-none focus:outline-none focus:ring-0 focus:border-orange-600 w-[16ch]">
             {% for status in statuses %}
@@ -33,9 +40,12 @@
               {% endif %}
             {% endfor %}
           </select> 
-        {{ Button.primary("Editar Estado", type="submit") }}
-        </div>
-      </form>
+            {{ Button.primary("Editar Estado", type="submit") }}
+          </div>
+        </form>
+      </div>
+      
+        
     </li>
     {% endfor %}
   </ul>

@@ -4,7 +4,8 @@ import typing_extensions as te
 
 from src.core.db import db
 from src.core.enums import RequestStatus
-from src.core.models.service_requests import ServiceRequest
+from src.core.models.service_requests import RequestNote, ServiceRequest
+from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -12,6 +13,10 @@ class RequestParams(t.TypedDict):
     title: str
     description: str
     status: RequestStatus
+
+
+class RequestNoteParam(t.TypedDict):
+    note: str
 
 
 class RequestServiceError(BaseServiceError):
@@ -88,3 +93,21 @@ class RequestService(BaseService):
         db.session.add(request)
         db.session.commit()
         return request
+
+    @classmethod
+    def get_request_notes(cls, request_id: int):
+        query = (
+            db.session.query(RequestNote.note, User.username)
+            .join(User, User.id == RequestNote.user_id)
+            .filter(RequestNote.service_request_id == request_id)
+            .all()
+        )
+        return query  # type :ignore
+
+    @classmethod
+    def create_note(cls, service_request_id: int, note: str, user_id: int):
+        request = RequestNote(
+            note=note, service_request_id=service_request_id, user_id=user_id
+        )
+        db.session.add(request)
+        db.session.commit()

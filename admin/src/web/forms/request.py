@@ -5,7 +5,7 @@ from wtforms import SelectField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.core.enums import RequestStatus
-from src.services.request import RequestParams
+from src.services.request import RequestNoteParam, RequestParams
 
 
 class RequestForm(FlaskForm):
@@ -29,3 +29,13 @@ class RequestForm(FlaskForm):
             "description": self.description.data,
             "status": t.cast(RequestStatus, self.status.data),
         }
+
+
+class RequestNoteForm(FlaskForm):
+    note = TextAreaField(
+        "Notas",
+        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+    )
+
+    def values(self) -> RequestNoteParam:
+        return {"note": self.note.data}  # type:ignore
