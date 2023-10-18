@@ -63,8 +63,11 @@ def check_db_get():
     return "Database is not running", status.HTTP_503_SERVICE_UNAVAILABLE
 
 
-@bp.route("/users", methods=["GET", "POST"])
-def users():
+@bp.get("/users")
+@h.authenticated_route(
+    module="user", permissions=("index", "create", "update", "destroy")
+)
+def users_get():
     site_config_pages = g.site_config.page_size
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
@@ -73,6 +76,7 @@ def users():
     users, total = UserService.filter_users_by_email_and_active(
         email, active, page, per_page  # type: ignore
     )
+
     return render_template(
         "admin/users.html",
         users=users,
@@ -84,14 +88,15 @@ def users():
     )
 
 
-@bp.get("/user/<int:user_id>/edit")
-def user_edit_get(user_id: int):
-    """Show the edit user form with his actual values"""
+@bp.get("/users/<int:user_id>")
+@h.authenticated_route(module="user", permissions=("show", "update"))
+def users_id_get(user_id: int):
     user = UserService.get_user(user_id)
-    genders = [(choice.name, choice.value) for choice in GenderOptions]
     if not user:
-        flash("Usuario no encontrado.", "error")
+        h.flash_error(f"Usuario con id {user_id} no encontrado.")
         return redirect("/admin/users")
+
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
 
     form = ProfileUpdateForm(obj=user)
     return render_template(
@@ -99,47 +104,56 @@ def user_edit_get(user_id: int):
     )
 
 
-@bp.post("/user/<int:user_id>/edit")
-def edit_user_post(user_id: int):
-    """Edit the user with the new values"""
+@bp.post("/users/<int:user_id>")
+@h.authenticated_route(module="user", permissions=("update",))
+def users_id_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
-        flash("Usuario no encontrado.", "error")
+        h.flash_error(f"Usuario con id {user_id} no encontrado al actualizar.")
         return redirect("/admin/users")
 
     form = ProfileUpdateForm(request.form)
     if form.validate():
         UserService.update_user(user_id, **form.values())
-        flash("Usuario actualizado con éxito.", "success")
+        h.flash_success("Usuario actualizado con éxito.")
         return redirect("/admin/users")
 
     return render_template("profile.html", user=user, form=form)
 
 
-@bp.post("/user/<int:user_id>/delete")
-def user_delete_post(user_id: int):
+@bp.post("/users/<int:user_id>/delete")
+@h.authenticated_route(module="user", permissions=("destroy",))
+def users_id_delete_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
-        flash("Usuario no encontrado.", "error")
+        h.flash_error(f"Usuario con id {user_id} no encontrado al eliminar.")
         return redirect("/admin/users")
-    else:
-        UserService.delete_user(user_id)
-        flash("Usuario eliminado con éxito.", "success")
+
+    if AuthService.user_is_site_admin(user_id):
+        h.flash_error("No se puede eliminar un usuario administrador.")
+        return redirect("/admin/users")
+
+    # TODO: check if user has been deleted
+    UserService.delete_user(user_id)
+    h.flash_success("Usuario eliminado con éxito.")
+
     return redirect("/admin/users")
 
 
-@bp.post("/user/<int:user_id>/toggle_active")
-def toggle_active(user_id: int):
+@bp.post("/users/<int:user_id>/toggle_active")
+@h.authenticated_route(module="user", permissions=("update",))
+def users_id_toggle_active_post(user_id: int):
     user = UserService.get_user(user_id)
     if not user:
-        flash("Usuario no encontrado.", "error")
+        h.flash_error(f"Usuario con id {user_id} no encontrado al actualizar.")
         return redirect("/admin/users")
+
+    UserService.toggle_active(user_id)
+    if user.is_active:
+        h.flash_success("Usuario activado con éxito.")
     else:
-        UserService.toggle_active(user_id)
-        if user.is_active:
-            flash("Usuario activado con éxito.", "success")
-        else:
-            flash("Usuario desactivado con éxito.", "success")
+        h.flash_success("Usuario desactivado con éxito.")
+
     return redirect("/admin/users")
 
 
