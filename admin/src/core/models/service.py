@@ -2,7 +2,7 @@
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from src.core.enums import ServiceType
+from src.core.enums import ServiceTypes
 from src.core.models.base import (
     BaseModel,
     CreatedAt,
@@ -22,7 +22,7 @@ class Service(BaseModel):
     laboratory: Mapped[Str32]
     description: Mapped[Str512]
     keywords: Mapped[Str256]
-    service_type: Mapped[ServiceType]
+    service_type: Mapped[ServiceTypes]
     enabled: Mapped[bool] = mapped_column(init=False, default=True)
 
     institution_id: Mapped[int]

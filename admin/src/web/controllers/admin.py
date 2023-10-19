@@ -1,7 +1,7 @@
 from flask import Blueprint, flash, g, redirect, render_template, request
 
 from src.core.enums import GenderOptions
-from src.core.models.service import ServiceType
+from src.core.models.service import ServiceTypes
 from src.services.auth import AuthService
 from src.services.database import DatabaseService
 from src.services.institution import InstitutionService
@@ -402,7 +402,7 @@ def service_edit_get(service_id: int):
         flash("Servicio no encontrado.", "error")
         return redirect("/admin/services")
 
-    categories = [(choice.name, choice.value) for choice in ServiceType]
+    categories = [(choice.name, choice.value) for choice in ServiceTypes]
     form = ServiceForm(obj=service)
     return render_template(
         "service/setting.html",
@@ -417,7 +417,6 @@ def create_service_view(institution_id: int):
     """Create a service form page"""
     form = ServiceForm(request.form)
     if request.method == "POST":
-        
         service_data = form.values()
         service_data["institution_id"] = institution_id
         ServiceService.create_service(**service_data)

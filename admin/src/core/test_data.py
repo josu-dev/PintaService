@@ -2,10 +2,8 @@ from src.core.enums import (
     DocumentTypes,
     GenderOptions,
     RequestStatus,
-    ServiceType,
+    ServiceTypes,
 )
-from src.services.request import RequestService
-from src.services.service import ServiceService  # MURIO CLEAN CODE
 
 
 def load_test_data():
@@ -15,6 +13,7 @@ def load_test_data():
     from src.core.db import db
     from src.core.models import auth
     from src.services.auth import AuthService
+    from src.services.request import RequestService
     from src.services.service import ServiceService
     from src.services.user import UserService
 
@@ -168,7 +167,7 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
-        service_type=ServiceType.ANALYSIS,
+        service_type=ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
         institution_id=1,
@@ -176,7 +175,7 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
-        service_type=ServiceType.CONSULTANCY,
+        service_type=ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
         institution_id=1,
@@ -184,7 +183,7 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
-        service_type=ServiceType.DEVELOPMENT,
+        service_type=ServiceTypes.DEVELOPMENT,
     )
     RequestService.create_request(
         1,
@@ -233,7 +232,7 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
-        service_type=enums.ServiceType.ANALYSIS,
+        service_type=enums.ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
         institution_id=1,
@@ -241,7 +240,7 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
-        service_type=enums.ServiceType.CONSULTANCY,
+        service_type=enums.ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
         institution_id=1,
@@ -249,18 +248,5 @@ def load_test_data():
         description="Descripción del servicio 1",
         laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
-        service_type=enums.ServiceType.DEVELOPMENT,
+        service_type=enums.ServiceTypes.DEVELOPMENT,
     )
-    # UserService.create_user(
-    #     firstname="test",
-    #     lastname="test",
-    #     password="test",
-    #     email="test@test.com",
-    #     username="test",
-    #     document_type=DocumentTypes.DNI,
-    #     document_number="25683652",
-    #     gender=GenderOptions.FEMALE,
-    #     gender_other="tal vez",
-    #     address="15 y 47",
-    #     phone="2355572726",
-    # )

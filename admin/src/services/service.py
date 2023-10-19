@@ -3,7 +3,7 @@ import typing as t
 import typing_extensions as te
 
 from src.core.db import db
-from src.core.enums import ServiceType
+from src.core.enums import ServiceTypes
 from src.core.models.institution import Institution
 from src.core.models.service import Service
 from src.services.base import BaseService, BaseServiceError
@@ -14,7 +14,7 @@ class ServiceParams(t.TypedDict):
     laboratory: str
     description: str
     keywords: str
-    service_type: ServiceType
+    service_type: ServiceTypes
 
 
 class ServiceServiceError(BaseServiceError):

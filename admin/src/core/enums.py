@@ -14,7 +14,7 @@ class DocumentTypes(Enum):
     LE = "Libreta de Enrolamiento"
 
 
-class ServiceType(Enum):
+class ServiceTypes(Enum):
     ANALYSIS = "analisis"
     CONSULTANCY = "consultoria"
     DEVELOPMENT = "desarrollo"
