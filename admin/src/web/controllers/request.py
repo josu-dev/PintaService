@@ -17,7 +17,6 @@ def requests_get(institution_id: int, service_id: int):
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
 
-    service_type = request.args.get("service_type")
     status = request.args.get("status")
     user_email = request.args.get("user_email")
     start_date = request.args.get("start_date")
@@ -27,16 +26,15 @@ def requests_get(institution_id: int, service_id: int):
         user_email = None
     if status == "" or status is None:
         status = None
-    if service_type == "" or service_type is None:
-        service_type = None
 
     (
         requests,  # type:ignore
         total,  # type:ignore
-    ) = RequestService.get_requests_filter_by(  # type:ignore
+    ) = RequestService.get_requests_filter_by_service(  # type:ignore
         per_page=per_page,
         page=page,
-        service_type=service_type,  # type:ignore
+        institution_id=institution_id,  # type:ignore
+        service_id=service_id,  # type:ignore
         status=status,  # type:ignore
         user_email=user_email,  # type:ignore
         start_date=start_date,  # type:ignore
@@ -54,7 +52,6 @@ def requests_get(institution_id: int, service_id: int):
         total=total,
         statuses=statuses,
         user_email=user_email,
-        service_type=service_type,
         status=status,
         start_date=start_date,
         end_date=end_date,
@@ -62,7 +59,8 @@ def requests_get(institution_id: int, service_id: int):
 
 
 @bp.get("/new")
-@h.authenticated_route(module="service_request", permissions=("create",))
+# @h.authenticated_route(module="service_request", permissions=("create",))
+#  # Only for devs this is not the final permission
 def requests_new_get(institution_id: int, service_id: int):
     form = RequestForm()
 
@@ -72,9 +70,9 @@ def requests_new_get(institution_id: int, service_id: int):
 
 
 @bp.post("/new")
-@h.authenticated_route(
-    module="service_request", permissions=("create",)
-)  # Only for devs this is not the final permission
+# @h.authenticated_route(
+#     module="service_request", permissions=("create",)
+# )  # Only for devs this is not the final permission
 def request_new_post(institution_id: int, service_id: int):
     form = RequestForm()
     if form.validate_on_submit():
@@ -124,7 +122,6 @@ def request_id_edit_post(
 
 @bp.get("/<int:request_id>/notes")
 @h.authenticated_route(module="service_request", permissions=("show", "index"))
-@h.authenticated_route()
 def notes_get(institution_id: int, service_id: int, request_id: int):
     notes = RequestService.get_request_notes(request_id)
     request_details = RequestService.get_service_request_details(request_id)
@@ -140,7 +137,6 @@ def notes_get(institution_id: int, service_id: int, request_id: int):
 
 @bp.get("/<int:request_id>/notes/new")
 @h.authenticated_route(module="service_request", permissions=("update",))
-@h.authenticated_route()
 def create_notes_get(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
 
@@ -152,7 +148,6 @@ def create_notes_get(institution_id: int, service_id: int, request_id: int):
 
 @bp.post("/<int:request_id>/notes/new")
 @h.authenticated_route(module="service_request", permissions=("update",))
-@h.authenticated_route()
 def create_notes_post(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
     user_id = g.user.id

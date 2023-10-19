@@ -40,15 +40,7 @@
         <label for="end_date">Fecha de fin:</label>
         <input type="date" name="end_date" id="end_date" class="w-full" value="{{ end_date }}">
       </div>
-      <div class=" form-group flex flex-col mb-8">
-        <label for="service_type">Tipo de servicio:</label>
-        <select name="service_type" id="service_type" class="w-full">
-          <option value="">Todos</option>
-          <option value="ANALYSIS" {% if service_type=="ANALYSIS" %}selected{% endif %}>Análisis</option>
-          <option value="CONSULTANCY" {% if service_type=="CONSULTANCY" %}selected{% endif %}>Consultoría</option>
-          <option value="DEVELOPMENT" {% if service_type=="DEVELOPMENT" %}selected{% endif %}>Desarrollo</option>
-        </select>
-      </div>
+
       <div class="mt-4 mb-4">
         {{ Button.primary("Filtrar", type="submit") }}
       </div>
