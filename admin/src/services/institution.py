@@ -143,3 +143,85 @@ class InstitutionService(BaseService):
             .all()
         )
         return res
+
+    @classmethod
+    def get_institution_users(cls, institution_id: int):
+        res = (
+            db.session.query(User, Role)
+            .join(
+                UserInstitutionRole,
+                sa.and_(
+                    User.id == UserInstitutionRole.user_id,
+                    UserInstitutionRole.institution_id == institution_id,
+                ),
+            )
+            .filter(
+                UserInstitutionRole.role_id.in_(
+                    db.session.query(Role.id)
+                    .filter(Role.name != permissions.RoleEnum.OWNER.value)
+                    .scalar_subquery(),
+                )
+            )
+            .filter(UserInstitutionRole.role_id == Role.id)
+            .all()
+        )
+        return res
+
+    @classmethod
+    def update_institution_role(
+        cls, institution_id: int, user_id: int, role_id: int
+    ) -> bool:
+        user_institution_role = (
+            db.session.query(UserInstitutionRole)
+            .filter(
+                UserInstitutionRole.institution_id == institution_id,
+                UserInstitutionRole.user_id == user_id,
+            )
+            .first()
+        )
+        if user_institution_role is None:
+            return False
+
+        user_institution_role.user_id = user_id
+        user_institution_role.institution_id = institution_id
+        user_institution_role.role_id = role_id
+        db.session.commit()
+        return True
+
+    @classmethod
+    def get_rol(cls, name_role: str) -> t.Union[Role, None]:
+        role = (db.session.query(Role).filter(Role.name == name_role)).first()
+        return role
+
+    @classmethod
+    def delete_institution_user(
+        cls, institution_id: int, user_id: int
+    ) -> bool:
+        user_institution = (
+            db.session.query(UserInstitutionRole)
+            .filter(
+                UserInstitutionRole.institution_id == institution_id,
+                UserInstitutionRole.user_id == user_id,
+            )
+            .first()
+        )
+        if user_institution is None:
+            return False
+
+        db.session.delete(user_institution)
+        db.session.commit()
+        return True
+
+    @classmethod
+    def institution_has_user(cls, user_id: int, institution_id: int) -> bool:
+        result = (
+            db.session.query(UserInstitutionRole)
+            .filter(
+                UserInstitutionRole.institution_id == institution_id,
+                UserInstitutionRole.user_id == user_id,
+            )
+            .first()
+        )
+        if result:
+            return True
+        return False
