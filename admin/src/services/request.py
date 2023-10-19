@@ -44,12 +44,17 @@ class RequestService(BaseService):
 
     @classmethod
     def get_requests_of(
-        cls, institution_id: int, page: int = 1, per_page: int = 10
+        cls,
+        institution_id: int,
+        service_id: int,
+        page: int = 1,
+        per_page: int = 10,
     ) -> t.Tuple[t.List[ServiceRequest], int]:
         """Get requests from database"""
         requests = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.institution_id == institution_id)
+            .filter(ServiceRequest.service_id == service_id)
             .offset((page - 1) * per_page)
             .limit(per_page)
             .all()
@@ -171,6 +176,43 @@ class RequestService(BaseService):
             .filter(RequestNote.user_id == user_id)
             .all()
         )
+
+    @classmethod
+    def get_requests_filter_by_service(
+        cls,
+        page: int,
+        per_page: int,
+        institution_id: int,
+        service_id: int,
+        **kwargs: te.Unpack[FilterRequestParams],
+    ):
+        """Get requests from database filtered by the args passed"""
+        query = db.session.query(ServiceRequest)
+        query = query.filter(ServiceRequest.institution_id == institution_id)
+        query = query.filter(ServiceRequest.service_id == service_id)
+        if (
+            "user_email" in kwargs
+            and kwargs["user_email"] is not None  # type:ignore
+        ):
+            query = query.join(User, User.id == ServiceRequest.user_id)
+            email = kwargs["user_email"]
+            query = query.filter(User.email.ilike(f"%{email}%"))
+
+        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+            query = query.filter(ServiceRequest.status == kwargs["status"])
+
+        if "start_date" in kwargs and kwargs["start_date"]:
+            start_date = datetime.strptime(kwargs["start_date"], "%Y-%m-%d")
+            query = query.filter(ServiceRequest.created_at >= start_date)
+
+        if "end_date" in kwargs and kwargs["end_date"]:
+            end_date = datetime.strptime(kwargs["end_date"], "%Y-%m-%d")
+            query = query.filter(ServiceRequest.created_at <= end_date)
+
+        total = query.count()
+        requests = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return requests, total
 
     @classmethod
     def get_requests_filter_by(

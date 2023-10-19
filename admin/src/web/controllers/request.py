@@ -17,7 +17,6 @@ def requests_get(institution_id: int, service_id: int):
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
 
-    service_type = request.args.get("service_type")
     status = request.args.get("status")
     user_email = request.args.get("user_email")
     start_date = request.args.get("start_date")
@@ -27,16 +26,15 @@ def requests_get(institution_id: int, service_id: int):
         user_email = None
     if status == "" or status is None:
         status = None
-    if service_type == "" or service_type is None:
-        service_type = None
 
     (
         requests,  # type:ignore
         total,  # type:ignore
-    ) = RequestService.get_requests_filter_by(  # type:ignore
+    ) = RequestService.get_requests_filter_by_service(  # type:ignore
         per_page=per_page,
         page=page,
-        service_type=service_type,  # type:ignore
+        institution_id=institution_id,  # type:ignore
+        service_id=service_id,  # type:ignore
         status=status,  # type:ignore
         user_email=user_email,  # type:ignore
         start_date=start_date,  # type:ignore
@@ -54,7 +52,6 @@ def requests_get(institution_id: int, service_id: int):
         total=total,
         statuses=statuses,
         user_email=user_email,
-        service_type=service_type,
         status=status,
         start_date=start_date,
         end_date=end_date,
