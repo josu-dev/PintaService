@@ -12,8 +12,6 @@ bp = Blueprint("requests", __name__)
 @h.authenticated_route(module="service_request", permissions=("index", "show"))
 def requests_get(institution_id: int, service_id: int):
     """Get requests from database filtered if is neccesary"""
-    if len(g.institutions) == 0:
-        return redirect("/")
 
     site_config_pages = g.site_config.page_size
     page = request.values.get("page", 1, type=int)
@@ -47,7 +45,7 @@ def requests_get(institution_id: int, service_id: int):
 
     statuses = [status.value for status in RequestStatus]
     return render_template(
-        "requests/index.html",
+        "institutions/[id]/services/[id]/requests/index.html",
         requests=requests,
         institution_id=institution_id,
         service_id=service_id,
@@ -68,7 +66,9 @@ def requests_get(institution_id: int, service_id: int):
 def requests_new_get(institution_id: int, service_id: int):
     form = RequestForm()
 
-    return render_template("requests/new.html", form=form)
+    return render_template(
+        "institutions/[id]/services/[id]/requests/new.html", form=form
+    )
 
 
 @bp.post("/new")
@@ -85,7 +85,9 @@ def request_new_post(institution_id: int, service_id: int):
         return redirect(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
-    return render_template("requests/new.html", form=form)
+    return render_template(
+        "institutions/[id]/services/[id]/requests/new.html", form=form
+    )
 
 
 @bp.post("/<int:request_id>/edit")
@@ -124,7 +126,7 @@ def notes_get(institution_id: int, service_id: int, request_id: int):
     notes = RequestService.get_request_notes(request_id)
 
     return render_template(
-        "requests/notes.html",
+        "institutions/[id]/services/[id]/requests/notes.html",
         notes=notes,
         institution_id=institution_id,
         service_id=service_id,
@@ -138,7 +140,7 @@ def create_notes_get(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
 
     return render_template(
-        "requests/new_note.html",
+        "institutions/[id]/services/[id]/requests/new_note.html",
         form=form,
     )
 
@@ -150,13 +152,13 @@ def create_notes_post(institution_id: int, service_id: int, request_id: int):
     user_id = g.user.id
     if form.validate():
         RequestService.create_note(
-            service_request_id=service_id, **form.values(), user_id=user_id
+            service_request_id=request_id, **form.values(), user_id=user_id
         )
         h.flash_success("Nota creada correctamente.")
         return redirect(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
     return render_template(
-        "requests/new_note.html",
+        "institutions/[id]/services/[id]/requests/new_note.html",
         form=form,
     )

@@ -111,7 +111,7 @@ class RequestService(BaseService):
     @classmethod
     def get_request_notes(cls, request_id: int):
         query = (
-            db.session.query(RequestNote.note, User.username)
+            db.session.query(User.username, RequestNote.note)
             .join(User, User.id == RequestNote.user_id)
             .filter(RequestNote.service_request_id == request_id)
             .all()

@@ -1,0 +1,33 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% block head %}
+<title>Notas de solicitud</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+  <h1 class="text-3xl font-semibold mb-4">Notas de la solicitud</h1>
+  <ul>
+    {% for username, note in notes %}
+    <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
+      <div>
+        <h2 class="text-xl font-semibold mb-2">Nota de : {{username}}</h2>
+        <p><strong>Descripcion:</strong> {{ note }}</p>
+      </div>
+
+    </li>
+    <!-- Button to go to create -->
+
+    {% endfor %}
+    <div class="flex justify-end">
+      {{ LinkButton.secondary("Agregar Nota",
+      "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request_id~"/notes/new") }}
+    </div>
+
+
+  </ul>
+
+</main>
+{% endblock %}

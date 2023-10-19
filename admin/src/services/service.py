@@ -14,10 +14,19 @@ from src.services.base import BaseService, BaseServiceError
 
 class ServiceParams(t.TypedDict):
     name: str
-    laboratory: str
     description: str
     keywords: str
     service_type: ServiceTypes
+    enabled: te.NotRequired[bool]
+
+
+class ServicePartialParams(t.TypedDict):
+    name: te.NotRequired[str]
+    description: te.NotRequired[str]
+    keywords: te.NotRequired[str]
+    service_type: te.NotRequired[ServiceTypes]
+    laboratory: te.NotRequired[str]
+    enabled: te.NotRequired[bool]
 
 
 class ServiceServiceError(BaseServiceError):
@@ -33,17 +42,25 @@ class ServiceService(BaseService):
 
     @classmethod
     def get_service(cls, service_id: int) -> t.Union[Service, None]:
-        return db.session.query(Service).get(service_id)
+        return (
+            db.session.query(Service).filter(Service.id == service_id).first()
+        )
 
     @classmethod
     def create_service(
         cls, institution_id: int, **kwargs: te.Unpack[ServiceParams]
     ) -> Service:
-        institution = db.session.query(Institution).get(institution_id)
+        institution: t.Union[Institution, None] = db.session.query(
+            Institution
+        ).get(institution_id)
         if institution is None:
             raise ServiceServiceError("Institution not found")
 
-        service = Service(institution_id=institution_id, **kwargs)
+        service = Service(
+            institution_id=institution_id,
+            laboratory=institution.name,
+            **kwargs,
+        )
 
         db.session.add(service)
         db.session.commit()
@@ -105,3 +122,15 @@ class ServiceService(BaseService):
             .filter(Service.institution_id == institution_id)
             .all()
         )
+
+    @classmethod
+    def get_institution_services_paginated(
+        cls, institution_id: int, page: int, per_page: int
+    ) -> t.Tuple[t.List[Service], int]:
+        query = db.session.query(Service).filter(
+            Service.institution_id == institution_id
+        )
+        total = query.count()
+        services = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return services, total

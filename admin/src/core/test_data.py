@@ -165,7 +165,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.ANALYSIS,
     )
@@ -173,7 +172,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.CONSULTANCY,
     )
@@ -181,7 +179,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.DEVELOPMENT,
     )
@@ -230,7 +227,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.ANALYSIS,
     )
@@ -238,7 +234,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.CONSULTANCY,
     )
@@ -246,7 +241,6 @@ def load_test_data():
         institution_id=1,
         name="Servicio 1",
         description="Descripción del servicio 1",
-        laboratory="https://www.servicio1.com/",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.DEVELOPMENT,
     )

@@ -52,6 +52,7 @@ MODULE_ACTIONS = {
     ),
     ModuleEnum.SERVICES: (
         ActionEnum.INDEX,
+        ActionEnum.SHOW,
         ActionEnum.CREATE,
         ActionEnum.UPDATE,
         ActionEnum.DESTROY,

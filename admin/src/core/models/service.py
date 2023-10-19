@@ -23,7 +23,6 @@ class Service(BaseModel):
     description: Mapped[Str512]
     keywords: Mapped[Str256]
     service_type: Mapped[ServiceTypes]
-    enabled: Mapped[bool] = mapped_column(init=False, default=True)
 
     institution_id: Mapped[int]
 
@@ -31,3 +30,5 @@ class Service(BaseModel):
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
+
+    enabled: Mapped[bool] = mapped_column(default=True)
