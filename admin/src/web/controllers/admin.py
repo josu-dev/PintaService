@@ -71,6 +71,7 @@ def users_get():
     site_config_pages = g.site_config.page_size
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
+
     email = request.values.get("email")
     active = request.values.get("active")
     users, total = UserService.filter_users_by_email_and_active(
