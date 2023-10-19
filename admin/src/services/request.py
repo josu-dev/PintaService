@@ -18,7 +18,7 @@ class RequestParams(t.TypedDict):
 
 
 class FilterRequestParams(t.TypedDict):
-    user_id: int
+    user_email: str
     service_type: ServiceTypes
     status: RequestStatus
     date_from: str
@@ -168,13 +168,16 @@ class RequestService(BaseService):
         per_page: int,
         **kwargs: te.Unpack[FilterRequestParams],
     ):
+        """Get requests from database filtered by the args passed"""
         query = db.session.query(ServiceRequest)
-
         if (
-            "user_id" in kwargs
-            and kwargs["user_id"] is not None  # type:ignore
+            "user_email" in kwargs
+            and kwargs["user_email"] is not None  # type:ignore
         ):
-            query = query.filter(ServiceRequest.user_id == kwargs["user_id"])
+            query = query.join(User, User.id == ServiceRequest.user_id)
+            email = kwargs["user_email"]
+            query = query.filter(User.email.ilike(f"%{email}%"))
+
         if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
             query = query.filter(ServiceRequest.status == kwargs["status"])
 

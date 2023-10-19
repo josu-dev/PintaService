@@ -19,12 +19,12 @@ def requests_get(institution_id: int, service_id: int):
 
     service_type = request.args.get("service_type")
     status = request.args.get("status")
-    user_id = request.args.get("user_id")
+    user_email = request.args.get("user_email")
     start_date = request.args.get("start_date")
     end_date = request.args.get("end_date")
 
-    if user_id == "" or user_id is None:
-        user_id = None
+    if user_email == "" or user_email is None:
+        user_email = None
     if status == "" or status is None:
         status = None
     if service_type == "" or service_type is None:
@@ -38,7 +38,7 @@ def requests_get(institution_id: int, service_id: int):
         page=page,
         service_type=service_type,  # type:ignore
         status=status,  # type:ignore
-        user_id=user_id,  # type:ignore
+        user_email=user_email,  # type:ignore
         start_date=start_date,  # type:ignore
         end_date=end_date,  # type:ignore
     )
@@ -53,7 +53,7 @@ def requests_get(institution_id: int, service_id: int):
         per_page=per_page,
         total=total,
         statuses=statuses,
-        user_id=user_id,
+        user_email=user_email,
         service_type=service_type,
         status=status,
         start_date=start_date,
