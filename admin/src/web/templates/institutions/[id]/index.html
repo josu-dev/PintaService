@@ -9,33 +9,45 @@
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col p-4 pt-16">
-    <h1 class="text-3xl font-semibold mt-[1em] text-center text-balance">{{ institution.name }}</h1>
-    <form action="/institutions/{{institution_id}}/add/user" method="post" class="flex flex-row gap-4 mt-2">
+<main class="flex-1 p-4 pt-2 md:pt-16">
+    <h1 class="text-3xl font-semibold my-4 text-center text-balance">{{ institution.name }}</h1>
+    <h2 class="text-xl font-semibold mb-2">Agregar usuario:</h2>
+    <form action="/institutions/{{institution_id}}/add/user" method="post"
+        class="flex flex-col md:flex-row gap-4 mb-4 p-4 border rounded shadow-lg items-center md:items-end md:justify-center">
+
         {{ form_new_user.csrf_token }}
+
         {{ Form.render_field(form_new_user.email) }}
-        <select id="new-role-dropdown-select" name="new-role" class="block  pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
-                rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
-                appearance-none focus:outline-none focus:ring-0 focus:border-orange-600 w-[16ch]">
-            {% for role in roles %}
-            <option value="{{ role[0] }}">{{ role[1]}}</option>
-            {% endfor%}
-        </select>
-        {{ Button.primary("Agregar usuario", "submit") }}
+
+        <label name="new-role" class="">
+            <select id="new-role-dropdown-select" name="new-role" class="block  pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
+                    rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
+                    appearance-none focus:outline-none focus:ring-0 focus:border-orange-600 w-[22ch]">
+                {% for role in roles %}
+                <option value="{{ role[0] }}">{{ role[1]}}</option>
+                {% endfor%}
+            </select>
+        </label>
+        {{ Button.primary("Agregar usuario", "submit", class="w-[22ch]") }}
     </form>
+    {% if users%}
+    <h2 class="text-xl font-semibold mb-2">Usuarios:</h2>
+    {% else %}
+    <h2 class="text-xl font-semibold mb-2">No hay usuarios</h2>
+    {% endif %}
     <ul>
         {% for user, user_role in users %}
-        <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
-            <div>
+        <li class="flex flex-col md:flex-row mb-4 p-4 border rounded shadow-lg items-center md:justify-center">
+            <div class="flex flex-col mr-4 items-center">
                 <h2 class="text-xl font-semibold mb-2">{{ user.username }}</h2>
-                <p><strong>Email: </strong> {{ user.email }}</p>
+                <p class="mb-2"><strong>Email: </strong> {{ user.email }}</p>
             </div>
 
-            <div class="flex gap-4 items-center">
+            <div class="flex flex-col md:flex-row gap-4 items-center ">
                 <form method="POST" action="/institutions/{{institution_id}}/edit/role">
                     {{ Form.new_csrf_token() }}
                     <input type="hidden" name="user_id" value={{user.id}}>
-                    <div class="flex gap-4 items-center">
+                    <div class="flex flex-col md:flex-row gap-4 items-center">
                         <select id="role-dropdown-select" name="role" class="block  pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
             rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
             appearance-none focus:outline-none focus:ring-0 focus:border-orange-600 w-[16ch]">

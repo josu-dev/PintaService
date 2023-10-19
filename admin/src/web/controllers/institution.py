@@ -2,7 +2,6 @@ from flask import Blueprint, g, redirect, render_template, request
 
 from src.services.auth import AuthService
 from src.services.institution import InstitutionService
-from src.services.service import ServiceService
 from src.services.user import UserService
 from src.web.controllers import _helpers as h
 from src.web.forms.institution import EmailForm
@@ -22,6 +21,20 @@ def index_get():
 @bp.get("/<int:institution_id>")
 @h.authenticated_route()
 def id_get(institution_id: int):
+    if not (
+        g.user_has_permissions(
+            (
+                "user_institution_create",
+                "user_institution_destroy",
+                "user_institution_index",
+                "user_institution_update",
+            )
+        )
+    ):
+        if g.user_has_permissions(("services", "services_index")):
+            return redirect(f"institutions/{institution_id}/services")
+        else:
+            return redirect("/")
     users = InstitutionService.get_institution_users(institution_id)
     institution = InstitutionService.get_institution(institution_id)
     roles = [
@@ -42,6 +55,7 @@ def id_get(institution_id: int):
     )
 
 
+@h.authenticated_route(module="user_institution", permissions=("update",))
 @bp.post("/<int:institution_id>/edit/role")
 @h.authenticated_route()
 def id_edit_role_post(institution_id: int):
@@ -72,16 +86,8 @@ def id_edit_role_post(institution_id: int):
     return redirect(f"/institutions/{institution_id}")
 
 
-@bp.get("/<int:institution_id>/edit")
-@h.authenticated_route()
-def id_services_get(institution_id: int):
-    services = ServiceService.get_institution_services(institution_id)
-
-    return render_template("admin/services.html", services=services)
-
-
 @bp.post("/<int:institution_id>/delete/user")
-@h.authenticated_route()
+@h.authenticated_route(module="user_institution", permissions=("destroy",))
 def id_delete_user(institution_id: int):
     user_id = request.form.get("user_id")
     if not user_id:
@@ -100,7 +106,7 @@ def id_delete_user(institution_id: int):
 
 
 @bp.post("/<int:institution_id>/add/user")
-@h.authenticated_route()
+@h.authenticated_route(module="user_institution", permissions=("create",))
 def id_add_user(institution_id: int):
     form = EmailForm(request.form)
     if not form.validate():
