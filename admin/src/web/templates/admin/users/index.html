@@ -1,17 +1,20 @@
 {% extends "_layouts/app.html" %}
-{% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
 {% import "_macros/link_button.html" as LinkButton %}
 {% import "_macros/table.html" as Table %}
 {% from "_macros/pagination.html" import Pagination %}
 
 {% block head %}
-<title>Pinta Service</title>
+<title>Usuarios - Pinta Service</title>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col">
-  <h1 class="text-3xl font-semibold mt-[1em] ml-2">Usuarios</h1>
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Usuarios</h1>
+    {{ LinkButton.primary("Crear usuario", "/admin/users/new", class="flex mt-auto mb-4") }}
+  </div>
 
   <form method="get" action="/admin/users">
     {{ Form.new_csrf_token() }}

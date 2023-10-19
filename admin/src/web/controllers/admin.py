@@ -10,7 +10,7 @@ from src.utils import status
 from src.web.controllers import _helpers as h
 from src.web.forms.institution import EmailForm, InstitutionForm
 from src.web.forms.site import SiteUpdateForm
-from src.web.forms.user import ProfileUpdateForm
+from src.web.forms.user import ProfileUpdateForm, UserCreateForm
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -76,7 +76,7 @@ def users_get():
     )
 
     return render_template(
-        "admin/users.html",
+        "admin/users/index.html",
         users=users,
         page=page,
         per_page=per_page,
@@ -84,6 +84,44 @@ def users_get():
         email=email,
         active=active,
     )
+
+
+@bp.get("/users/new")
+@h.authenticated_route(module="user", permissions=("create",))
+def users_new_get():
+    form = UserCreateForm()
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+    return render_template("admin/users/new.html", form=form, genders=genders)
+
+
+@bp.post("/users/new")
+@h.authenticated_route(module="user", permissions=("create",))
+def services_new_post():
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+    form = UserCreateForm(request.form)
+    if not form.validate():
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    if UserService.exist_user_with_email(form.email.data):  # type: ignore
+        h.flash_error(f"Usuario con email {form.email.data} ya existe.")
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    try:
+        _ = UserService.create_user(**form.values())
+    except UserService.UserServiceError as e:
+        h.flash_error(e.message)
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    h.flash_success("Usuario creado exitosamente")
+    return redirect("/admin/users")
 
 
 @bp.get("/users/<int:user_id>")

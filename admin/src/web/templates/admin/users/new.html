@@ -1,0 +1,51 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
+
+{% block head %}
+<title>Nuevo usuario</title>
+<script src="{{ url_for('static', filename='js/user_setting.js') }}" defer></script>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col">
+  <div class="mx-auto w-full max-w-lg">
+    <h1 class="text-3xl font-semibold mt-[1em] ml-2">Creación de Usuario</h1>
+
+    <form method="post" class="flex flex-col gap-2 p-4 md:gap-4 mb-4 md:mt-4">
+      {{ form.csrf_token }}
+      {{ Form.render_field(form.firstname) }}
+      {{ Form.render_field(form.lastname) }}
+      {{ Form.render_field(form.username) }}
+      {{ Form.render_field(form.email) }}
+      {{ Form.render_field(form.password) }}
+      {{ Form.render_field(form.document_type) }}
+      {{ Form.render_field(form.document_number) }}
+      {{ Form.render_field(form.address) }}
+      {{ Form.render_field(form.phone) }}
+
+      <div id="field_select" class="flex items-center flex-col">
+        <label class="mb-2">Genero</label>
+        <select name="gender" id="select" required>
+          <option value="" hidden></option>
+          {% for gender in genders %}
+          <option value="{{gender[0]}}" {% if gender[0]==form.gender.data %} selected {%endif%}>{{ gender[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div id="field_gender_other" class="flex items-center flex-col">
+        <label class="mt-2">Especifique como se identifica</label>
+        <input type="text" id="gender_other" name="gender_other" required minlength="4" maxlength="32"
+          value="{{ form.gender_other.data or "" }}" class="mt-2" />
+      </div>
+
+      <div class="flex flex-col xs:flex-row gap-4 justify-around mt-4 md:mt-8">
+        {{ LinkButton.danger("Volver", "/admin/users") }}
+        {{ Button.success("Crear", type='submit') }}
+      </div>
+    </form>
+  </div>
+</main>
+{% endblock %}
