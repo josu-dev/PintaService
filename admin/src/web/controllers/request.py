@@ -77,7 +77,6 @@ def request_new_post(institution_id: int, service_id: int):
     form = RequestForm()
     if form.validate_on_submit():
         RequestService.create_request(
-            institution_id=institution_id,
             service_id=service_id,
             user_id=g.user.id,
             **form.values(),

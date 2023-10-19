@@ -185,13 +185,11 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        1,
         title="Pelea",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
-        1,
         1,
         1,
         title="Pelea2",
@@ -201,7 +199,6 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        2,
         title="Pelea3",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
@@ -209,7 +206,6 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        3,
         title="Pelea4",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
@@ -218,7 +214,6 @@ def load_test_data():
     RequestService.create_request(
         1,
         2,
-        1,
         title="Pelea5",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,

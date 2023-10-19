@@ -134,3 +134,30 @@ class ServiceService(BaseService):
         services = query.offset((page - 1) * per_page).limit(per_page).all()
 
         return services, total
+
+    @classmethod
+    def search_services(
+        cls,
+        q: str,
+        service_type: t.Union[ServiceTypes, None],
+        page: int,
+        per_page: int,
+    ) -> t.Tuple[t.List[Service], int]:
+        query = db.session.query(Service)
+        if q != "":
+            query = query.filter(
+                sa.or_(
+                    Service.name.ilike(f"%{q}%"),
+                    Service.description.ilike(f"%{q}%"),
+                    Service.keywords.ilike(f"%{q}%"),
+                    Service.laboratory.ilike(f"%{q}%"),
+                )
+            )
+
+        if service_type is not None:
+            query = query.filter(Service.service_type == service_type)
+
+        total = query.count()
+        services = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return services, total
