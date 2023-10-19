@@ -62,7 +62,7 @@ def requests_get(institution_id: int, service_id: int):
 
 
 @bp.get("/new")
-# @h.authenticated_route(module="service_request", permissions=("create",))
+@h.authenticated_route(module="service_request", permissions=("create",))
 def requests_new_get(institution_id: int, service_id: int):
     form = RequestForm()
 
@@ -72,8 +72,10 @@ def requests_new_get(institution_id: int, service_id: int):
 
 
 @bp.post("/new")
-# @h.authenticated_route(module="service_request", permissions=("create",))
-def request_new_post(institution_id: int, service_id: int):
+@h.authenticated_route(
+    module="service_request", permissions=("create",)
+)  # Only for devs this is not the final permission
+def requests_new_post(institution_id: int, service_id: int):
     form = RequestForm()
     if form.validate_on_submit():
         RequestService.create_request(
@@ -90,7 +92,8 @@ def request_new_post(institution_id: int, service_id: int):
 
 
 @bp.post("/<int:request_id>/edit")
-def request_id_edit_post(
+@h.authenticated_route(module="service_request", permissions=("update",))
+def requests_id_edit_post(
     institution_id: int, service_id: int, request_id: int
 ):
     """Update a request."""
@@ -109,10 +112,10 @@ def request_id_edit_post(
         return redirect(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
-    else:
-        selected_status = RequestStatus(selected_status_str)
-        RequestService.update_state_request(request_id, selected_status)
-        h.flash_success("Solicitud actualizada correctamente.")
+    
+    selected_status = RequestStatus(selected_status_str)
+    RequestService.update_state_request(request_id, selected_status)
+    h.flash_success("Solicitud actualizada correctamente.")
 
     return redirect(
         f"/institutions/{institution_id}/services/{service_id}/requests"
@@ -120,22 +123,24 @@ def request_id_edit_post(
 
 
 @bp.get("/<int:request_id>/notes")
-@h.authenticated_route()
-def notes_get(institution_id: int, service_id: int, request_id: int):
+@h.authenticated_route(module="service_request", permissions=("show", "index"))
+def requests_id_notes_get(institution_id: int, service_id: int, request_id: int):
     notes = RequestService.get_request_notes(request_id)
+    request_details = RequestService.get_service_request_details(request_id)
 
     return render_template(
         "institutions/[id]/services/[id]/requests/notes.html",
         notes=notes,
         institution_id=institution_id,
+        request_details=request_details,
         service_id=service_id,
         request_id=request_id,
     )
 
 
 @bp.get("/<int:request_id>/notes/new")
-@h.authenticated_route()
-def create_notes_get(institution_id: int, service_id: int, request_id: int):
+@h.authenticated_route(module="service_request", permissions=("update",))
+def requests_id_notes_new_get(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
 
     return render_template(
@@ -145,8 +150,8 @@ def create_notes_get(institution_id: int, service_id: int, request_id: int):
 
 
 @bp.post("/<int:request_id>/notes/new")
-@h.authenticated_route()
-def create_notes_post(institution_id: int, service_id: int, request_id: int):
+@h.authenticated_route(module="service_request", permissions=("update",))
+def requests_id_notes_new_post(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
     user_id = g.user.id
     if form.validate():
@@ -155,8 +160,9 @@ def create_notes_post(institution_id: int, service_id: int, request_id: int):
         )
         h.flash_success("Nota creada correctamente.")
         return redirect(
-            f"/institutions/{institution_id}/services/{service_id}/requests"
+            f"/institutions/{institution_id}/services/{service_id}/requests/{request_id}/notes"  # noqa: E501
         )
+
     return render_template(
         "institutions/[id]/services/[id]/requests/new_note.html",
         form=form,
