@@ -1,9 +1,11 @@
 import typing as t
+from datetime import datetime
 
 import typing_extensions as te
 
 from src.core.db import db
-from src.core.enums import RequestStatus
+from src.core.enums import RequestStatus, ServiceTypes
+from src.core.models.service import Service
 from src.core.models.service_requests import RequestNote, ServiceRequest
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
@@ -13,6 +15,14 @@ class RequestParams(t.TypedDict):
     title: str
     description: str
     status: RequestStatus
+
+
+class FilterRequestParams(t.TypedDict):
+    user_id: int
+    service_type: ServiceTypes
+    status: RequestStatus
+    date_from: str
+    date_to: str
 
 
 class RequestNoteParam(t.TypedDict):
@@ -86,13 +96,13 @@ class RequestService(BaseService):
         user_id: int,
         institution_id: int,
         service_id: int,
-        **kwargs: te.Unpack[RequestParams]
+        **kwargs: te.Unpack[RequestParams],
     ):
         request = ServiceRequest(
             user_id=user_id,
             institution_id=institution_id,
             service_id=service_id,
-            **kwargs
+            **kwargs,
         )
         db.session.add(request)
         db.session.commit()
@@ -101,7 +111,7 @@ class RequestService(BaseService):
     @classmethod
     def get_request_notes(cls, request_id: int):
         query = (
-            db.session.query(RequestNote.note, User.username)
+            db.session.query(User.username, RequestNote.note)
             .join(User, User.id == RequestNote.user_id)
             .filter(RequestNote.service_request_id == request_id)
             .all()
@@ -115,3 +125,52 @@ class RequestService(BaseService):
         )
         db.session.add(request)
         db.session.commit()
+
+    @classmethod
+    def get_requests_notes_of_user(cls, user_id: int) -> t.List[RequestNote]:
+        return (
+            db.session.query(RequestNote)
+            .filter(RequestNote.user_id == user_id)
+            .all()
+        )
+
+    @classmethod
+    def get_requests_filter_by(
+        cls,
+        page: int,
+        per_page: int,
+        **kwargs: te.Unpack[FilterRequestParams],
+    ):
+        query = db.session.query(ServiceRequest)
+
+        if (
+            "user_id" in kwargs
+            and kwargs["user_id"] is not None  # type:ignore
+        ):
+            query = query.filter(ServiceRequest.user_id == kwargs["user_id"])
+        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+            query = query.filter(ServiceRequest.status == kwargs["status"])
+
+        if (
+            "service_type" in kwargs
+            and kwargs["service_type"] is not None  # type:ignore
+        ):
+            query = query.join(
+                Service, Service.id == ServiceRequest.service_id
+            )
+            query = query.filter(
+                Service.service_type == kwargs["service_type"]
+            )
+
+        if "start_date" in kwargs and kwargs["start_date"]:
+            start_date = datetime.strptime(kwargs["start_date"], "%Y-%m-%d")
+            query = query.filter(ServiceRequest.created_at >= start_date)
+
+        if "end_date" in kwargs and kwargs["end_date"]:
+            end_date = datetime.strptime(kwargs["end_date"], "%Y-%m-%d")
+            query = query.filter(ServiceRequest.created_at <= end_date)
+
+        total = query.count()
+        requests = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return requests, total

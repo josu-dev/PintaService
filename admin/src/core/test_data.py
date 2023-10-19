@@ -1,5 +1,9 @@
-from src.core.enums import DocumentTypes, GenderOptions, RequestStatus
-from src.services.request import RequestService
+from src.core.enums import (
+    DocumentTypes,
+    GenderOptions,
+    RequestStatus,
+    ServiceTypes,
+)
 
 
 def load_test_data():
@@ -9,6 +13,8 @@ def load_test_data():
     from src.core.db import db
     from src.core.models import auth
     from src.services.auth import AuthService
+    from src.services.request import RequestService
+    from src.services.service import ServiceService
     from src.services.user import UserService
 
     UserService.create_user(
@@ -155,6 +161,27 @@ def load_test_data():
     AuthService.add_institution_role(
         "OWNER", user_id=3, institution_id=ins2.id
     )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceTypes.ANALYSIS,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceTypes.CONSULTANCY,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=ServiceTypes.DEVELOPMENT,
+    )
     RequestService.create_request(
         1,
         1,
@@ -174,7 +201,7 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        1,
+        2,
         title="Pelea3",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
@@ -182,7 +209,7 @@ def load_test_data():
     RequestService.create_request(
         1,
         1,
-        1,
+        3,
         title="Pelea4",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
@@ -196,16 +223,24 @@ def load_test_data():
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
-    # UserService.create_user(
-    #     firstname="test",
-    #     lastname="test",
-    #     password="test",
-    #     email="test@test.com",
-    #     username="test",
-    #     document_type=DocumentTypes.DNI,
-    #     document_number="25683652",
-    #     gender=GenderOptions.FEMALE,
-    #     gender_other="tal vez",
-    #     address="15 y 47",
-    #     phone="2355572726",
-    # )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceTypes.ANALYSIS,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceTypes.CONSULTANCY,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceTypes.DEVELOPMENT,
+    )

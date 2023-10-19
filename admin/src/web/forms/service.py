@@ -1,20 +1,14 @@
-import typing as t
-
 from flask_wtf import FlaskForm
-from wtforms import SelectField, StringField, TextAreaField
+from wtforms import BooleanField, SelectField, StringField, TextAreaField
 from wtforms import validators as v
 
-from src.core.models.service import ServiceType
+from src.core.models.service import ServiceTypes
 from src.services.service import ServiceParams
 
 
 class ServiceForm(FlaskForm):
     name = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
-    )
-    laboratory = StringField(
-        "Laboratorio",
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
     description = TextAreaField(
@@ -27,15 +21,16 @@ class ServiceForm(FlaskForm):
     )
     service_type = SelectField(
         "Tipo de Servicio",
-        choices=[(choice.name, choice.value) for choice in ServiceType],
+        choices=[(choice.name, choice.value) for choice in ServiceTypes],
         validators=[v.DataRequired()],
     )
+    enabled = BooleanField("Habilitado")
 
     def values(self) -> ServiceParams:
         return {  # type:ignore
             "name": self.name.data,
-            "laboratory": self.laboratory.data,
             "description": self.description.data,
             "keywords": self.keywords.data,
-            "service_type": t.cast(ServiceType, self.service_type.data),
+            "service_type": self.service_type.data,
+            "enabled": self.enabled.data,
         }
