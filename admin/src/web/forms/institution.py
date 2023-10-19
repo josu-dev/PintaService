@@ -54,11 +54,11 @@ class InstitutionForm(FlaskForm):
         }
 
 
-class InstitutionOwnerFormValues(t.TypedDict):
+class EmailFormValues(t.TypedDict):
     email: str
 
 
-class InstitutionOwnerForm(FlaskForm):
+class EmailForm(FlaskForm):
     email = EmailField(
         "Email",
         validators=[
@@ -68,7 +68,7 @@ class InstitutionOwnerForm(FlaskForm):
         ],
     )
 
-    def values(self) -> InstitutionOwnerFormValues:
+    def values(self) -> EmailFormValues:
         return {
             "email": self.email.data,  # type: ignore
         }

@@ -8,7 +8,7 @@ from src.services.site import SiteService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.institution import InstitutionForm, InstitutionOwnerForm
+from src.web.forms.institution import EmailForm, InstitutionForm
 from src.web.forms.site import SiteUpdateForm
 from src.web.forms.user import ProfileUpdateForm
 
@@ -203,7 +203,7 @@ def institutions_id_get(institution_id: int):
         institution_id
     )
     form = InstitutionForm(obj=institution)
-    form_new_owner = InstitutionOwnerForm()
+    form_new_owner = EmailForm()
 
     return render_template(
         "admin/institutions/update.html",
@@ -285,7 +285,7 @@ def institutions_id_disable_post(institution_id: int):
 @bp.post("/institutions/<int:institution_id>/add_owner")
 @h.authenticated_route(module="institution", permissions=("update",))
 def institutions_id_add_owner_post(institution_id: int):
-    form = InstitutionOwnerForm(request.form)
+    form = EmailForm(request.form)
     if not form.validate():
         h.flash_error("Formulario invalido.")
         return redirect(f"/admin/institutions/{institution_id}")
