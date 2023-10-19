@@ -11,15 +11,40 @@ bp = Blueprint("requests", __name__)
 @bp.get("/")
 @h.authenticated_route(module="service_request", permissions=("index", "show"))
 def requests_get(institution_id: int, service_id: int):
+    """Get requests from database filtered if is neccesary"""
     if len(g.institutions) == 0:
         return redirect("/")
 
     site_config_pages = g.site_config.page_size
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
-    requests, total = RequestService.get_requests_of(
-        institution_id, page=page, per_page=per_page  # type:ignore
+
+    service_type = request.args.get("service_type")
+    status = request.args.get("status")
+    user_id = request.args.get("user_id")
+    start_date = request.args.get("start_date")
+    end_date = request.args.get("end_date")
+
+    if user_id == "" or user_id is None:
+        user_id = None
+    if status == "" or status is None:
+        status = None
+    if service_type == "" or service_type is None:
+        service_type = None
+
+    (
+        requests,  # type:ignore
+        total,  # type:ignore
+    ) = RequestService.get_requests_filter_by(  # type:ignore
+        per_page=per_page,
+        page=page,
+        service_type=service_type,  # type:ignore
+        status=status,  # type:ignore
+        user_id=user_id,  # type:ignore
+        start_date=start_date,  # type:ignore
+        end_date=end_date,  # type:ignore
     )
+
     statuses = [status.value for status in RequestStatus]
     return render_template(
         "requests/index.html",
@@ -27,9 +52,14 @@ def requests_get(institution_id: int, service_id: int):
         institution_id=institution_id,
         service_id=service_id,
         page=page,
-        total=total,
         per_page=per_page,
+        total=total,
         statuses=statuses,
+        user_id=user_id,
+        service_type=service_type,
+        status=status,
+        start_date=start_date,
+        end_date=end_date,
     )
 
 
@@ -67,13 +97,17 @@ def request_id_edit_post(
 
     if not requestElement:
         h.flash_error("Solicitud no encontrada.")
-        return redirect("requests")
+        return redirect(
+            f"/institutions/{institution_id}/services/{service_id}/requests"
+        )
 
     selected_status_str = request.form.get("request")
 
     if selected_status_str is None:
         h.flash_error("Estado no seleccionado.")
-        return redirect("requests")
+        return redirect(
+            f"/institutions/{institution_id}/services/{service_id}/requests"
+        )
     else:
         selected_status = RequestStatus(selected_status_str)
         RequestService.update_state_request(request_id, selected_status)
@@ -104,7 +138,7 @@ def create_notes_get(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
 
     return render_template(
-        "requests/new.html",
+        "requests/new_note.html",
         form=form,
     )
 
@@ -118,10 +152,11 @@ def create_notes_post(institution_id: int, service_id: int, request_id: int):
         RequestService.create_note(
             service_request_id=service_id, **form.values(), user_id=user_id
         )
+        h.flash_success("Nota creada correctamente.")
         return redirect(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
     return render_template(
-        "requests/new.html",
+        "requests/new_note.html",
         form=form,
     )
