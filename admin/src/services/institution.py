@@ -145,8 +145,10 @@ class InstitutionService(BaseService):
         return res
 
     @classmethod
-    def get_institution_users(cls, institution_id: int):
-        res = (
+    def get_institution_users(
+        cls, institution_id: int, page: int, per_page: int
+    ):
+        query = (
             db.session.query(User, Role)
             .join(
                 UserInstitutionRole,
@@ -163,9 +165,11 @@ class InstitutionService(BaseService):
                 )
             )
             .filter(UserInstitutionRole.role_id == Role.id)
-            .all()
+            .order_by(User.id)
         )
-        return res
+        total: int = query.count()
+        users = query.offset((page - 1) * per_page).limit(per_page).all()
+        return users, total
 
     @classmethod
     def update_institution_role(

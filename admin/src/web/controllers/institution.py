@@ -35,7 +35,14 @@ def id_get(institution_id: int):
             return redirect(f"institutions/{institution_id}/services")
         else:
             return redirect("/")
-    users = InstitutionService.get_institution_users(institution_id)
+    page_size = g.site_config.page_size
+    page: int = request.values.get("page", 1, type=int)  # type:ignore
+    per_page: int = request.values.get(  # type:ignore
+        "per_page", page_size, type=int
+    )
+    users, total = InstitutionService.get_institution_users(
+        institution_id, page=page, per_page=per_page
+    )
     institution = InstitutionService.get_institution(institution_id)
     roles = [
         ("INSTITUTION_MANAGER", "Manager"),
@@ -48,9 +55,9 @@ def id_get(institution_id: int):
         users=users,
         institution_id=institution_id,
         institution=institution,
-        page=1,
-        total=15,
-        per_page=10,
+        page=page,
+        total=total,
+        per_page=per_page,
         roles=roles,
     )
 
