@@ -52,11 +52,7 @@
       {% endfor %}
     </ul>
     <div class="mt-4 flex-none">
-      {% set query_args =
-      (["service_type=" ~ service_type] if service_type else []) + (["user_id=" ~ user_id] if user_id else []) +
-      (["status=" ~ status] if status else []) + (["start_date=" ~ start_date] if start_date else []) + (["end_date=" ~
-      end_date] if end_date else []) %}
-      {{ Pagination(page, per_page, total, query_args) }}
+      {{ Pagination(page, per_page, total) }}
     </div>
   </div>
 </main>
