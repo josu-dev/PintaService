@@ -148,13 +148,18 @@ def users_id_get(user_id: int):
 @h.authenticated_route(module="user", permissions=("update",))
 def users_id_post(user_id: int):
     user = UserService.get_user(user_id)
+
     if not user:
         h.flash_error(f"Usuario con id {user_id} no encontrado al actualizar.")
         return redirect("/admin/users")
 
     form = ProfileUpdateForm(request.form)
     if not form.validate():
-        return render_template("profile.html", user=user, form=form)
+        genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+        return render_template(
+            "profile.html", user=user, form=form, genders=genders
+        )
 
     UserService.update_user(user_id, **form.values())
     h.flash_success("Usuario actualizado con éxito.")

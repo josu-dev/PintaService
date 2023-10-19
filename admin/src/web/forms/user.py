@@ -23,7 +23,14 @@ class ProfileUpdateForm(FlaskForm):
     )
     document_number = StringField(
         "Número de documento",
-        validators=[v.DataRequired(), v.Length(min=8, max=8)],
+        validators=[
+            v.DataRequired(),
+            v.Length(min=8, max=8),
+            v.Regexp(
+                r"^[0-9]+$",
+                message="El número de documento debe contener solo números",
+            ),
+        ],
     )
     gender = SelectField(
         "Género",
@@ -95,7 +102,14 @@ class UserCreateForm(FlaskForm):
     )
     document_number = StringField(
         "Número de documento",
-        validators=[v.DataRequired(), v.Length(min=8, max=8)],
+        validators=[
+            v.DataRequired(),
+            v.Length(min=8, max=8),
+            v.Regexp(
+                r"^[0-9]+$",
+                message="El número de documento debe contener solo números",
+            ),
+        ],
     )
     address = StringField(
         "Dirección",
