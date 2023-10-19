@@ -177,3 +177,7 @@ class RequestService(BaseService):
         requests = query.offset((page - 1) * per_page).limit(per_page).all()
 
         return requests, total
+
+
+# TODO RETURN THE LAST UPDATE
+# TODO DETAILS

@@ -61,6 +61,7 @@
       <div class="mb-4 md:mr-4 md:max-w-sm ">
         <h2 class="text-xl font-semibold mb-2">{{ request.title }}</h2>
         <p><strong>Descripcion:</strong> {{ request.description| truncate(20) }}</p>
+        <p><strong>Ultima actualizacion:</strong> {{ request.updated_at.strftime("%Y-%m-%d %H:%M") }}</p>
       </div>
 
       <div class="flex flex-col md:flex-row gap-4 items-center">
