@@ -55,9 +55,11 @@ def init_app(app: flask.Flask):
         flask.g.institution_id = None
         flask.g.institutions = tuple()
 
+        print("entre hook", flush=True)
         user_id = flask.session.get("user_id")  # type: ignore
         if user_id is not None:
             user = UserService.get_user(user_id)  # type: ignore
+            print(user, flush=True)
             if user is None:
                 flask.session.clear()
             else:
@@ -74,6 +76,7 @@ def init_app(app: flask.Flask):
                     institution_id = get_institution_id(flask.request.path)
                     flask.g.instituin_id = institution_id
 
+                    print(user, flush=True)
                     if institution_id is not None:
                         flask.g.user_permissions = (
                             AuthService.get_user_permissions(
