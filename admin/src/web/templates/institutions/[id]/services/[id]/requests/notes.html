@@ -30,10 +30,9 @@
         </div>
 
       </li>
-      <!-- Button to go to create -->
 
       {% endfor %}
-      <div class="flex justify-end">
+      <div class="flex justify-center">
         {{ LinkButton.secondary("Agregar Nota",
         "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request_id~"/notes/new") }}
       </div>

@@ -62,7 +62,7 @@ def requests_get(institution_id: int, service_id: int):
 
 
 @bp.get("/new")
-# @h.authenticated_route(module="service_request", permissions=("create",))
+@h.authenticated_route(module="service_request", permissions=("create",))
 def requests_new_get(institution_id: int, service_id: int):
     form = RequestForm()
 
@@ -72,7 +72,9 @@ def requests_new_get(institution_id: int, service_id: int):
 
 
 @bp.post("/new")
-# @h.authenticated_route(module="service_request", permissions=("create",))
+@h.authenticated_route(
+    module="service_request", permissions=("create",)
+)  # Only for devs this is not the final permission
 def request_new_post(institution_id: int, service_id: int):
     form = RequestForm()
     if form.validate_on_submit():
@@ -90,6 +92,7 @@ def request_new_post(institution_id: int, service_id: int):
 
 
 @bp.post("/<int:request_id>/edit")
+@h.authenticated_route(module="service_request", permissions=("update",))
 def request_id_edit_post(
     institution_id: int, service_id: int, request_id: int
 ):
@@ -120,6 +123,7 @@ def request_id_edit_post(
 
 
 @bp.get("/<int:request_id>/notes")
+@h.authenticated_route(module="service_request", permissions=("show", "index"))
 @h.authenticated_route()
 def notes_get(institution_id: int, service_id: int, request_id: int):
     notes = RequestService.get_request_notes(request_id)
@@ -135,6 +139,7 @@ def notes_get(institution_id: int, service_id: int, request_id: int):
 
 
 @bp.get("/<int:request_id>/notes/new")
+@h.authenticated_route(module="service_request", permissions=("update",))
 @h.authenticated_route()
 def create_notes_get(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
@@ -146,6 +151,7 @@ def create_notes_get(institution_id: int, service_id: int, request_id: int):
 
 
 @bp.post("/<int:request_id>/notes/new")
+@h.authenticated_route(module="service_request", permissions=("update",))
 @h.authenticated_route()
 def create_notes_post(institution_id: int, service_id: int, request_id: int):
     form = RequestNoteForm()
