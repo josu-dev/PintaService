@@ -37,13 +37,10 @@ class RequestService(BaseService):
     RequestServiceError = RequestServiceError
 
     @classmethod
-    def get_request(cls, request_id: int) -> ServiceRequest:
-        query = db.session.get(ServiceRequest, request_id)
-        """Get request from database"""
-        if query is None:
-            raise RequestServiceError("Solicitud no encontrada")
+    def get_request(cls, request_id: int) -> t.Union[ServiceRequest, None]:
+        request = db.session.get(ServiceRequest, request_id)
 
-        return query
+        return request
 
     @classmethod
     def get_requests_of(
@@ -62,6 +59,19 @@ class RequestService(BaseService):
             .filter(ServiceRequest.institution_id == institution_id)
             .count()
         )
+        return requests, total
+
+    @classmethod
+    def get_requests_by_user(
+        cls, user_id: int, page: int = 1, per_page: int = 10
+    ) -> t.Tuple[t.List[ServiceRequest], int]:
+        query = db.session.query(ServiceRequest).filter(
+            ServiceRequest.user_id == user_id
+        )
+
+        total = query.count()
+        requests = query.offset((page - 1) * per_page).limit(per_page).all()
+
         return requests, total
 
     @classmethod
@@ -94,18 +104,24 @@ class RequestService(BaseService):
     def create_request(
         cls,
         user_id: int,
-        institution_id: int,
         service_id: int,
         **kwargs: te.Unpack[RequestParams],
     ):
+        service = (
+            db.session.query(Service).filter(Service.id == service_id).first()
+        )
+        if service is None:
+            raise RequestServiceError(f"Servicio {service_id} no encontrado")
+
         request = ServiceRequest(
             user_id=user_id,
-            institution_id=institution_id,
+            institution_id=service.institution_id,
             service_id=service_id,
             **kwargs,
         )
         db.session.add(request)
         db.session.commit()
+
         return request
 
     @classmethod
@@ -119,12 +135,23 @@ class RequestService(BaseService):
         return query  # type :ignore
 
     @classmethod
-    def create_note(cls, service_request_id: int, note: str, user_id: int):
+    def create_note(cls, service_request_id: int, user_id: int, note: str):
+        request = (
+            db.session.query(ServiceRequest)
+            .filter(ServiceRequest.id == service_request_id)
+            .first()
+        )
+        if request is None:
+            raise RequestServiceError(
+                f"Solicitud {service_request_id} no encontrada"
+            )
+
         request = RequestNote(
-            note=note, service_request_id=service_request_id, user_id=user_id
+            service_request_id=service_request_id, user_id=user_id, note=note
         )
         db.session.add(request)
         db.session.commit()
+        return request
 
     @classmethod
     def get_requests_notes_of_user(cls, user_id: int) -> t.List[RequestNote]:

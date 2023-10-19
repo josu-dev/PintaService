@@ -19,15 +19,15 @@ class AuthForm(FlaskForm):
     )
 
     def values(self) -> AuthFormValues:
-        return {
-            "password": self.password.data,  # type: ignore
-            "email": self.user.data,  # type: ignore
+        return {  # type: ignore
+            "password": self.password.data,
+            "email": self.user.data,
         }
 
 
 class PaginationFormValues(t.TypedDict):
     page: int
-    per_page: int
+    per_page: t.Union[int, None]
 
 
 class PaginationForm(FlaskForm):
@@ -39,18 +39,19 @@ class PaginationForm(FlaskForm):
     )
 
     def values(self) -> PaginationFormValues:
-        return {
-            "page": self.page.data or 1,
-            "per_page": self.per_page.data or 1,
-        }
+        return {"page": self.page.data or 1, "per_page": self.per_page.data}
 
 
-class ServiceFormValues(t.TypedDict):
+class ServiceRequestFormValues(t.TypedDict):
+    service_id: int
     title: str
     description: str
 
 
-class ServiceForm(FlaskForm):
+class ServiceRequestForm(FlaskForm):
+    service_id = wtforms.IntegerField(
+        validators=[v.DataRequired(), v.NumberRange(min=0)],
+    )
     title = wtforms.StringField(
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
@@ -58,33 +59,32 @@ class ServiceForm(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=512)],
     )
 
-    def values(self) -> ServiceFormValues:
-        return {
-            "title": self.title.data or 1,  # type: ignore
-            "description": self.description.data or 1,  # type: ignore
+    def values(self) -> ServiceRequestFormValues:
+        return {  # type: ignore
+            "service_id": self.service_id.data,
+            "title": self.title.data,
+            "description": self.description.data,
         }
 
 
-class TextFormValues(t.TypedDict):
+class RequestNoteFormValues(t.TypedDict):
     text: str
 
 
-class TextForm(FlaskForm):
+class RequestNoteForm(FlaskForm):
     text = wtforms.StringField(
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[v.DataRequired(), v.Length(min=8, max=512)],
     )
 
-    def values(self) -> ServiceFormValues:
-        return {
-            "text": self.text.data or 1,  # type: ignore
-        }
+    def values(self) -> RequestNoteFormValues:
+        return {"text": self.text.data}  # type: ignore
 
 
 class ServiceSearchFormValues(t.TypedDict):
     q: str
     type: str
     page: int
-    per_page: int
+    per_page: t.Union[int, None]
 
 
 class ServiceSearchForm(FlaskForm):
@@ -102,9 +102,9 @@ class ServiceSearchForm(FlaskForm):
     )
 
     def values(self) -> ServiceSearchFormValues:
-        return {
+        return {  # type: ignore
             "q": self.q.data,
             "type": self.type.data,
             "page": self.page.data or 1,
-            "per_page": self.per_page.data or 1,  # type: ignore
+            "per_page": self.per_page.data,
         }
