@@ -79,33 +79,31 @@ def validation(
             if _content_type == "json" and not flask.request.is_json:
                 return API_BAD_REQUEST_RESPONSE
 
+            # Replace with real jwt auth on second iteration
+            # Only for testing purposes
             if require_auth:
-                # TODO: implement jwt auth
-                # if not authorized: return API_UNAUTHORIZED_RESPONSE
                 token = flask.request.headers.get("Authorization")
                 raw_user_id = token.lstrip("Bearer ") if token else ""
-                if raw_user_id.isdigit():
-                    user_id = raw_user_id
-                else:
-                    user_id = None
-                if not user_id:
+
+                if not raw_user_id.isdigit():
                     return API_UNAUTHORIZED_RESPONSE
-                kwargs["user_id"] = int(user_id)
+
+                kwargs["user_id"] = int(raw_user_id)
 
             if schema is not None:
                 if method == "GET":
                     form = schema(flask.request.args, meta={"csrf": False})
-                    res_kwarg = "args"
+                    form_arg = "args"
                 else:
                     form = schema(meta={"csrf": False})
-                    res_kwarg = "body"
+                    form_arg = "body"
 
                 if not form.validate():
                     if debug:
                         print(form.errors, flush=True)
                     return API_BAD_REQUEST_RESPONSE
 
-                kwargs[res_kwarg] = form.values()  # pyright: ignore
+                kwargs[form_arg] = form.values()  # pyright: ignore
 
             return func(*args, **kwargs)
 
