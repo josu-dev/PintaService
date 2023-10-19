@@ -10,7 +10,7 @@ from src.utils import status
 from src.web.controllers import _helpers as h
 from src.web.forms.institution import EmailForm, InstitutionForm
 from src.web.forms.site import SiteUpdateForm
-from src.web.forms.user import ProfileUpdateForm
+from src.web.forms.user import ProfileUpdateForm, UserCreateForm
 
 bp = Blueprint("admin", __name__, url_prefix="/admin")
 
@@ -65,18 +65,20 @@ def check_db_get():
     module="user", permissions=("index", "create", "update", "destroy")
 )
 def users_get():
-    site_config_pages = g.site_config.page_size
-    page = request.values.get("page", 1, type=int)
-    per_page = request.values.get("per_page", site_config_pages, type=int)
-
+    page_size = g.site_config.page_size
+    page: int = request.values.get("page", 1, type=int)  # type:ignore
+    per_page: int = request.values.get(  # type:ignore
+        "per_page", page_size, type=int
+    )
     email = request.values.get("email")
     active = request.values.get("active")
+
     users, total = UserService.filter_users_by_email_and_active(
-        email, active, page, per_page  # type: ignore
+        email, active, page, per_page
     )
 
     return render_template(
-        "admin/users.html",
+        "admin/users/index.html",
         users=users,
         page=page,
         per_page=per_page,
@@ -84,6 +86,46 @@ def users_get():
         email=email,
         active=active,
     )
+
+
+@bp.get("/users/new")
+@h.authenticated_route(module="user", permissions=("create",))
+def users_new_get():
+    form = UserCreateForm()
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+    return render_template("admin/users/new.html", form=form, genders=genders)
+
+
+@bp.post("/users/new")
+@h.authenticated_route(module="user", permissions=("create",))
+def services_new_post():
+    genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+    form = UserCreateForm(request.form)
+    if not form.validate():
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    form_values = form.values()
+
+    if UserService.exist_user_with_email(form_values["email"]):
+        h.flash_error(f"Usuario con email {form_values['email']} ya existe.")
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    try:
+        _ = UserService.create_user(**form_values)
+    except UserService.UserServiceError as e:
+        h.flash_error(e.message)
+        return render_template(
+            "admin/users/new.html", form=form, genders=genders
+        )
+
+    h.flash_success("Usuario creado exitosamente")
+    return redirect("/admin/users")
 
 
 @bp.get("/users/<int:user_id>")
@@ -111,12 +153,12 @@ def users_id_post(user_id: int):
         return redirect("/admin/users")
 
     form = ProfileUpdateForm(request.form)
-    if form.validate():
-        UserService.update_user(user_id, **form.values())
-        h.flash_success("Usuario actualizado con éxito.")
-        return redirect("/admin/users")
+    if not form.validate():
+        return render_template("profile.html", user=user, form=form)
 
-    return render_template("profile.html", user=user, form=form)
+    UserService.update_user(user_id, **form.values())
+    h.flash_success("Usuario actualizado con éxito.")
+    return redirect("/admin/users")
 
 
 @bp.post("/users/<int:user_id>/delete")
@@ -131,11 +173,18 @@ def users_id_delete_post(user_id: int):
         h.flash_error("No se puede eliminar un usuario administrador.")
         return redirect("/admin/users")
 
-    # TODO: check if user has been deleted
-    UserService.delete_user(user_id)
-    h.flash_success("Usuario eliminado con éxito.")
+    try:
+        result = UserService.delete_user(user_id)
+    except UserService.UserServiceError as e:
+        h.flash_error(e.message)
+        return redirect("/admin/users")
 
-    return redirect("/admin/users")
+    if result:
+        h.flash_success("Usuario eliminado con éxito.")
+        return redirect("/admin/users")
+
+    h.flash_error("No se pudo eliminar el usuario.")
+    return redirect(f"/admin/users/{user.id}")
 
 
 @bp.post("/users/<int:user_id>/toggle_active")
