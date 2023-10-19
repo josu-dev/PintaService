@@ -67,7 +67,6 @@ def services_new_post(institution_id: int):
 )
 def services_id_get(institution_id: int, service_id: int):
     service = ServiceService.get_service(service_id)
-    print(service, flush=True)
     if not service:
         h.flash_info(f"Servicio '{service_id}' no encontrado")
         return redirect(f"/institutions/{institution_id}/services")
