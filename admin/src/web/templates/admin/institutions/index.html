@@ -2,6 +2,7 @@
 {% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
 {% import "_macros/link_button.html" as LinkButton %}
+{% from "_macros/pagination.html" import Pagination %}
 
 {% block head %}
 <title>Pinta Service - Instituciones</title>
@@ -49,5 +50,9 @@
     </li>
     {% endfor %}
   </ul>
+  <div class="mt-4 flex-none">
+
+    {{ Pagination(page, per_page, total, query_args) }}
+  </div>
 </main>
 {% endblock %}

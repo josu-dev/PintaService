@@ -158,10 +158,20 @@ def users_id_toggle_active_post(user_id: int):
 @bp.get("/institutions")
 @h.authenticated_route(module="institution", permissions=("index",))
 def institutions_get():
-    institutions = InstitutionService.get_institutions()
+    site_config_pages = g.site_config.page_size
+    page = request.values.get("page", 1, type=int)
+    per_page = request.values.get("per_page", site_config_pages, type=int)
+
+    institutions, total = InstitutionService.get_institutions(
+        page, per_page  # type: ignore
+    )
 
     return render_template(
-        "admin/institutions/index.html", institutions=institutions
+        "admin/institutions/index.html",
+        institutions=institutions,
+        page=page,
+        per_page=per_page,
+        total=total,
     )
 
 
