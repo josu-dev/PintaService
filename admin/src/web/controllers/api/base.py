@@ -68,23 +68,29 @@ def validation(
     schema: t.Optional[t.Type[flask_wtf.FlaskForm]] = None,
     method: t.Literal["GET", "POST"] = "POST",
     content_type: t.Literal["json", False] = "json",
-    auth_required: bool = False,
+    require_auth: bool = False,
     debug: bool = False,
 ) -> t.Callable[[TRoute], TRoute]:
+    _content_type = False if method == "GET" else content_type
+
     def decorator(func: TRoute) -> TRoute:
         @functools.wraps(func)
         def wrapper(*args: t.Any, **kwargs: t.Any) -> tf.ResponseReturnValue:
-            if content_type == "json" and not flask.request.is_json:
+            if _content_type == "json" and not flask.request.is_json:
                 return API_BAD_REQUEST_RESPONSE
 
-            if auth_required:
+            if require_auth:
                 # TODO: implement jwt auth
                 # if not authorized: return API_UNAUTHORIZED_RESPONSE
                 token = flask.request.headers.get("Authorization")
-                user_id = token.lstrip("Bearer ") if token else ""
-                kwargs["user_id"] = user_id
+                raw_user_id = token.lstrip("Bearer ") if token else ""
+                if raw_user_id.isdigit():
+                    user_id = raw_user_id
+                else:
+                    user_id = None
                 if not user_id:
                     return API_UNAUTHORIZED_RESPONSE
+                kwargs["user_id"] = int(user_id)
 
             if schema is not None:
                 if method == "GET":

@@ -1,5 +1,5 @@
 """Model for institution."""
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from src.core.models.base import (
@@ -28,12 +28,6 @@ class Institution(BaseModel):
     days_and_opening_hours: Mapped[Str256]
 
     enabled: Mapped[bool] = mapped_column(init=False, default=True)
-
-    services = relationship(  # type:ignore
-        "Service",
-        secondary="institution_service",
-        back_populates="institutions",
-    )
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(

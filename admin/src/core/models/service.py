@@ -1,9 +1,8 @@
 """Model for service."""
-from sqlalchemy import Column, ForeignKey, Integer
-from sqlalchemy.orm import Mapped, mapped_column, relationship
+from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from src.core.enums import ServiceType
+from src.core.enums import ServiceTypes
 from src.core.models.base import (
     BaseModel,
     CreatedAt,
@@ -11,7 +10,6 @@ from src.core.models.base import (
     Str32,
     Str256,
     Str512,
-    Timestamp,
     UpdatedAt,
 )
 
@@ -24,30 +22,13 @@ class Service(BaseModel):
     laboratory: Mapped[Str32]
     description: Mapped[Str512]
     keywords: Mapped[Str256]
-    service_type: Mapped[ServiceType]
-    enabled: Mapped[bool] = mapped_column(init=False, default=True)
+    service_type: Mapped[ServiceTypes]
 
-    institutions = relationship(  # type:ignore
-        "Institution",
-        secondary="institution_service",
-        back_populates="services",
-    )
+    institution_id: Mapped[int]
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
 
-
-class InstitutionService(BaseModel):
-    __tablename__ = "institution_service"
-
-    id: Mapped[IntPK] = mapped_column(init=False)
-
-    service_id = Column(Integer, ForeignKey("services.id"))
-    institution_id = Column(Integer, ForeignKey("institutions.id"))
-
-    created_at: Mapped[Timestamp] = mapped_column(init=False)
-    updated_at: Mapped[Timestamp] = mapped_column(
-        init=False, onupdate=func.current_timestamp()
-    )
+    enabled: Mapped[bool] = mapped_column(default=True)

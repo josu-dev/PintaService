@@ -1,17 +1,14 @@
-from flask import Blueprint, flash, g, redirect, render_template, request
+from flask import Blueprint, g, redirect, render_template, request
 
 from src.core.enums import GenderOptions
-from src.core.models.service import ServiceType
 from src.services.auth import AuthService
 from src.services.database import DatabaseService
 from src.services.institution import InstitutionService
-from src.services.service import ServiceService
 from src.services.site import SiteService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.institution import InstitutionForm, InstitutionOwnerForm
-from src.web.forms.service import ServiceForm
+from src.web.forms.institution import EmailForm, InstitutionForm
 from src.web.forms.site import SiteUpdateForm
 from src.web.forms.user import ProfileUpdateForm
 
@@ -71,6 +68,7 @@ def users_get():
     site_config_pages = g.site_config.page_size
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
+
     email = request.values.get("email")
     active = request.values.get("active")
     users, total = UserService.filter_users_by_email_and_active(
@@ -215,7 +213,7 @@ def institutions_id_get(institution_id: int):
         institution_id
     )
     form = InstitutionForm(obj=institution)
-    form_new_owner = InstitutionOwnerForm()
+    form_new_owner = EmailForm()
 
     return render_template(
         "admin/institutions/update.html",
@@ -297,7 +295,7 @@ def institutions_id_disable_post(institution_id: int):
 @bp.post("/institutions/<int:institution_id>/add_owner")
 @h.authenticated_route(module="institution", permissions=("update",))
 def institutions_id_add_owner_post(institution_id: int):
-    form = InstitutionOwnerForm(request.form)
+    form = EmailForm(request.form)
     if not form.validate():
         h.flash_error("Formulario invalido.")
         return redirect(f"/admin/institutions/{institution_id}")
@@ -318,7 +316,7 @@ def institutions_id_add_owner_post(institution_id: int):
         result = AuthService.add_institution_role(
             "OWNER", new_owner.id, institution_id
         )
-    except InstitutionService.InstitutionServiceError as e:
+    except AuthService.AuthServiceError as e:
         # TODO: handle error on creation
         h.flash_error(e.message)
         return redirect(f"/admin/institutions/{institution_id}")
@@ -353,97 +351,3 @@ def institutions_id_remove_owner_id_post(institution_id: int, owner_id: int):
         h.flash_error("No se pudo remover dueño de la institución.")
 
     return redirect(f"/admin/institutions/{institution_id}")
-
-
-@bp.route("/create_service", methods=["GET", "POST"])
-def create_service():
-    """Create a service form page"""
-    form = ServiceForm(request.form)
-    if request.method == "POST":
-        ServiceService.create_service(**form.values())
-        flash("Servicio creado con exito", "success")
-        return redirect("/admin/services")
-    return render_template("admin/create_service.html", form=form)
-
-
-@bp.route("/services", methods=["GET"])
-def show_services():
-    """Show all services in the database"""
-    services = ServiceService.get_services()
-    return render_template("admin/services.html", services=services)
-
-
-@bp.post("/service/<int:service_id>/delete")
-def service_delete_post(service_id: int):
-    service = ServiceService.get_service(service_id)
-    if not service:
-        flash("Servicio no encontrado.", "error")
-        return redirect("/admin/services")
-    else:
-        ServiceService.delete_service(service_id)
-        flash("Servicio eliminado con éxito.", "success")
-    return redirect("/admin/services")
-
-
-@bp.post("/service/<int:service_id>/edit")
-def edit_service_post(service_id: int):
-    """Edit the service with the new values"""
-    service = ServiceService.get_service(service_id)
-    if not service:
-        flash("Servicio no encontrado.", "error")
-        return redirect("/admin/services")
-
-    form = ServiceForm(request.form)
-    if form.validate():
-        ServiceService.update_service(service_id, **form.values())
-        flash("Servicio actualizado con éxito.", "success")
-        return redirect("/admin/services")
-
-    return render_template("service/setting.html", service=service, form=form)
-
-
-@bp.get("/service/<int:service_id>/edit")
-def service_edit_get(service_id: int):
-    """Show the edit service form with its actual values"""
-    service = ServiceService.get_service(service_id)
-
-    if not service:
-        flash("Servicio no encontrado.", "error")
-        return redirect("/admin/services")
-
-    categories = [(choice.name, choice.value) for choice in ServiceType]
-    form = ServiceForm(obj=service)
-    return render_template(
-        "service/setting.html",
-        service=service,
-        categories=categories,
-        form=form,
-    )
-
-
-@bp.route("/create_service/<int:institution_id>", methods=["GET", "POST"])
-def create_service_view(institution_id: int):
-    """Create a service form page"""
-    form = ServiceForm(request.form)
-    if request.method == "POST":
-        service_data = form.values()
-        service_data["institution_id"] = institution_id
-        ServiceService.create_service(**service_data)
-
-        flash("Servicio creado con éxito", "success")
-        return redirect(f"/admin/services/{institution_id}")
-    return render_template("admin/create_service.html", form=form)
-
-
-@bp.route(
-    "/other_services", defaults={"institution_id": None}, methods=["GET"]
-)
-@bp.route("/other_services/<int:institution_id>", methods=["GET"])
-def show_other_services(institution_id):
-    """Show services for a specific institution or all services if no institution specified"""
-    if institution_id:
-        services = ServiceService.get_institution_services(institution_id)
-    else:
-        services = ServiceService.get_services()
-
-    return render_template("admin/services.html", services=services)
