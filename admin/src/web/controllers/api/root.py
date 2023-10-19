@@ -29,9 +29,10 @@ def institutions_get(args: api_forms.PaginationFormValues):
     per_page = args["per_page"] or 1
 
     try:
-        # TODO: change to pagination get
-        raw_institutions = InstitutionService.get_institutions()
-        total = 80
+        (
+            raw_institutions,
+            total,
+        ) = InstitutionService.get_institutions(page=page, per_page=per_page)
     except InstitutionService.InstitutionServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 

@@ -68,7 +68,7 @@ def init_app(app: flask.Flask):
                         AuthService.get_site_admin_permissions(user.id)
                     )
                     flask.g.institutions = (
-                        InstitutionService.get_institutions()
+                        InstitutionService.get_all_institutions()
                     )
                 else:
                     institution_id = get_institution_id(flask.request.path)
