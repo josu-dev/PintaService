@@ -4,7 +4,7 @@ from datetime import datetime
 import typing_extensions as te
 
 from src.core.db import db
-from src.core.enums import RequestStatus, ServiceType
+from src.core.enums import RequestStatus, ServiceTypes
 from src.core.models.service import Service
 from src.core.models.service_requests import RequestNote, ServiceRequest
 from src.core.models.user import User
@@ -19,7 +19,7 @@ class RequestParams(t.TypedDict):
 
 class FilterRequestParams(t.TypedDict):
     user_id: int
-    service_type: ServiceType
+    service_type: ServiceTypes
     status: RequestStatus
     date_from: str
     date_to: str
