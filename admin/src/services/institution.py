@@ -8,6 +8,8 @@ from src.core import permissions
 from src.core.db import db
 from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.institution import Institution
+from src.core.models.service import Service
+from src.core.models.service_requests import RequestNote, ServiceRequest
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
@@ -84,7 +86,53 @@ class InstitutionService(BaseService):
 
     @classmethod
     def delete_institution(cls, institution_id: int) -> bool:
-        """Delete an institution from the database."""
+        (
+            db.session.query(RequestNote)
+            .filter(
+                RequestNote.id.in_(
+                    sa.select(RequestNote.id)
+                    .join(
+                        ServiceRequest,
+                        sa.and_(
+                            ServiceRequest.id == RequestNote.service_request_id
+                        ),
+                    )
+                    .join(
+                        Service,
+                        sa.and_(
+                            Service.id == ServiceRequest.service_id,
+                            Service.institution_id == institution_id,
+                        ),
+                    )
+                )
+            )
+            .delete()
+        )
+        (
+            db.session.query(ServiceRequest)
+            .filter(
+                ServiceRequest.id.in_(
+                    sa.select(ServiceRequest.id).join(
+                        Service,
+                        sa.and_(
+                            Service.id == ServiceRequest.service_id,
+                            Service.institution_id == institution_id,
+                        ),
+                    )
+                )
+            )
+            .delete()
+        )
+        (
+            db.session.query(Service)
+            .filter(Service.institution_id == institution_id)
+            .delete()
+        )
+        (
+            db.session.query(UserInstitutionRole)
+            .filter(UserInstitutionRole.institution_id == institution_id)
+            .delete()
+        )
         delete_count = (
             db.session.query(Institution)
             .filter(Institution.id == institution_id)

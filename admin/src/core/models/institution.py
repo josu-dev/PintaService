@@ -29,12 +29,6 @@ class Institution(BaseModel):
 
     enabled: Mapped[bool] = mapped_column(init=False, default=True)
 
-    services = relationship(  # type:ignore
-        "Service",
-        secondary="institution_service",
-        back_populates="institutions",
-    )
-
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()

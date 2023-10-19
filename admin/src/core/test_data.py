@@ -9,6 +9,7 @@ def load_test_data():
     from src.core.db import db
     from src.core.models import auth
     from src.services.auth import AuthService
+    from src.services.service import ServiceService
     from src.services.user import UserService
 
     UserService.create_user(
@@ -195,6 +196,30 @@ def load_test_data():
         title="Pelea5",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com/",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceType.ANALYSIS,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com/",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceType.CONSULTANCY,
+    )
+    ServiceService.create_service(
+        institution_id=1,
+        name="Servicio 1",
+        description="Descripción del servicio 1",
+        laboratory="https://www.servicio1.com/",
+        keywords="servicio1, servicio, 1",
+        service_type=enums.ServiceType.DEVELOPMENT,
     )
     # UserService.create_user(
     #     firstname="test",

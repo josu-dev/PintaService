@@ -1,12 +1,11 @@
 import typing as t
 
-import sqlalchemy as sa
 import typing_extensions as te
 
 from src.core.db import db
 from src.core.enums import ServiceType
 from src.core.models.institution import Institution
-from src.core.models.service import InstitutionService, Service
+from src.core.models.service import Service
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -58,15 +57,11 @@ class ServiceService(BaseService):
     def create_service(
         cls, institution_id: int, **kwargs: te.Unpack[ServiceParams]
     ):
-        """Create service in the database."""
-        service = Service(**kwargs)
-
         institution = db.session.query(Institution).get(institution_id)
-
         if institution is None:
             raise ServiceServiceError("Institution not found")
 
-        service.institutions.append(institution)
+        service = Service(institution_id=institution_id, **kwargs)
 
         db.session.add(service)
         db.session.commit()
@@ -75,12 +70,6 @@ class ServiceService(BaseService):
     def get_institution_services(cls, institution_id: int) -> t.List[Service]:
         return (
             db.session.query(Service)
-            .join(
-                InstitutionService,
-                sa.and_(
-                    Service.id == InstitutionService.service_id,
-                    InstitutionService.institution_id == institution_id,
-                ),
-            )
+            .filter(Service.institution_id == institution_id)
             .all()
         )
