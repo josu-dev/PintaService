@@ -125,6 +125,17 @@ class RequestService(BaseService):
         return request
 
     @classmethod
+    def get_service_request_details(cls, service_request_id: int):
+        query = (
+            db.session.query(ServiceRequest, User, Service)
+            .join(User, User.id == ServiceRequest.user_id)
+            .join(Service, Service.id == ServiceRequest.service_id)
+            .filter(ServiceRequest.id == service_request_id)
+            .first()
+        )
+        return query
+
+    @classmethod
     def get_request_notes(cls, request_id: int):
         query = (
             db.session.query(User.username, RequestNote.note)

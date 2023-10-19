@@ -123,11 +123,12 @@ def request_id_edit_post(
 @h.authenticated_route()
 def notes_get(institution_id: int, service_id: int, request_id: int):
     notes = RequestService.get_request_notes(request_id)
-
+    request_details = RequestService.get_service_request_details(request_id)
     return render_template(
         "institutions/[id]/services/[id]/requests/notes.html",
         notes=notes,
         institution_id=institution_id,
+        request_details=request_details,
         service_id=service_id,
         request_id=request_id,
     )
@@ -155,7 +156,7 @@ def create_notes_post(institution_id: int, service_id: int, request_id: int):
         )
         h.flash_success("Nota creada correctamente.")
         return redirect(
-            f"/institutions/{institution_id}/services/{service_id}/requests"
+            f"/institutions/{institution_id}/services/{service_id}/requests/{request_id}/notes"  # noqa: E501
         )
     return render_template(
         "institutions/[id]/services/[id]/requests/new_note.html",
