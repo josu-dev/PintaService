@@ -201,23 +201,6 @@ class InstitutionService(BaseService):
         )
         return res
 
-    @classmethod
-    def filter_institutions(
-        cls,
-        email: t.Union[str, None],
-        active: t.Union[str, None],
-        page: int = 1,
-        per_page: int = 10,
-    ) -> t.Tuple[t.List[Institution], int]:
-        query = db.session.query(Institution)
-
-        total = query.count()
-        institutions = (
-            query.offset((page - 1) * per_page).limit(per_page).all()
-        )
-
-        return institutions, total
-
     def get_institution_users(
         cls, institution_id: int, page: int, per_page: int
     ):

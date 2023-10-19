@@ -162,7 +162,7 @@ def institutions_get():
     page = request.values.get("page", 1, type=int)
     per_page = request.values.get("per_page", site_config_pages, type=int)
 
-    institutions, total = InstitutionService.filter_institutions(
+    institutions, total = InstitutionService.get_institutions(
         page, per_page  # type: ignore
     )
 
