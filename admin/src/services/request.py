@@ -143,7 +143,7 @@ class RequestService(BaseService):
             .filter(RequestNote.service_request_id == request_id)
             .all()
         )
-        return query  # type :ignore
+        return query
 
     @classmethod
     def create_note(cls, service_request_id: int, user_id: int, note: str):
