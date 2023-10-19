@@ -45,9 +45,18 @@ class InstitutionService(BaseService):
     InstitutionServiceError = InstitutionServiceError
 
     @classmethod
-    def get_institutions(cls) -> t.List[Institution]:
-        """Get all institutions from the database."""
-        return db.session.query(Institution).all()
+    def get_institutions(
+        cls, page: int = 1, per_page: int = 10
+    ) -> t.Tuple[t.List[Institution], int]:
+        """Get institutions from the database."""
+        institutions = (
+            db.session.query(Institution)
+            .offset((page - 1) * per_page)
+            .limit(per_page)
+            .all()
+        )
+        total = db.session.query(Institution).count()
+        return institutions, total
 
     @classmethod
     def get_institution(cls, institution_id: int) -> t.Optional[Institution]:
@@ -143,3 +152,20 @@ class InstitutionService(BaseService):
             .all()
         )
         return res
+
+    @classmethod
+    def filter_institutions(
+        cls,
+        email: t.Union[str, None],
+        active: t.Union[str, None],
+        page: int = 1,
+        per_page: int = 10,
+    ) -> t.Tuple[t.List[Institution], int]:
+        query = db.session.query(Institution)
+
+        total = query.count()
+        institutions = (
+            query.offset((page - 1) * per_page).limit(per_page).all()
+        )
+
+        return institutions, total
