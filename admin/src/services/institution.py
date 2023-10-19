@@ -200,7 +200,8 @@ class InstitutionService(BaseService):
             .all()
         )
         return res
-
+        
+    @classmethod
     def get_institution_users(
         cls, institution_id: int, page: int, per_page: int
     ):
