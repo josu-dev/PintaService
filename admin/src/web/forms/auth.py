@@ -17,7 +17,7 @@ class UserLogin(FlaskForm):
         "Email",
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=0, max=32),
+            v.Length(min=0, max=64),
         ],
     )
     password = PasswordField(
@@ -54,7 +54,7 @@ class UserPreRegister(FlaskForm):
         "Email",
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=0, max=32),
+            v.Length(min=0, max=64),
             v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
         ],
     )
