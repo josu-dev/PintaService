@@ -41,7 +41,10 @@ class UserServiceError(BaseServiceError):
 
 
 class UserService(BaseService):
-    """Create, read, update and delete users."""
+    """Service for handling users.
+
+    This service is used for CRUD operations on users and for searching users.
+    """
 
     UserServiceError = UserServiceError
 
@@ -49,7 +52,6 @@ class UserService(BaseService):
     def get_users(
         cls, page: int = 1, per_page: int = 10
     ) -> t.Tuple[t.List[User], int]:
-        """Get  users from database"""
         subquery = db.session.query(SiteAdmin.user_id)
         users = (
             db.session.query(User)
@@ -62,23 +64,32 @@ class UserService(BaseService):
         return users, total
 
     @classmethod
-    def get_user(cls, user_id: int):
-        """Get an user from database"""
+    def get_user(cls, user_id: int) -> t.Union[User, None]:
         return db.session.get(User, user_id)
 
     @classmethod
-    def update_user(cls, user_id: int, **kwargs: te.Unpack[UserUpdateParams]):
-        """Update user in the database"""
+    def update_user(
+        cls, user_id: int, **kwargs: te.Unpack[UserUpdateParams]
+    ) -> t.Union[User, None]:
         user = db.session.query(User).get(user_id)
         if user:
             for key, value in kwargs.items():
                 setattr(user, key, value)
             db.session.commit()
             return user
+
         return None
 
     @classmethod
-    def delete_user(cls, user_id: int):
+    def delete_user(cls, user_id: int) -> bool:
+        """Deletes a user.
+
+        Returns:
+            True if the user was deleted, False otherwise.
+
+        Raises:
+            UserServiceError: If the user is a site admin.
+        """
         # Delete using complex join are not supported by SQLAlchemy
         if (
             db.session.query(SiteAdmin)
@@ -109,14 +120,19 @@ class UserService(BaseService):
             db.session.query(User).filter(User.id == user_id).delete()
         )
         db.session.commit()
+
         return delete_count == 1
 
     @classmethod
     def create_user(
         cls,
         **kwargs: te.Unpack[UserParams],
-    ):
-        """Create user in database"""
+    ) -> None:
+        """Creates a user.
+
+        Raises:
+            UserServiceError: If the username already exists.
+        """
         if UserService.get_by_username(kwargs["username"]):
             raise UserServiceError("Username already exists")
 
@@ -129,28 +145,33 @@ class UserService(BaseService):
         db.session.commit()
 
     @classmethod
-    def get_by_email(cls, email: str):
-        """Get user by email"""
+    def get_by_email(cls, email: str) -> t.Union[User, None]:
         return db.session.query(User).filter(User.email == email).first()
 
     @classmethod
-    def get_by_username(cls, username: str):
-        """Get user by username"""
+    def get_by_username(cls, username: str) -> t.Union[User, None]:
         return db.session.query(User).filter(User.username == username).first()
 
     @classmethod
-    def toggle_active(cls, id: int):
-        """Toggle user active status"""
-        user = db.session.query(User).get(id)
+    def toggle_active(cls, user_id: int) -> t.Union[User, None]:
+        user = db.session.query(User).get(user_id)
         if user:
             user.is_active = not user.is_active
             db.session.commit()
             return user
+
         return None
 
     @classmethod
-    def validate_email_password(cls, email: str, password: str):
-        """Check if the mail and password are valid"""
+    def validate_email_password(
+        cls, email: str, password: str
+    ) -> t.Union[User, None]:
+        """Validate the email and password of a user.
+
+        Returns:
+            User: The user if the email and password are valid.
+            None: If the email or password are invalid.
+        """
         user = cls.get_by_email(email)
 
         if user and bcrypt.check_password_hash(
@@ -161,18 +182,14 @@ class UserService(BaseService):
         return None
 
     @classmethod
-    def exist_user_with_email(cls, email: str):
-        """check if the email is valid"""
-
+    def exist_user_with_email(cls, email: str) -> bool:
         return (
             db.session.query(User).filter(User.email == email).first()
             is not None
         )
 
     @classmethod
-    def exist_user_with_username(cls, username: str):
-        """check if the username is valid"""
-
+    def exist_user_with_username(cls, username: str) -> bool:
         return (
             db.session.query(User).filter(User.username == username).first()
             is not None

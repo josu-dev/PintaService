@@ -28,6 +28,11 @@ class SiteServiceError(BaseServiceError):
 
 
 class SiteService(BaseService):
+    """Service for handling site config.
+
+    This service is used for updating and retrieving the site config.
+    """
+
     SiteServiceError = SiteServiceError
 
     @staticmethod
@@ -41,6 +46,13 @@ class SiteService(BaseService):
 
     @classmethod
     def get_site_config(cls) -> SiteConfig:
+        """Gets the site config.
+
+        If the site config is missing, it will be created with the default.
+
+        Raises:
+            SiteServiceError: If the site config could not be retrieved.
+        """
         try:
             site_config = db.session.execute(select(SiteConfig)).scalar()
         except exc.SQLAlchemyError as e:
@@ -56,6 +68,13 @@ class SiteService(BaseService):
     def update_site_config(
         cls, **kwargs: te.Unpack[SiteConfigPartialParams]
     ) -> SiteConfig:
+        """Updates the site config.
+
+        If the site config is missing, it will be created with the default.
+
+        Raises:
+            SiteServiceError: If the site config could not be updated.
+        """
         try:
             site_config = db.session.execute(
                 update(SiteConfig)

@@ -35,6 +35,18 @@ API_INTERNAL_SERVER_ERROR_RESPONSE = (
 
 
 class BaseAPIError(Exception):
+    """Base API error class.
+
+    An API error is an exception that is raised when an API endpoint
+    fails to execute its business logic.
+
+    Attributes:
+        message: A human-readable message describing the error.
+        status_code: The HTTP status code to return.
+        payload: A dictionary containing additional information related
+            to the error.
+    """
+
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     def __init__(
