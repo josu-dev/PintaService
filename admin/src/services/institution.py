@@ -47,22 +47,25 @@ class InstitutionService(BaseService):
     InstitutionServiceError = InstitutionServiceError
 
     @classmethod
+    def get_all_institutions(cls) -> t.List[Institution]:
+        institutions = db.session.query(Institution).all()
+
+        return institutions
+
+    @classmethod
     def get_institutions(
         cls, page: int = 1, per_page: int = 10
     ) -> t.Tuple[t.List[Institution], int]:
-        """Get institutions from the database."""
+        query = db.session.query(Institution)
+        total = query.count()
         institutions = (
-            db.session.query(Institution)
-            .offset((page - 1) * per_page)
-            .limit(per_page)
-            .all()
+            query.offset((page - 1) * per_page).limit(per_page).all()
         )
-        total = db.session.query(Institution).count()
+
         return institutions, total
 
     @classmethod
     def get_institution(cls, institution_id: int) -> t.Optional[Institution]:
-        """Get an institution by its ID."""
         return db.session.query(Institution).get(institution_id)
 
     @classmethod
@@ -152,7 +155,6 @@ class InstitutionService(BaseService):
 
     @classmethod
     def get_user_institutions(cls, user_id: int) -> t.List[Institution]:
-        """Get all institutions from the database."""
         result = (
             db.session.query(Institution)
             .join(
@@ -168,7 +170,6 @@ class InstitutionService(BaseService):
 
     @classmethod
     def user_has_institutions(cls, user_id: int) -> bool:
-        """Check if a user has institutions."""
         return (
             db.session.query(Institution.id)
             .join(
@@ -200,7 +201,7 @@ class InstitutionService(BaseService):
             .all()
         )
         return res
-        
+
     @classmethod
     def get_institution_users(
         cls, institution_id: int, page: int, per_page: int

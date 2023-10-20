@@ -58,7 +58,9 @@ def init_app(app: flask.Flask):
         user_id = flask.session.get("user_id")  # type: ignore
         if user_id is not None:
             user = UserService.get_user(user_id)  # type: ignore
-            if user is not None:
+            if user is None:
+                flask.session.clear()
+            else:
                 flask.g.user = user
 
                 if flask.session.get("is_admin"):
@@ -66,7 +68,7 @@ def init_app(app: flask.Flask):
                         AuthService.get_site_admin_permissions(user.id)
                     )
                     flask.g.institutions = (
-                        InstitutionService.get_institutions()
+                        InstitutionService.get_all_institutions()
                     )
                 else:
                     institution_id = get_institution_id(flask.request.path)

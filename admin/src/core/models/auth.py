@@ -88,3 +88,5 @@ def seed_auth(db: fsa.SQLAlchemy):
                 for permission_id in role_permissions
             ),
         )
+
+    db.session.commit()

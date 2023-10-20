@@ -1,12 +1,12 @@
 import typing as t
 
 import typing_extensions as te
-from sqlalchemy import and_
 
 from src.core.bcrypt import bcrypt
 from src.core.db import db
 from src.core.enums import DocumentTypes, GenderOptions
-from src.core.models.auth import SiteAdmin
+from src.core.models.auth import SiteAdmin, UserInstitutionRole
+from src.core.models.service_requests import RequestNote, ServiceRequest
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
@@ -79,11 +79,37 @@ class UserService(BaseService):
 
     @classmethod
     def delete_user(cls, user_id: int):
-        """Delete user from database"""
-        user = db.session.query(User).get(user_id)
-        if user:
-            db.session.delete(user)
-            db.session.commit()
+        # Delete using complex join are not supported by SQLAlchemy
+        if (
+            db.session.query(SiteAdmin)
+            .filter(SiteAdmin.user_id == user_id)
+            .first()
+            is not None
+        ):
+            raise UserServiceError(
+                f"User with id '{user_id}' can't be deleted"
+            )
+
+        (
+            db.session.query(RequestNote)
+            .filter(RequestNote.user_id == user_id)
+            .delete()
+        )
+        (
+            db.session.query(ServiceRequest)
+            .filter(ServiceRequest.user_id == user_id)
+            .delete()
+        )
+        (
+            db.session.query(UserInstitutionRole)
+            .filter(UserInstitutionRole.user_id == user_id)
+            .delete()
+        )
+        delete_count = (
+            db.session.query(User).filter(User.id == user_id).delete()
+        )
+        db.session.commit()
+        return delete_count == 1
 
     @classmethod
     def create_user(
@@ -170,7 +196,7 @@ class UserService(BaseService):
         elif active == "0":
             query = query.filter(~User.is_active)
 
-        query = query.join(SiteAdmin, and_(User.id != SiteAdmin.user_id))
+        query = query.filter(~User.id.in_(db.session.query(SiteAdmin.user_id)))
 
         total = query.count()
         users = query.offset((page - 1) * per_page).limit(per_page).all()
