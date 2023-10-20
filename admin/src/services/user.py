@@ -1,6 +1,5 @@
 import typing as t
 
-import sqlalchemy as sa
 import typing_extensions as te
 
 from src.core.bcrypt import bcrypt
@@ -197,7 +196,7 @@ class UserService(BaseService):
         elif active == "0":
             query = query.filter(~User.is_active)
 
-        query = query.join(SiteAdmin, sa.and_(User.id != SiteAdmin.user_id))
+        query = query.filter(~User.id.in_(db.session.query(SiteAdmin.user_id)))
 
         total = query.count()
         users = query.offset((page - 1) * per_page).limit(per_page).all()
