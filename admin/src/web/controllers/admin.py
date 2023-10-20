@@ -294,8 +294,17 @@ def institutions_id_post(institution_id: int):
         h.flash_success("Institución actualizada con éxito.")
         return redirect(f"/admin/institutions/{institution.id}")
 
+    institution_owners = InstitutionService.get_institution_owners(
+        institution_id
+    )
+    form_new_owner = EmailForm()
+
     return render_template(
-        "/admin/institutions/update.html", institution=institution, form=form
+        "/admin/institutions/update.html",
+        form=form,
+        form_new_owner=form_new_owner,
+        institution=institution,
+        institution_owners=institution_owners,
     )
 
 

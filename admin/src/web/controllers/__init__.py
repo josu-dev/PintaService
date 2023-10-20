@@ -92,6 +92,7 @@ def init_app(app: flask.Flask):
             not site_config.maintenance_active
             or ("setting_update" in flask.g.user_permissions)
             or flask.request.path.startswith("/login")
+            or flask.request.path.startswith("/logout")
         ):
             return None
 
