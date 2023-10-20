@@ -43,6 +43,11 @@ class RequestServiceError(BaseServiceError):
 
 
 class RequestService(BaseService):
+    """Service for requests of institutions services.
+
+    This service is used for CRUD operations of service requests.
+    """
+
     RequestServiceError = RequestServiceError
 
     @classmethod
@@ -59,7 +64,6 @@ class RequestService(BaseService):
         page: int = 1,
         per_page: int = 10,
     ) -> t.Tuple[t.List[ServiceRequest], int]:
-        """Get requests from database"""
         requests = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.institution_id == institution_id)
@@ -73,6 +77,7 @@ class RequestService(BaseService):
             .filter(ServiceRequest.institution_id == institution_id)
             .count()
         )
+
         return requests, total
 
     @classmethod
@@ -104,6 +109,14 @@ class RequestService(BaseService):
     def update_state_request(
         cls, request_id: int, **kwargs: te.Unpack[RequestHistoryParams]
     ) -> bool:
+        """Update the state of a request.
+
+        Returns:
+            True if the request was updated, False otherwise.
+
+        Raises:
+            RequestServiceError: If the request is not found.
+        """
         request = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.id == request_id)
@@ -124,13 +137,18 @@ class RequestService(BaseService):
             db.session.add(request)
             db.session.commit()
             return True
-        else:
-            return False
+
+        return False
 
     @classmethod
     def create_request_history(
         cls, request_id: int, state: RequestStatus, observations: str
     ) -> RequestHistory:
+        """Creates a new request history entry.
+
+        Raises:
+            RequestServiceError: If the request is not found.
+        """
         request = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.id == request_id)
@@ -147,6 +165,7 @@ class RequestService(BaseService):
         )
         db.session.add(request)
         db.session.commit()
+
         return request
 
     @classmethod
@@ -156,6 +175,11 @@ class RequestService(BaseService):
         service_id: int,
         **kwargs: te.Unpack[RequestParams],
     ) -> ServiceRequest:
+        """Creates a new service request.
+
+        Raises:
+            RequestServiceError: If the service is not found.
+        """
         service = (
             db.session.query(Service).filter(Service.id == service_id).first()
         )
@@ -182,6 +206,7 @@ class RequestService(BaseService):
             .filter(ServiceRequest.id == service_request_id)
             .first()
         )
+
         return query
 
     @classmethod
@@ -192,10 +217,18 @@ class RequestService(BaseService):
             .filter(RequestNote.service_request_id == request_id)
             .all()
         )
+
         return query
 
     @classmethod
-    def create_note(cls, service_request_id: int, user_id: int, note: str):
+    def create_note(
+        cls, service_request_id: int, user_id: int, note: str
+    ) -> RequestNote:
+        """Creates a new note for a service request.
+
+        Raises:
+            RequestServiceError: If the service request is not found.
+        """
         request = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.id == service_request_id)
@@ -211,6 +244,7 @@ class RequestService(BaseService):
         )
         db.session.add(request)
         db.session.commit()
+
         return request
 
     @classmethod
@@ -229,8 +263,7 @@ class RequestService(BaseService):
         institution_id: int,
         service_id: int,
         **kwargs: te.Unpack[FilterRequestParams],
-    ):
-        """Get requests from database filtered by the args passed"""
+    ) -> t.Tuple[t.List[ServiceRequest], int]:
         query = db.session.query(ServiceRequest)
         query = query.filter(ServiceRequest.institution_id == institution_id)
         query = query.filter(ServiceRequest.service_id == service_id)
@@ -264,8 +297,7 @@ class RequestService(BaseService):
         page: int,
         per_page: int,
         **kwargs: te.Unpack[FilterRequestParams],
-    ):
-        """Get requests from database filtered by the args passed"""
+    ) -> t.Tuple[t.List[ServiceRequest], int]:
         query = db.session.query(ServiceRequest)
         if (
             "user_email" in kwargs
@@ -303,7 +335,7 @@ class RequestService(BaseService):
         return requests, total
 
     @classmethod
-    def get_request_history(cls, request_id: int):
+    def get_request_history(cls, request_id: int) -> t.List[RequestHistory]:
         return (
             db.session.query(RequestHistory)
             .filter(RequestHistory.service_request_id == request_id)
