@@ -7,12 +7,6 @@ from wtforms import validators as v
 from src.services.auth import PreRegisterUserParams
 
 
-class RegisterFormValues(TypedDict):
-    username: str
-    password: str
-    password_con: str
-
-
 class LoginFormValues(TypedDict):
     email: str
     password: str
@@ -21,55 +15,76 @@ class LoginFormValues(TypedDict):
 class UserLogin(FlaskForm):
     email = EmailField(
         "Email",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=64),
+        ],
     )
     password = PasswordField(
         "Contraseña",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
 
     def values(self) -> LoginFormValues:
-        return {
-            "email": self.email.data,  # type: ignore
-            "password": self.password.data,  # type: ignore
+        return {  # type: ignore
+            "email": self.email.data,
+            "password": self.password.data,
         }
 
 
 class UserPreRegister(FlaskForm):
     firstname = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     lastname = StringField(
         "Apellido",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     email = EmailField(
         "Email",
         validators=[
-            v.DataRequired(),
-            v.Length(min=0, max=32),
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=64),
             v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
         ],
     )
 
     def values(self) -> PreRegisterUserParams:
-        return {
-            "firstname": self.firstname.data,  # type: ignore
-            "lastname": self.lastname.data,  # type: ignore
-            "email": self.email.data,  # type: ignore
+        return {  # type: ignore
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "email": self.email.data,
         }
+
+
+class UserRegisterFormValues(TypedDict):
+    username: str
+    password: str
+    password_confirmation: str
 
 
 class UserRegister(FlaskForm):
     username = StringField(
         "Nombre de usuario",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     password = PasswordField(
         "Contraseña",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
             v.EqualTo(
                 "password_confirmation", message="Las contraseñas no coinciden"
@@ -78,12 +93,15 @@ class UserRegister(FlaskForm):
     )
     password_confirmation = PasswordField(
         "Confirmar contraseña",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
 
-    def values(self) -> RegisterFormValues:
-        return {
-            "username": self.username.data,  # type: ignore
-            "password": self.password.data,  # type: ignore
-            "password_confirmation": self.password_confirmation.data,  # type: ignore # noqa: E501
+    def values(self) -> UserRegisterFormValues:
+        return {  # type: ignore
+            "username": self.username.data,
+            "password": self.password.data,
+            "password_confirmation": self.password_confirmation.data,
         }

@@ -31,10 +31,11 @@ def id_get(institution_id: int):
             )
         )
     ):
-        if g.user_has_permissions(("services", "services_index")):
-            return redirect(f"institutions/{institution_id}/services")
-        else:
-            return redirect("/")
+        if g.user_has_permissions(("services_index",)):
+            return redirect(f"/institutions/{institution_id}/services")
+
+        return redirect("/")
+
     page_size = g.site_config.page_size
     page: int = request.values.get("page", 1, type=int)  # type:ignore
     per_page: int = request.values.get(  # type:ignore
@@ -62,11 +63,9 @@ def id_get(institution_id: int):
     )
 
 
-@h.authenticated_route(module="user_institution", permissions=("update",))
 @bp.post("/<int:institution_id>/edit/role")
-@h.authenticated_route()
+@h.authenticated_route(module="user_institution", permissions=("update",))
 def id_edit_role_post(institution_id: int):
-    """Update a request."""
     user_id = request.form.get("user_id")
     if not user_id:
         h.flash_error("Usuario no encontrado.")
@@ -90,6 +89,7 @@ def id_edit_role_post(institution_id: int):
         h.flash_success("Rol actualizado correctamente.")
     else:
         h.flash_success("El rol no pudo ser actualizado.")
+
     return redirect(f"/institutions/{institution_id}")
 
 
@@ -131,7 +131,8 @@ def id_add_user(institution_id: int):
             de una institución."
         )
         return redirect(f"/institutions/{institution_id}")
-    elif InstitutionService.institution_has_user(institution_id, new_user.id):
+
+    if InstitutionService.institution_has_user(institution_id, new_user.id):
         h.flash_error(
             f"Usuario con email {form.email.data} ya es parte \
             de la institución."

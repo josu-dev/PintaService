@@ -1,19 +1,31 @@
 {% extends "_layouts/base.html" %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
 
 {% block base_head %}
 <title>Mantenimiento en curso</title>
 {% endblock %}
 
 {% block base_body %}
-<main class="flex-1 flex flex-col">
+<main class="flex-1 flex flex-col p-4">
   <div class="flex-1 flex flex-col justify-center items-center">
-    <h1 class="text-6xl font-bold text-balance text-center text-zinc-900">
+    <h1
+      class="text-4xl md:text-5xl lg:text-6xl font-bold text-balance text-center text-orange-600 dark:text-orange-500">
       Mantenimiento en curso
     </h1>
-    <p class="text-zinc-600">{{ maintenance_message }}</p>
+    <p class="text-zinc-600 text-base md:text-lg mt-[1em]">{{ maintenance_message }}</p>
   </div>
-  <p class="text-center my-[1em] text-zinc-500">
-    Vuelva a intentarlo más tarde
+  <p class="text-center my-2 text-zinc-500">
+    Vuelva a intentarlo más tarde o
   </p>
+  <div class="mx-auto">{% if g.user %}
+    <form method="POST" action="/logout">
+      {{ Form.new_csrf_token() }}
+      {{ Button.primary("Cierre su sesion", type="submit", class="") }}
+    </form>{% else %}
+    {{ LinkButton.primary("Inicie su sesion", href="/login", class="block") }}
+    {% endif %}
+  </div>
 </main>
 {% endblock %}

@@ -5,6 +5,7 @@ import flask
 import flask_wtf
 from flask import typing as tf
 
+from src.services.user import UserService
 from src.utils import status
 
 API_BAD_REQUEST_RESPONSE = (
@@ -34,6 +35,18 @@ API_INTERNAL_SERVER_ERROR_RESPONSE = (
 
 
 class BaseAPIError(Exception):
+    """Base API error class.
+
+    An API error is an exception that is raised when an API endpoint
+    fails to execute its business logic.
+
+    Attributes:
+        message: A human-readable message describing the error.
+        status_code: The HTTP status code to return.
+        payload: A dictionary containing additional information related
+            to the error.
+    """
+
     status_code: int = status.HTTP_500_INTERNAL_SERVER_ERROR
 
     def __init__(
@@ -80,7 +93,7 @@ def validation(
                 return API_BAD_REQUEST_RESPONSE
 
             # Replace with real jwt auth on second iteration
-            # Only for testing purposes
+            # Simulate jwt auth by passing user_id in Authorization header
             if require_auth:
                 token = flask.request.headers.get("Authorization")
                 raw_user_id = token.lstrip("Bearer ") if token else ""
@@ -88,7 +101,12 @@ def validation(
                 if not raw_user_id.isdigit():
                     return API_UNAUTHORIZED_RESPONSE
 
-                kwargs["user_id"] = int(raw_user_id)
+                user_id = int(raw_user_id)
+                user = UserService.get_user(user_id)
+                if user is None:
+                    return API_UNAUTHORIZED_RESPONSE
+
+                kwargs["user_id"] = user_id
 
             if schema is not None:
                 if method == "GET":

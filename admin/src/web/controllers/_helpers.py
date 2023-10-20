@@ -5,19 +5,19 @@ import flask
 from flask import typing as tf
 
 
-def flash_info(message: str):
+def flash_info(message: str) -> None:
     flask.flash(message, "info")
 
 
-def flash_success(message: str):
+def flash_success(message: str) -> None:
     flask.flash(message, "success")
 
 
-def flash_warning(message: str):
+def flash_warning(message: str) -> None:
     flask.flash(message, "warning")
 
 
-def flash_error(message: str):
+def flash_error(message: str) -> None:
     flask.flash(message, "error")
 
 

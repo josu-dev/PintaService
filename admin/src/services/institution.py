@@ -42,7 +42,11 @@ class InstitutionServiceError(BaseServiceError):
 
 
 class InstitutionService(BaseService):
-    """Service for handling institutions."""
+    """Service for handling institutions.
+
+    This service is used for CRUD operations on institutions and for
+    managing the users that are associated with an institution.
+    """
 
     InstitutionServiceError = InstitutionServiceError
 
@@ -65,13 +69,20 @@ class InstitutionService(BaseService):
         return institutions, total
 
     @classmethod
-    def get_institution(cls, institution_id: int) -> t.Optional[Institution]:
+    def get_institution(
+        cls, institution_id: int
+    ) -> t.Union[Institution, None]:
         return db.session.query(Institution).get(institution_id)
 
     @classmethod
     def create_institution(
         cls, **kwargs: te.Unpack[InstitutionParams]
     ) -> Institution:
+        """Create a new institution.
+
+        Raises:
+            InstitutionServiceError: If the institution could not be created.
+        """
         institution = Institution(**kwargs)
         try:
             db.session.add(institution)
@@ -86,18 +97,33 @@ class InstitutionService(BaseService):
     @classmethod
     def update_institution(
         cls, institution_id: int, **kwargs: te.Unpack[InstitutionPartialParams]
-    ):
-        """Update an existing institution in the database."""
+    ) -> t.Union[Institution, None]:
+        """Update an existing institution by id.
+
+        Returns:
+            Institution: The updated institution.
+            None: If the institution could not be found.
+        """
         institution = db.session.query(Institution).get(institution_id)
         if institution:
             for key, value in kwargs.items():
                 setattr(institution, key, value)
             db.session.commit()
             return institution
+
         return None
 
     @classmethod
     def delete_institution(cls, institution_id: int) -> bool:
+        """Delete an institution by id.
+
+        The deletion of an institution cascades to all the services, requests
+        and notes associated with the institution.
+
+        Returns:
+            bool: True if the institution was deleted, False if the institution
+                was not deleted or if the institution could not be found.
+        """
         (
             db.session.query(RequestNote)
             .filter(
@@ -151,6 +177,7 @@ class InstitutionService(BaseService):
             .delete()
         )
         db.session.commit()
+
         return delete_count == 1
 
     @classmethod
@@ -200,6 +227,7 @@ class InstitutionService(BaseService):
             )
             .all()
         )
+
         return res
 
     @classmethod
@@ -227,6 +255,7 @@ class InstitutionService(BaseService):
         )
         total: int = query.count()
         users = query.offset((page - 1) * per_page).limit(per_page).all()
+
         return users, total
 
     @classmethod
@@ -251,14 +280,23 @@ class InstitutionService(BaseService):
         return True
 
     @classmethod
-    def get_rol(cls, name_role: str) -> t.Union[Role, None]:
-        role = (db.session.query(Role).filter(Role.name == name_role)).first()
+    def get_rol(cls, role_name: str) -> t.Union[Role, None]:
+        role = (db.session.query(Role).filter(Role.name == role_name)).first()
+
         return role
 
     @classmethod
     def delete_institution_user(
         cls, institution_id: int, user_id: int
     ) -> bool:
+        """Delete a user from an institution.
+
+        Removes the role of the user in the institution.
+
+        Returns:
+            bool: True if the user was removed, False if the user was not
+                removed or if the user did not have a role in the institution.
+        """
         user_institution = (
             db.session.query(UserInstitutionRole)
             .filter(
@@ -284,6 +322,7 @@ class InstitutionService(BaseService):
             )
             .first()
         )
-        if result:
-            return True
-        return False
+        if result is None:
+            return False
+
+        return True

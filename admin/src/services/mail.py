@@ -15,11 +15,16 @@ class MailServiceError(BaseServiceError):
 
 
 class MailService(BaseService):
+    """Service for handling mail sending.
+
+    This service is used for sending emails as the configured sender.
+    """
+
     _mail: Mail
     MailServiceError = MailServiceError
 
     @classmethod
-    def init_app(cls, app: Flask):
+    def init_app(cls, app: Flask) -> None:
         cls._mail = Mail()
         cls._mail.init_app(app)
 
@@ -29,11 +34,16 @@ class MailService(BaseService):
         subject: str,
         recipients: str,
         body: str,
-    ):
-        """
-        subject: asunto,
-        recipients: destinatario/s,
-        body: mensaje,
+    ) -> None:
+        """Sends an email.
+
+        Args:
+            subject: The subject of the email.
+            recipients: The recipients of the email.
+            body: The body of the email, a jinja2 template string.
+
+        Raises:
+            MailServiceError: If the email could not be sent.
         """
         try:
             html = render_template_string(body)

@@ -10,28 +10,33 @@
 
 {% block content %}
 <main class="flex-1 flex flex-col p-4">
-  <div class="flex justify-between">
+  {% if g.user_has_permissions(("user_institution_index",)) %}<div class="flex">
+    {{ LinkButton.primary("Volver a institucion","/institutions/" ~ param_institution_id) }}
+  </div>{% endif %}
+
+  <div class="flex flex-wrap justify-between">
     <h1 class="mt-[1em] mb-4 text-3xl font-semibold ">Servicios</h1>
-    {{ LinkButton.primary(
+
+    {{ LinkButton.success(
     "Crear Servicio",
     "/institutions/" ~ param_institution_id ~ "/services/new",
-    class="flex mt-auto mb-4"
+    class="flex mt-auto ml-auto mb-4"
     ) }}
   </div>
 
   <div>
     <ul>
       {% for service in services %}
-      <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
-        <div>
+      <li class="mb-4 p-4 border rounded shadow-lg flex flex-col gap-y-4 md:flex-row justify-between md:items-center">
+        <div class="break-all">
           <h2 class="text-xl font-semibold mb-2">{{ service.name }}</h2>
           <p><strong>Descripción:</strong> {{ service.description }}</p>
           <p><strong>Palabras clave:</strong> {{ service.keywords }}</p>
           <p><strong>Tipo de Servicio:</strong> {{ service.service_type.value }}</p>
         </div>
 
-        <div class="flex gap-4 items-center">
-          {{ LinkButton.success(
+        <div class="flex gap-4 flex-wrap items-center md:min-w-max">
+          {{ LinkButton.primary(
           "Ver solicitudes", "/institutions/" ~ service.institution_id ~ "/services/" ~ service.id ~ "/requests"
           ) }}
           {{ LinkButton.info("Editar", "/institutions/" ~ service.institution_id ~ "/services/" ~ service.id ) }}
@@ -51,9 +56,9 @@
       </li>
       {% endfor %}
     </ul>
-    <div class="mt-4 flex-none">
+    {% if total %}<div class="mt-4 flex-none">
       {{ Pagination(page, per_page, total) }}
-    </div>
+    </div>{% endif %}
   </div>
 </main>
 {% endblock %}
