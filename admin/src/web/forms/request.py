@@ -11,16 +11,22 @@ from src.services.request import RequestNoteParam, RequestParams
 class RequestForm(FlaskForm):
     title = StringField(
         "Titulo",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     description = TextAreaField(
         "Descripcion",
-        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=512),
+        ],
     )
     status = SelectField(
         "Estado",
         choices=[(choice.name, choice.value) for choice in RequestStatus],
-        validators=[v.DataRequired()],
+        validators=[v.DataRequired("Este campo es requerido")],
     )
 
     def values(self) -> RequestParams:
@@ -34,7 +40,10 @@ class RequestForm(FlaskForm):
 class RequestNoteForm(FlaskForm):
     note = TextAreaField(
         "Notas",
-        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=512),
+        ],
     )
 
     def values(self) -> RequestNoteParam:
