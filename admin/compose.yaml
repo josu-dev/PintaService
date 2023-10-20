@@ -1,42 +1,104 @@
 # adapted from https://github.com/khezen/compose-postgres/tree/master
 
-name: service-search
+name: pinta-service
 
 services:
-  postgres:
-    container_name: service_search_postgres
+  backend:
+    container_name: ps-backend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - "${BACKEND_ENV_FILE:-.env}"
+    environment:
+      DB_HOST: db
+      DB_PORT: 5432
+      DB_USER: ${DOCKER_POSTGRES_USER:-username}
+      DB_PASS: ${DOCKER_POSTGRES_PASSWORD:-password}
+      DB_NAME: ${DOCKER_POSTGRES_DB:-pinta_service}
+      MAIL_SERVER: mailtrap
+      MAIL_PORT: 25
+      MAIL_USERNAME: ${DOCKER_MAILTRAP_USER:-username}
+      MAIL_PASSWORD: ${DOCKER_MAILTRAP_PASSWORD:-password}
+    ports:
+      - "5001:5000"
+    networks:
+      - database
+      - email
+    depends_on:
+      - db
+      - mailtrap
+    restart: unless-stopped
+    profiles:
+      - all
+      - backend
+    attach: true
+    stop_signal: SIGINT
+
+  pgadmin:
+    container_name: ps-pgadmin
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${DOCKER_PGADMIN_EMAIL:-email@email.com}
+      PGADMIN_DEFAULT_PASSWORD: ${DOCKER_PGADMIN_PASSWORD:-password}
+    volumes:
+      - pgadmin:/var/lib/pgadmin
+    ports:
+      - "${DOCKER_PGADMIN_PORT:-5050}:80"
+    networks:
+      - database
+    depends_on:
+      - db
+    restart: unless-stopped
+    profiles:
+      - all
+      - pgadmin
+    attach: false
+
+  db:
+    container_name: ps-postgres
     image: postgres
     environment:
-      POSTGRES_USER: ${DB_USER:-postgres}
-      POSTGRES_PASSWORD: ${DB_PASS:-changeme}
-      POSTGRES_DB: ${DB_NAME:-postgres}
+      POSTGRES_USER: ${DOCKER_POSTGRES_USER:-username}
+      POSTGRES_PASSWORD: ${DOCKER_POSTGRES_PASSWORD:-password}
+      POSTGRES_DB: ${DOCKER_POSTGRES_DB:-pinta_service}
       PGDATA: /data/postgres
     volumes:
        - postgres:/data/postgres
     ports:
-      - "5432:5432"
+      - "${DOCKER_POSTGRES_PORT:-5432}:5432"
     networks:
-      - postgres
+      - database
     restart: unless-stopped
+    attach: false
 
-  pgadmin:
-    container_name: service_search_pgadmin
-    image: dpage/pgadmin4
+  mailtrap:
+    container_name: ps-mailtrap
+    image: dbck/mailtrap:latest
+    init: true
     environment:
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL:-pgadmin@pgadmin.com}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD:-changeme}
+      TZ : "America/Argentina/Buenos_Aires"
+      MAILTRAP_USER: ${DOCKER_MAILTRAP_USER:-username}
+      MAILTRAP_PASSWORD: ${DOCKER_MAILTRAP_PASSWORD:-password}
     volumes:
-      - pgadmin:/var/lib/pgadmin
+      - maildata:/var/mail
     ports:
-      - "${PGADMIN_PORT:-5050}:80"
+      - "9025:25"
+      - "9080:80"
+      - "9143:143"
+      - "9587:587"
     networks:
-      - postgres
+      - email
     restart: unless-stopped
-
-networks:
-  postgres:
-    driver: bridge
+    attach: false
 
 volumes:
   postgres:
   pgadmin:
+  maildata:
+
+networks:
+  database:
+    driver: bridge
+  email:
+    driver: bridge

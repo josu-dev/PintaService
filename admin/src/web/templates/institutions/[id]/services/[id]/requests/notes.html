@@ -1,0 +1,44 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% block head %}
+<title>Notas de solicitud</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+  <h1 class="text-3xl font-semibold mb-4">Detalle de la solicitud </h1>
+  <h3 class="p-2 text-2xl font-semibold mb-2">Información del Cliente:</h3>
+  <p class="p-2"><strong>Nombre y apellido:</strong> {{ request_details[1].firstname }} {{ request_details[1].lastname
+    }}</p>
+  <p class="p-2"><strong>Email:</strong> {{ request_details[1].email }}</p>
+
+  <h1 class="p-2 text-2xl font-semibold mb-2">Detalles del Pedido de Servicio:</h3>
+    <p class="p-2"><strong>Nombre del Servicio:</strong> {{ request_details[2].name }}</p>
+    <p class="p-2"><strong>Descripción del Servicio:</strong> {{ request_details[2].description }}</p>
+
+
+
+    <h1 class="mt-4 text-2xl font-semibold mb-4">Notas de la solicitud</h1>
+    <ul>
+      {% for username, note in notes %}
+      <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-semibold mb-2">Nota de : {{username}}</h2>
+          <p><strong>Descripcion:</strong> {{ note }}</p>
+        </div>
+
+      </li>
+
+      {% endfor %}
+      <div class="flex justify-center">
+        {{ LinkButton.secondary("Agregar Nota",
+        "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request_id~"/notes/new") }}
+      </div>
+
+
+    </ul>
+
+</main>
+{% endblock %}

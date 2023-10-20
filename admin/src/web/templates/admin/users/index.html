@@ -1,0 +1,88 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% import "_macros/table.html" as Table %}
+{% from "_macros/pagination.html" import Pagination %}
+
+{% block head %}
+<title>Usuarios - Pinta Service</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Usuarios</h1>
+    {{ LinkButton.primary("Crear usuario", "/admin/users/new", class="flex mt-auto mb-4") }}
+  </div>
+
+  <form method="get" action="/admin/users">
+    {{ Form.new_csrf_token() }}
+    <input type="text" name="email" placeholder="Filtrar por correo electrónico" value="{{ email or "" }}">
+    <select name="active">
+      <option value="">Todos</option>
+      <option value="1" {% if active=="1" %}selected{% endif %}>Activos</option>
+      <option value="0" {% if active=="0" %}selected{% endif %}>No Activos</option>
+    </select>
+    <button type="submit" class="filter-button">Filtrar</button>
+  </form>
+
+  <div class="mt-4 mx-auto md:max-h-[48rem]">
+    {% call Table.Table() %}
+    {{ Table.TableHead(("Email", "Nombre de usuario", "Nombre", "Apellido", "Acciones")) }}
+    <tbody>
+      {% if users|length == 0 %}
+      <tr>
+        <td class="text-center font-medium" colspan="5">No se encontraron usuarios</td>
+      </tr>
+      {% endif %}
+      {% for user in users %}
+      <tr>
+        <td>{{ user.email }}</td>
+        <td>{{ user.username }}</td>
+        <td>{{ user.firstname }}</td>
+        <td>{{ user.lastname }}</td>
+        <td>
+          <div class="flex gap-2">
+            {{ LinkButton.info("Editar", "/admin/users/" ~ user.id ) }}
+            <form method="POST" action="/admin/users/{{ user.id }}/toggle_active" style="display: inline;">
+              {{ Form.new_csrf_token() }}
+              {% if user.is_active %}
+              {{ Button.warning("Desactivar", type="submit") }}
+              {% else %}
+              {{ Button.success("Activar", type="submit") }}
+              {% endif %}
+            </form>
+            <form method="POST" action="/admin/users/{{ user.id }}/delete" style="display: inline;">
+              {{ Form.new_csrf_token() }}
+              {% set props = {"data-button-delete-user": "", "data-username": user.username} %}
+              {{ Button.danger("Eliminar", type="submit", **props) }}
+            </form>
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+    {% endcall %}
+  </div>
+
+  <div class="mt-4 flex-none">
+    {% set query_args = (["email=" ~ email] if email else []) + (["active=" ~ active] if active else []) %}
+    {{ Pagination(page, per_page, total, query_args) }}
+  </div>
+</main>
+
+<script>
+  /** @type {NodeListOf<HTMLButtonElement>} */
+  const deleteUserButtons = document.querySelectorAll('[data-button-delete-user]');
+
+  deleteUserButtons.forEach((button) => {
+    button.addEventListener('click', (event) => {
+      const username = event.target.getAttribute('data-username');
+      if (!confirm(`¿Estás seguro de que quieres eliminar al usuario ${username}?`)) {
+        event.preventDefault();
+      }
+    });
+  });
+</script>
+{% endblock %}

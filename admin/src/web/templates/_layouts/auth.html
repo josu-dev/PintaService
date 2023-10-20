@@ -1,0 +1,17 @@
+{% extends "_layouts/base.html" %}
+{% block base_head %}{% block head %}{% endblock %}{% endblock %}
+{% block base_body %}
+<main class="flex flex-col items-center justify-center h-full md:flex-row">
+  {%block content_image %}
+  <div class="flex flex-col md:basis-1/2 items-center">
+    <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
+      alt="cidepint logo" class='w-20 md:w-72 h-20 md:h-72 my-6 xs:p-2'>
+    <p class="sr-only xs:not-sr-only xs:m-2 md:mx-16 text-center text-balance">
+      Pinta service, encontra el servicio para tu necesidad.
+    </p>
+  </div>
+  {%endblock %}
+  {%block content %}{%endblock %}
+</main>
+{%block body %}{% endblock %}
+{% endblock%}

@@ -1,0 +1,21 @@
+{% extends "_layouts/auth.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+
+{% block head %}
+<title>Pre registro</title>
+{% endblock %}
+
+{% block content %}
+<div class="flex flex-col items-center md:basis-1/2">
+  {% call Form.render_form(form) %}
+  {{Button.success("Registrarme","submit")}}
+  {{Button.default("Registrarme con
+  Google")}}
+  {% endcall %}
+  <div class="flex flex-row gap-2 mt-2">
+    <p>¿Tienes cuenta?</p>
+    <a href="{{ url_for('root.index_get')}}" class="text-blue-700">Inicia sesion</a>
+  </div>
+</div>
+{% endblock %}

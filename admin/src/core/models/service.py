@@ -1,9 +1,8 @@
 """Model for service."""
-from enum import Enum
-
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
+from src.core.enums import ServiceTypes
 from src.core.models.base import (
     BaseModel,
     CreatedAt,
@@ -15,12 +14,6 @@ from src.core.models.base import (
 )
 
 
-class ServiceType(Enum):
-    ANALYSIS = "analysis"
-    CONSULTANCY = "consultancy"
-    DEVELOPMENT = "development"
-
-
 class Service(BaseModel):
     __tablename__ = "services"
 
@@ -29,10 +22,13 @@ class Service(BaseModel):
     laboratory: Mapped[Str32]
     description: Mapped[Str512]
     keywords: Mapped[Str256]
-    service_type: Mapped[ServiceType]
-    enabled: Mapped[bool] = mapped_column(init=False, default=True)
+    service_type: Mapped[ServiceTypes]
+
+    institution_id: Mapped[int]
 
     created_at: Mapped[CreatedAt] = mapped_column(init=False)
     updated_at: Mapped[UpdatedAt] = mapped_column(
         init=False, onupdate=func.current_timestamp()
     )
+
+    enabled: Mapped[bool] = mapped_column(default=True)

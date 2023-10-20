@@ -1,0 +1,58 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% from "_macros/pagination.html" import Pagination %}
+
+{% block head %}
+<title>Instituciones - Pinta Service</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+  <h1 class="text-3xl font-semibold mb-4">Instituciones</h1>
+  <ul>
+    {% for institution in institutions %}
+    <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
+      <div>
+        <h2 class="text-xl font-semibold mb-2">{{ institution.name }}</h2>
+        <p><strong>Información:</strong> {{ institution.information }}</p>
+        <p><strong>Dirección:</strong> {{ institution.address }}</p>
+        <p><strong>Ubicación:</strong> {{ institution.location }}</p>
+        <p><strong>Sitio web:</strong> {{ institution.web }}</p>
+        <p><strong>Palabras clave:</strong> {{ institution.keywords }}</p>
+        <p><strong>Correo electrónico:</strong> {{ institution.email }}</p>
+        <p><strong>Días y Horarios de Apertura:</strong> {{ institution.days_and_opening_hours }}</p>
+        <p><strong>ID:</strong> {{ institution.id }}</p>
+      </div>
+      <div class="flex gap-4 items-center">
+        {% if institution.enabled %}
+        <form method="POST" action="/admin/institutions/{{ institution.id }}/disable">
+          {{ Form.new_csrf_token() }}
+          {{ Button.warning("Deshabilitar", type="submit") }}
+        </form>
+        {% else %}
+        <form method="POST" action="/admin/institutions/{{ institution.id }}/enable">
+          {{ Form.new_csrf_token() }}
+          {{ Button.primary("Habilitar", type="submit") }}
+        </form>
+        {% endif %}
+        {{ LinkButton.info("Editar", "/admin/institutions/" ~ institution.id ) }}
+        <form method="POST" action="/admin/institutions/{{ institution.id }}/delete">
+          {{ Form.new_csrf_token() }}
+          {% set props = {"data-institution-delete-" ~ institution.id: ""} %}
+          {{ Button.danger("Eliminar", type="submit", **props) }}
+        </form>
+      </div>
+      {{ Form.click_confirmation("[data-institution-delete-" ~ institution.id ~ "]",
+      "¿Estás seguro que deseas eliminar la institución " ~ institution.name ~ "?\n Esta acción no se puede deshacer.")
+      }}
+    </li>
+    {% endfor %}
+  </ul>
+  <div class="mt-4 flex-none">
+
+    {{ Pagination(page, per_page, total, query_args) }}
+  </div>
+</main>
+{% endblock %}

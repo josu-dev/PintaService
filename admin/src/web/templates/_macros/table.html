@@ -1,0 +1,21 @@
+{% macro Table(class="") %}
+<div class="overflow-x-auto max-w-[95vw] shadow-lg sm:rounded-sm">
+  <table
+    {% for key, value in kwargs.items() %}{{ key }}="{{ value }}" {% endfor %}
+    class="w-full text-sm  text-left text-zinc-800
+    [&>tbody]:bg-orange-100 [&>tbody]:divide-y
+    [&>tbody>tr]:bg-white [&>tbody>tr:hover]:bg-orange-100
+    [&>tbody>tr>td]:px-6 [&>tbody>tr>td]:py-4 {{ class }}">{{ caller() }}</table>
+</div>
+{% endmacro %}
+
+{% macro TableHead(col_names, class="", col_class="") %}
+<thead
+  {% for key, value in kwargs.items() %}{{ key }}="{{ value }}" {% endfor %}
+  class="sticky top-0 text-sm text-zinc-700 uppercase bg-orange-200 border-b border-zinc-200 {{ class }}">
+  <tr class="">{% for name in col_names %}<th scope="col"
+      class="whitespace-nowrap px-6 py-3 font-medium tracking-wider {{ col_class }}">{{ name }}</th>{%
+    endfor %}
+  </tr>
+</thead>
+{% endmacro %}

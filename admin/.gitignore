@@ -3,6 +3,10 @@ static/.dev/tailwind.css
 
 # envs
 .env*
+!.env.example
+
+#flask_session
+flask_session/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
