@@ -14,8 +14,8 @@
           alt="Pinta Service logo" class='w-10 h-10' />
       </a>
       {% if g.user and g.user_has_permissions(["setting_show", "setting_update"]) %}
-      <a href="/admin">
-        <span class="sr-only md:not-sr-only text-xl font-medium">Panel admin</span>
+      <a href="/admin" class="underline-offset-2 hover:underline">
+        <span class="sr-only md:not-sr-only text-xl font-medium">Panel Admin</span>
         <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
           fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
           class="lucide lucide-layout-panel-left">
@@ -56,7 +56,8 @@
         </li>
         {% endif %}
         <li class="hidden xs:flex relative">
-          <button id="openPerfil" class="text-zinc-950 inline-block" data-toggle="tab">
+          <button id="openPerfil" class="text-zinc-950 inline-block underline-offset-2 hover:underline"
+            data-toggle="tab">
             <span class="sr-only md:not-sr-only">Perfil</span>
             <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
               fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">

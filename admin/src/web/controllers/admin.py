@@ -140,7 +140,7 @@ def users_id_get(user_id: int):
 
     form = ProfileUpdateForm(obj=user)
     return render_template(
-        "profile.html", user=user, genders=genders, form=form
+        "admin/users/update.html", user=user, genders=genders, form=form
     )
 
 
@@ -158,7 +158,7 @@ def users_id_post(user_id: int):
         genders = [(choice.name, choice.value) for choice in GenderOptions]
 
         return render_template(
-            "profile.html", user=user, form=form, genders=genders
+            "admin/users/update.html", user=user, form=form, genders=genders
         )
 
     UserService.update_user(user_id, **form.values())
