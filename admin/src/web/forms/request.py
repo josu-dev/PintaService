@@ -5,7 +5,11 @@ from wtforms import SelectField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.core.enums import RequestStatus
-from src.services.request import RequestNoteParam, RequestParams
+from src.services.request import (
+    RequestHistoryParams,
+    RequestNoteParam,
+    RequestParams,
+)
 
 
 class RequestForm(FlaskForm):
@@ -48,3 +52,24 @@ class RequestNoteForm(FlaskForm):
 
     def values(self) -> RequestNoteParam:
         return {"note": self.note.data}  # type:ignore
+
+
+class RequestHistoryForm(FlaskForm):
+    status = SelectField(
+        "Estado",
+        choices=[(choice.name, choice.value) for choice in RequestStatus],
+        validators=[v.DataRequired("Este campo es requerido")],
+    )
+    observations = TextAreaField(
+        "Observaciones",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=512),
+        ],
+    )
+
+    def values(self) -> RequestHistoryParams:
+        return {  # type: ignore
+            "status": t.cast(RequestStatus, self.status.data),
+            "observations": self.observations.data,  # type: ignore
+        }
