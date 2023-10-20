@@ -21,7 +21,6 @@ def index_get():
 @bp.get("/<int:institution_id>")
 @h.authenticated_route()
 def id_get(institution_id: int):
-    print("entre", flush=True)
     if not (
         g.user_has_permissions(
             (

@@ -66,10 +66,10 @@
     {% endcall %}
   </div>
 
-  <div class="mt-4 flex-none">
+  {% if total %}<div class="mt-4 flex-none">
     {% set query_args = (["email=" ~ email] if email else []) + (["active=" ~ active] if active else []) %}
     {{ Pagination(page, per_page, total, query_args) }}
-  </div>
+  </div>{% endif %}
 </main>
 
 <script>

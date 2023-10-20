@@ -50,9 +50,8 @@
     </li>
     {% endfor %}
   </ul>
-  <div class="mt-4 flex-none">
-
+  {% if total %}<div class="mt-4 flex-none">
     {{ Pagination(page, per_page, total, query_args) }}
-  </div>
+  </div>{% endif %}
 </main>
 {% endblock %}
