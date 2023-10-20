@@ -141,7 +141,7 @@ class UserCreateForm(FlaskForm):
     )
     phone = StringField(
         "Teléfono",
-        validators=[64("Este campo es requerido")],
+        validators=[v.DataRequired("Este campo es requerido")],
     )
     gender = SelectField(
         "Género",
