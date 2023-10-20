@@ -8,7 +8,10 @@ from src.services.site import SiteConfigParams
 class SiteUpdateForm(FlaskForm):
     page_size = IntegerField(
         "Tamaño de pagina",
-        validators=[v.DataRequired(), v.NumberRange(min=1, max=100)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.NumberRange(min=1, max=100),
+        ],
     )
     contact_info = StringField(
         "Informacion de contacto",

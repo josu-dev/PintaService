@@ -15,11 +15,17 @@ class LoginFormValues(TypedDict):
 class UserLogin(FlaskForm):
     email = EmailField(
         "Email",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     password = PasswordField(
         "Contraseña",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
 
     def values(self) -> LoginFormValues:
@@ -32,16 +38,22 @@ class UserLogin(FlaskForm):
 class UserPreRegister(FlaskForm):
     firstname = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     lastname = StringField(
         "Apellido",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     email = EmailField(
         "Email",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
             v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
         ],
@@ -64,12 +76,15 @@ class UserRegisterFormValues(TypedDict):
 class UserRegister(FlaskForm):
     username = StringField(
         "Nombre de usuario",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     password = PasswordField(
         "Contraseña",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
             v.EqualTo(
                 "password_confirmation", message="Las contraseñas no coinciden"
@@ -78,7 +93,10 @@ class UserRegister(FlaskForm):
     )
     password_confirmation = PasswordField(
         "Confirmar contraseña",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
 
     def values(self) -> UserRegisterFormValues:

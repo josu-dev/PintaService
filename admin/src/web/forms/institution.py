@@ -10,35 +10,59 @@ from src.services.institution import InstitutionParams
 class InstitutionForm(FlaskForm):
     name = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     information = TextAreaField(
         "Información",
-        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=512),
+        ],
     )
     address = StringField(
         "Dirección",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     location = StringField(
         "Ubicación",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     web = StringField(
         "Sitio web",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     keywords = StringField(
         "Palabras clave",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     email = EmailField(
         "Correo electrónico",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     days_and_opening_hours = StringField(
         "Días y Horarios de Apertura",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
 
     def values(self) -> InstitutionParams:
@@ -62,7 +86,7 @@ class EmailForm(FlaskForm):
     email = EmailField(
         "Email",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
             v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
         ],
