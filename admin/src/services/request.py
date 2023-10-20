@@ -6,7 +6,11 @@ import typing_extensions as te
 from src.core.db import db
 from src.core.enums import RequestStatus, ServiceTypes
 from src.core.models.service import Service
-from src.core.models.service_requests import RequestNote, ServiceRequest
+from src.core.models.service_requests import (
+    RequestHistory,
+    RequestNote,
+    ServiceRequest,
+)
 from src.core.models.user import User
 from src.services.base import BaseService, BaseServiceError
 
@@ -27,6 +31,11 @@ class FilterRequestParams(t.TypedDict):
 
 class RequestNoteParam(t.TypedDict):
     note: str
+
+
+class RequestHistoryParams(t.TypedDict):
+    status: RequestStatus
+    observations: str
 
 
 class RequestServiceError(BaseServiceError):
@@ -92,7 +101,9 @@ class RequestService(BaseService):
         )
 
     @classmethod
-    def update_state_request(cls, request_id: int, state: RequestStatus):
+    def update_state_request(
+        cls, request_id: int, **kwargs: te.Unpack[RequestHistoryParams]
+    ) -> bool:
         request = (
             db.session.query(ServiceRequest)
             .filter(ServiceRequest.id == request_id)
@@ -101,9 +112,42 @@ class RequestService(BaseService):
         if request is None:
             raise RequestServiceError("Solicitud no encontrada")
 
-        request.status = state
+        new_status = kwargs.get("status", None)
+        if (
+            new_status is not None  # type:ignore
+            and new_status != request.status.name  # type:ignore
+        ):
+            request.status = new_status
+            cls.create_request_history(
+                request_id, new_status, kwargs.get("observations")
+            )
+            db.session.add(request)
+            db.session.commit()
+            return True
+        else:
+            return False
+
+    @classmethod
+    def create_request_history(
+        cls, request_id: int, state: RequestStatus, observations: str
+    ) -> RequestHistory:
+        request = (
+            db.session.query(ServiceRequest)
+            .filter(ServiceRequest.id == request_id)
+            .first()
+        )
+
+        if request is None:
+            raise RequestServiceError("Solicitud no encontrada")
+
+        request = RequestHistory(
+            service_request_id=request_id,
+            status=state,
+            observations=observations,
+        )
         db.session.add(request)
         db.session.commit()
+        return request
 
     @classmethod
     def create_request(
@@ -111,7 +155,7 @@ class RequestService(BaseService):
         user_id: int,
         service_id: int,
         **kwargs: te.Unpack[RequestParams],
-    ):
+    ) -> ServiceRequest:
         service = (
             db.session.query(Service).filter(Service.id == service_id).first()
         )
@@ -257,3 +301,11 @@ class RequestService(BaseService):
         requests = query.offset((page - 1) * per_page).limit(per_page).all()
 
         return requests, total
+
+    @classmethod
+    def get_request_history(cls, request_id: int):
+        return (
+            db.session.query(RequestHistory)
+            .filter(RequestHistory.service_request_id == request_id)
+            .all()
+        )

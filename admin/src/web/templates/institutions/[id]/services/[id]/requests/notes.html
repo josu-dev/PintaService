@@ -4,14 +4,14 @@
 {% import "_macros/link_button.html" as LinkButton %}
 
 {% block head %}
-<title>Notas de solicitud</title>
+<title>Informacion de solicitud</title>
 {% endblock %}
 
 {% block content %}
 <main class="flex-1 flex flex-col p-4">
   <div class="flex">
     {{ LinkButton.primary(
-    "Volver a la solicitud",
+    "Volver a las solicitudes",
     "/institutions/" ~ param_institution_id ~ "/services/" ~ param_service_id ~ "/requests"
     ) }}
   </div>
@@ -27,6 +27,12 @@
   <h2 class="p-2 text-2xl font-semibold mb-2">Detalles del Pedido de Servicio:</h2>
   <p class="p-2"><strong>Nombre del Servicio:</strong> {{ request_details[2].name }}</p>
   <p class="p-2"><strong>Descripción del Servicio:</strong> {{ request_details[2].description }}</p>
+  <div class="flex">
+    {{ LinkButton.success("Historial de la solicitud",
+    "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request_id~"/history") }}
+  </div>
+
+
 
   <h2 class="mt-4 text-2xl font-semibold mb-4">Notas de la solicitud</h2>
   <ul>
