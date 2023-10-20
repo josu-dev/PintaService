@@ -31,10 +31,11 @@ def id_get(institution_id: int):
             )
         )
     ):
-        if g.user_has_permissions(("services", "services_index")):
-            return redirect(f"institutions/{institution_id}/services")
-        else:
-            return redirect("/")
+        if g.user_has_permissions(("services_index",)):
+            return redirect(f"/institutions/{institution_id}/services")
+
+        return redirect("/")
+
     page_size = g.site_config.page_size
     page: int = request.values.get("page", 1, type=int)  # type:ignore
     per_page: int = request.values.get(  # type:ignore

@@ -167,13 +167,13 @@ def load_test_data():
     db.session.commit()
 
     AuthService.add_institution_role(
-        "OWNER", user_id=2, institution_id=ins1.id
-    )
-    AuthService.add_institution_role(
-        "OWNER", user_id=2, institution_id=ins2.id
+        "OWNER", user_id=3, institution_id=ins1.id
     )
     AuthService.add_institution_role(
         "OWNER", user_id=3, institution_id=ins2.id
+    )
+    AuthService.add_institution_role(
+        "OWNER", user_id=4, institution_id=ins2.id
     )
     ServiceService.create_service(
         institution_id=1,

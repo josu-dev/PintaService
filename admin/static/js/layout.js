@@ -12,9 +12,6 @@ const mainMenu = document.getElementById('mainMenuContainer');
 /** @type {HTMLButtonElement} */
 const openPerfil = document.getElementById('openPerfil');
 
-/** @type {HTMLButtonElement} */
-const closePerfil = document.getElementById('closePerfil');
-
 /** @type {HTMLDivElement} */
 const perfilContainer = document.getElementById('perfilContainer');
 
@@ -32,11 +29,9 @@ closeMainMenuButton.addEventListener('click', () => {
   mainMenu.classList.toggle('hidden');
 });
 
-closePerfil.addEventListener('click', () => {
-  perfilContainer.classList.toggle('hidden');
-});
-
-openPerfil.addEventListener('click', () => {
+openPerfil.addEventListener('click', (event) => {
+  event.stopPropagation();
+  event.preventDefault();
   perfilContainer.classList.toggle('hidden');
   document.addEventListener('click', (event) => clickOutsidePerfilMenu(event))
 });

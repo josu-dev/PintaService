@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, StringField
+from wtforms import BooleanField, IntegerField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.services.site import SiteConfigParams
@@ -15,7 +15,7 @@ class SiteUpdateForm(FlaskForm):
         validators=[v.Length(min=0, max=256)],
     )
     maintenance_active = BooleanField("En mantenimiento")
-    maintenance_message = StringField(
+    maintenance_message = TextAreaField(
         "Mensaje de mantenimiento",
         validators=[v.Length(min=0, max=512)],
     )

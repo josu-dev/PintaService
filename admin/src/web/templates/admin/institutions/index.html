@@ -1,6 +1,6 @@
 {% extends "_layouts/app.html" %}
-{% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
 {% import "_macros/link_button.html" as LinkButton %}
 {% import "_macros/table.html" as Table %}
 {% from "_macros/pagination.html" import Pagination %}
@@ -10,9 +10,13 @@
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col">
-  <div class=" flex justify-center">
-    <h1 class="text-3xl font-semibold">Instituciones</h1>
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex flex-wrap justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Instituciones</h1>
+    <div class="flex flex-wrap gap-4 mt-auto mb-4">
+      {{ LinkButton.success("Crear Institución", "/admin/institutions/new") }}
+      {{ LinkButton.primary("Volver al panel", "/admin", class="hidden md:block") }}
+    </div>
   </div>
 
   <div class="mt-4 mx-auto md:max-h-[48rem]">
@@ -54,10 +58,9 @@
     {% endcall %}
   </div>
 
-  <div class="mt-4 flex-none">
-    {% set query_args = [] %}
-    {{ Pagination(page, per_page, total, query_args) }}
-  </div>
+  {% if total %}<div class="mt-4 flex-none">
+    {{ Pagination(page, per_page, total) }}
+  </div>{% endif %}
 </main>
 
 <script>

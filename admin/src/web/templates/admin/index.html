@@ -6,22 +6,29 @@
 
 {% block content %}
 <main class="flex-1 flex flex-col p-4 pt-16">
-  <h1 class="text-3xl font-semibold text-center text-balance">Panel de administración para Pinta Service</h1>
+  <h1 class="text-3xl font-semibold text-center text-balance">Panel de administración de Pinta Service</h1>
 
-  <div class="flex justify-center mt-8">
-    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
-      <a href="/admin/users" class="group flex items-center p-6 rounded-lg border border-gray-300 hover:shadow-md transition duration-300">
-        <span class="text-2xl font-semibold">Usuarios</span>
-      </a>
-
-      <a href="/admin/institutions" class="group flex items-center p-6 rounded-lg border border-gray-300 hover:shadow-md transition duration-300">
-        <span class="text-2xl font-semibold">Instituciones</span>
-      </a>
-
-      <a href="/admin/site_config" class="group flex items-center p-6 rounded-lg border border-gray-300 hover:shadow-md transition duration-300">
-        <span class="text-2xl font-semibold">Configuración del sitio</span>
-      </a>
-    </div>
-  </div>
+  <nav class="flex justify-center mt-8">
+    <ul class="flex flex-col gap-4 md:gap-6 xl:gap-8">
+      <li>
+        <a href="/admin/users"
+          class="flex items-center justify-center p-6 rounded-lg ring-1 ring-orange-300 hover:shadow-md hover:ring-2 hover:ring-orange-500 transition bg-orange-100/50">
+          <span class="text-2xl font-semibold">Usuarios</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/institutions"
+          class="flex items-center justify-center p-6 rounded-lg ring-1 ring-orange-300 hover:shadow-md hover:ring-2 hover:ring-orange-500 transition bg-orange-100/50">
+          <span class="text-2xl font-semibold">Instituciones</span>
+        </a>
+      </li>
+      <li>
+        <a href="/admin/site_config"
+          class="flex items-center justify-center p-6 rounded-lg ring-1 ring-orange-300 hover:shadow-md hover:ring-2 hover:ring-orange-500 transition bg-orange-100/50">
+          <span class="text-2xl font-semibold">Configuración del sitio</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
 </main>
 {% endblock %}
