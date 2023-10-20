@@ -1,6 +1,6 @@
 from src.core.models import (
+    auth,
     institution,
-    pre_regis_user,
     service,
     service_requests,
     site,
@@ -8,8 +8,8 @@ from src.core.models import (
 )
 
 __all__ = [
+    "auth",
     "institution",
-    "pre_regis_user",
     "service",
     "service_requests",
     "site",

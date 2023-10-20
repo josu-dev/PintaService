@@ -1,0 +1,55 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+
+{% block head %}
+<title>Actualizar institución</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col my-4">
+  <div class="flex flex-col md:flex-row gap-8 md:gap-16 mx-auto">
+    {% call Form.render_form(form) %}
+    <div class="flex flex-row gap-x-4">
+      {{Button.primary("Cancelar","reset")}}
+      {{Button.success("Actualizar","submit")}}
+    </div>
+    {% endcall %}
+    <div>
+      <div class="flex flex-col mt-8 h-max p-4 shadow-md rounded ring-1 bg-zinc-50 ring-orange-500">
+        <h2 class="text-xl font-bold">Asignacion de dueño</h2>
+        <form action="/admin/institutions/{{ institution.id }}/add_owner" method="post"
+          class="flex flex-col gap-4 mt-2">
+          {{ form_new_owner.csrf_token }}
+          {{ Form.render_field(form_new_owner.email) }}
+          {{ Button.primary("Asignar dueño", "submit") }}
+        </form>
+      </div>
+      <div class="mt-4 p-4 shadow-md rounded ring-1 bg-zinc-50 ring-orange-500">
+        <h2 class="mt-2 text-xl font-bold">Dueños actuales</h2>
+        <ul class="flex flex-col gap-4 m-auto mt-2 ">
+          {% for owner in institution_owners %}
+          <li class="py-4 px-2 border-t border-zinc-300">
+            <p class="text-lg">
+              Usuario: {{ owner.username }}
+            </p>
+            <p class="text-lg">
+              Email: {{ owner.email }}
+            </p>
+            <form action="/admin/institutions/{{ institution.id }}/remove_owner/{{ owner.id }}" method="post"
+              class="mt-4">
+              {{ Form.new_csrf_token() }}
+              {{ Button.danger("Remover dueño", "submit") }}
+            </form>
+          </li>{% else %}
+          <li>
+            <p class="text-lg">
+              Ningun dueño asignado
+            </p>
+          </li>{% endfor %}
+        </ul>
+      </div>
+    </div>
+  </div>
+</main>
+{% endblock %}

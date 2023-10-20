@@ -1,0 +1,59 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% from "_macros/pagination.html" import Pagination %}
+
+{% block head %}
+<title>Servicios</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold ">Servicios</h1>
+    {{ LinkButton.primary(
+    "Crear Servicio",
+    "/institutions/" ~ param_institution_id ~ "/services/new",
+    class="flex mt-auto mb-4"
+    ) }}
+  </div>
+
+  <div>
+    <ul>
+      {% for service in services %}
+      <li class="mb-4 p-4 border rounded shadow-lg flex justify-between items-center">
+        <div>
+          <h2 class="text-xl font-semibold mb-2">{{ service.name }}</h2>
+          <p><strong>Descripción:</strong> {{ service.description }}</p>
+          <p><strong>Palabras clave:</strong> {{ service.keywords }}</p>
+          <p><strong>Tipo de Servicio:</strong> {{ service.service_type.value }}</p>
+        </div>
+
+        <div class="flex gap-4 items-center">
+          {{ LinkButton.success(
+          "Ver solicitudes", "/institutions/" ~ service.institution_id ~ "/services/" ~ service.id ~ "/requests"
+          ) }}
+          {{ LinkButton.info("Editar", "/institutions/" ~ service.institution_id ~ "/services/" ~ service.id ) }}
+          <form method="POST" action="/institutions/{{ service.institution_id }}/services/{{ service.id }}/delete">
+            {{ Form.new_csrf_token() }}
+            {% set props = {"data-service-delete-" ~ service.id: ""} %}
+            {{ Button.danger("Eliminar", type="submit", **props) }}
+          </form>
+        </div>
+        {{ Form.click_confirmation("[data-service-delete-" ~ service.id ~ "]",
+        "¿Estás seguro que deseas eliminar el servicio " ~ service.name ~ "?\n Esta acción no se puede deshacer.")
+        }}
+      </li>
+      {% else %}
+      <li class="text-lg">
+        No hay servicios registrados
+      </li>
+      {% endfor %}
+    </ul>
+    <div class="mt-4 flex-none">
+      {{ Pagination(page, per_page, total) }}
+    </div>
+  </div>
+</main>
+{% endblock %}

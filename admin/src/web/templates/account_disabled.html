@@ -1,0 +1,36 @@
+{% extends "_layouts/base.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+
+{% block base_head %}
+<title>Cuenta deshabilitada</title>
+{% endblock %}
+
+{% block base_body %}
+<main class="flex flex-coll items-center justify-center h-full">
+  <section class="">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+      <div class="mx-auto max-w-screen-sm text-center">
+        <h1
+          class="mb-4 text-7xl tracking-tight font-extrabold md:text-8xl lg:text-9xl text-orange-600 dark:text-orange-500">
+          403
+        </h1>
+        <p class="mb-4 text-3xl tracking-tight font-bold text-zinc-900 md:text-4xl">
+          Acceso denegado
+        </p>
+        <p class="mb-4 text-base md:text-lg font-light text-zinc-500">
+          Tu cuenta a sido deshabilitada
+          {% if g.site_config.contact_info %}
+          , si crees que ha sido un error contactate con el servicio al cliente
+          {{g.site_config.contact_info}}
+          {% endif %}
+        </p>
+        <form method="POST" action="/logout">
+          {{ Form.new_csrf_token() }}
+          {{ Button.primary("Cerrar sesion", type="submit") }}
+        </form>
+      </div>
+    </div>
+  </section>
+</main>
+{% endblock %}
