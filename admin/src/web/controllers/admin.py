@@ -25,7 +25,7 @@ def index_get():
 @h.authenticated_route(module="setting", permissions=("show",))
 def site_config_get():
     site_config = SiteService.get_site_config()
-    form = SiteUpdateForm(request.form, obj=site_config)
+    form = SiteUpdateForm(obj=site_config)
     return render_template("admin/site_config.html", form=form)
 
 
