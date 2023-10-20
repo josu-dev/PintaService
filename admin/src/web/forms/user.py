@@ -11,11 +11,17 @@ from src.services.user import UserParams, UserUpdateParams
 class ProfileUpdateForm(FlaskForm):
     firstname = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     lastname = StringField(
         "Apellido",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     document_type = SelectField(
         "Tipo de Documento",
@@ -24,7 +30,7 @@ class ProfileUpdateForm(FlaskForm):
     document_number = StringField(
         "Número de documento",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=8, max=8),
             v.Regexp(
                 r"^[0-9]+$",
@@ -42,11 +48,14 @@ class ProfileUpdateForm(FlaskForm):
     )
     address = StringField(
         "Dirección",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     phone = StringField(
         "Teléfono",
-        validators=[v.DataRequired()],
+        validators=[v.DataRequired("Este campo es requerido")],
     )
 
     def values(self) -> UserUpdateParams:
@@ -74,27 +83,39 @@ class UserSearchForm(FlaskForm):
 class UserCreateForm(FlaskForm):
     firstname = StringField(
         "Nombre",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     lastname = StringField(
         "Apellido",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     username = StringField(
         "Nombre de usuario",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     email = EmailField(
         "Email",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
             v.Regexp(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+.[A-Z|a-z]{2,7}\b"),
         ],
     )
     password = PasswordField(
         "Contraseña",
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     document_type = SelectField(
         "Tipo de Documento",
@@ -103,7 +124,7 @@ class UserCreateForm(FlaskForm):
     document_number = StringField(
         "Número de documento",
         validators=[
-            v.DataRequired(),
+            v.DataRequired("Este campo es requerido"),
             v.Length(min=8, max=8),
             v.Regexp(
                 r"^[0-9]+$",
@@ -113,11 +134,14 @@ class UserCreateForm(FlaskForm):
     )
     address = StringField(
         "Dirección",
-        validators=[v.DataRequired(), v.Length(min=0, max=256)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=256),
+        ],
     )
     phone = StringField(
         "Teléfono",
-        validators=[v.DataRequired()],
+        validators=[v.DataRequired("Este campo es requerido")],
     )
     gender = SelectField(
         "Género",
