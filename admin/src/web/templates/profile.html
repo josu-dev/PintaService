@@ -9,36 +9,41 @@
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col items-center my-4">
-  <form class="flex flex-col items-center gap-6 md:max-w-sm " method="post">
-    {{ form.csrf_token }}
-    {{ Form.render_field(form.firstname) }}
-    {{ Form.render_field(form.lastname) }}
-    {{ Form.render_field(form.document_type) }}
-    {{ Form.render_field(form.document_number) }}
-    {{ Form.render_field(form.address) }}
-    {{ Form.render_field(form.phone) }}
+<main class="flex-1 flex flex-col my-4">
+  <div class="flex flex-col mx-auto">
+    <h1 class="mt-[1em] text-3xl font-bold text-center">
+      Actualización de Perfil
+    </h1>
+    <form method="post" class="flex flex-col gap-2 p-4 md:gap-4 md:mt-4">
+      {{ form.csrf_token }}
+      {{ Form.render_field(form.firstname) }}
+      {{ Form.render_field(form.lastname) }}
+      {{ Form.render_field(form.document_type) }}
+      {{ Form.render_field(form.document_number) }}
+      {{ Form.render_field(form.address) }}
+      {{ Form.render_field(form.phone) }}
 
-    <div id="field_select" class="flex items-center flex-col">
-      <label class="mb-2">Genero</label>
-      <select name="gender" id="select" required>
-        <option value="" hidden></option>
-        {% for gender in genders %}
-        <option value="{{gender[0]}}" {% if gender[0]==user.gender.name %} selected {%endif%}>{{ gender[1] }}</option>
-        {% endfor %}
-      </select>
-    </div>
+      <div id="field_select" class="flex items-center flex-col">
+        <label class="mb-2">Genero</label>
+        <select name="gender" id="select" required>
+          <option value="" hidden></option>
+          {% for gender in genders %}
+          <option value="{{gender[0]}}" {% if gender[0]==user.gender.name %} selected {%endif%}>{{ gender[1] }}</option>
+          {% endfor %}
+        </select>
+      </div>
 
-    <div id="field_gender_other" class="flex items-center flex-col">
-      <label class="mt-2">Especifique como se identifica</label>
-      <input type="text" id="gender_other" name="gender_other" required minlength="4" maxlength="32"
-        value="{{ form.gender_other.data }}" class="mt-2" />
-    </div>
+      <div id="field_gender_other" class="flex items-center flex-col">
+        <label class="mt-2">Especifique como se identifica</label>
+        <input type="text" id="gender_other" name="gender_other" required minlength="4" maxlength="32"
+          value="{{ form.gender_other.data }}" class="mt-2" />
+      </div>
 
-    <div class="flex flex-row gap-x-4">
-      {{Button.primary("Cancelar","reset")}}
-      {{Button.success("Confirmar","submit")}}
-    </div>
-  </form>
+      <div class="flex flex-col xs:flex-row gap-4 mt-4 justify-around">
+        {{Button.danger("Cancelar","reset")}}
+        {{Button.success("Confirmar","submit")}}
+      </div>
+    </form>
+  </div>
 </main>
 {% endblock %}
