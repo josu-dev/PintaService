@@ -1,11 +1,34 @@
 {% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
+{% from "_macros/pagination.html" import Pagination %}
 
 {% block head %}
 <title>Instituciones</title>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col p-4 pt-16">
-  <h1 class="text-3xl font-semibold mt-[1em] text-center text-balance"> holis</h1>
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Mis instituciones</h1>
+  </div>
+
+  <div>
+    <ul class="mx-auto max-w-screen-lg">
+      {% for inst in g.institutions %}
+      <li class="flex flex-col gap-4 md:flex-row mb-4 p-4 border rounded shadow-lg justify-between md:items-center">
+        <div>
+          <h2 class="text-xl font-semibold mb-2">{{ inst.name }}</h2>
+          <p class="font-medium">{{ inst.information }}</p>
+        </div>
+
+        <div class="flex gap-4 items-center">
+          {{ LinkButton.primary("Ver institución", "/institutions/" ~ inst.id) }}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </div>
 </main>
 {% endblock %}

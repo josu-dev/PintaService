@@ -7,12 +7,6 @@ from wtforms import validators as v
 from src.services.auth import PreRegisterUserParams
 
 
-class RegisterFormValues(TypedDict):
-    username: str
-    password: str
-    password_con: str
-
-
 class LoginFormValues(TypedDict):
     email: str
     password: str
@@ -29,9 +23,9 @@ class UserLogin(FlaskForm):
     )
 
     def values(self) -> LoginFormValues:
-        return {
-            "email": self.email.data,  # type: ignore
-            "password": self.password.data,  # type: ignore
+        return {  # type: ignore
+            "email": self.email.data,
+            "password": self.password.data,
         }
 
 
@@ -54,11 +48,17 @@ class UserPreRegister(FlaskForm):
     )
 
     def values(self) -> PreRegisterUserParams:
-        return {
-            "firstname": self.firstname.data,  # type: ignore
-            "lastname": self.lastname.data,  # type: ignore
-            "email": self.email.data,  # type: ignore
+        return {  # type: ignore
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "email": self.email.data,
         }
+
+
+class UserRegisterFormValues(TypedDict):
+    username: str
+    password: str
+    password_confirmation: str
 
 
 class UserRegister(FlaskForm):
@@ -81,9 +81,9 @@ class UserRegister(FlaskForm):
         validators=[v.DataRequired(), v.Length(min=0, max=32)],
     )
 
-    def values(self) -> RegisterFormValues:
-        return {
-            "username": self.username.data,  # type: ignore
-            "password": self.password.data,  # type: ignore
-            "password_confirmation": self.password_confirmation.data,  # type: ignore # noqa: E501
+    def values(self) -> UserRegisterFormValues:
+        return {  # type: ignore
+            "username": self.username.data,
+            "password": self.password.data,
+            "password_confirmation": self.password_confirmation.data,
         }

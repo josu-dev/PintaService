@@ -24,10 +24,11 @@ bp = Blueprint("root", __name__)
 @bp.get("/")
 @h.authenticated_route()
 def index_get():
-    if len(g.institutions) > 0 and g.user_has_permissions(
-        ("institution_index",)
-    ):
-        return redirect("/admin/institutions")
+    if g.user_has_permissions(("setting_show",)):
+        return redirect("/admin")
+
+    if len(g.institutions) > 0:
+        return redirect("/institutions")
 
     return render_template("index.html")
 

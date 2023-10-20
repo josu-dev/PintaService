@@ -30,7 +30,21 @@ def load_test_data():
         phone="12345678",
         gender_other="",
     )
+    UserService.create_user(
+        firstname="admin1",
+        lastname="admin1",
+        password="admin1",
+        email="admin1@test.test",
+        username="admin1",
+        document_type=enums.DocumentTypes.DNI,
+        document_number="12345678",
+        gender=enums.GenderOptions.NOT_SPECIFIED,
+        address="admin",
+        phone="12345678",
+        gender_other="",
+    )
     db.session.execute(sa.insert(auth.SiteAdmin).values(user_id=1, role_id=1))
+    db.session.execute(sa.insert(auth.SiteAdmin).values(user_id=2, role_id=1))
 
     UserService.create_user(
         firstname="test1",
@@ -153,13 +167,13 @@ def load_test_data():
     db.session.commit()
 
     AuthService.add_institution_role(
-        "OWNER", user_id=2, institution_id=ins1.id
-    )
-    AuthService.add_institution_role(
-        "OWNER", user_id=2, institution_id=ins2.id
+        "OWNER", user_id=3, institution_id=ins1.id
     )
     AuthService.add_institution_role(
         "OWNER", user_id=3, institution_id=ins2.id
+    )
+    AuthService.add_institution_role(
+        "OWNER", user_id=4, institution_id=ins2.id
     )
     ServiceService.create_service(
         institution_id=1,
