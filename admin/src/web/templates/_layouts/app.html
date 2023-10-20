@@ -8,7 +8,7 @@
 {% block base_body %}
 <div class="relative bodyContainer h-full flex flex-col overflow-hidden">
   <header class="flex-none flex justify-between p-2 md:px-3 border-b shadow border-zinc-900">
-    <div class="ml-2 flex items-center gap-4">
+    <div class="ml-2 flex items-center gap-2">
       <a href="/">
         <img src="/static/img/logo_64x64.png"
           alt="Pinta Service logo" class='w-10 h-10' />
@@ -23,6 +23,10 @@
           <rect width="7" height="7" x="14" y="3" rx="1" />
           <rect width="7" height="7" x="14" y="14" rx="1" />
         </svg>
+      </a>
+      {% else %}
+      <a href="/" class="underline-offset-2 hover:underline">
+        <span class="sr-only md:not-sr-only text-xl font-medium">Pinta Service</span>
       </a>
       {% endif %}
     </div>
