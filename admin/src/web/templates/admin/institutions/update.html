@@ -1,13 +1,21 @@
 {% extends "_layouts/app.html" %}
-{% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
 
 {% block head %}
 <title>Actualizar institución</title>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col my-4">
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex flex-wrap justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Actualización de Institución</h1>
+    <div class="flex flex-wrap gap-4 mt-auto mb-4">
+      {{ LinkButton.primary("Volver a instituciones", "/admin/institutions") }}
+    </div>
+  </div>
+
   <div class="flex flex-col md:flex-row gap-8 md:gap-16 mx-auto">
     {% call Form.render_form(form) %}
     <div class="flex flex-row gap-x-4">

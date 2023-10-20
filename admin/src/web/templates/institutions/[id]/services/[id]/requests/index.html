@@ -10,86 +10,88 @@
 
 {% block content %}
 <main class="flex-1 flex flex-col p-4">
-  <h1 class="text-3xl font-semibold mb-4">Solicitudes</h1>
+  <div class="flex">
+    {{ LinkButton.primary("Volver al servicio","/institutions/" ~ param_institution_id ~ "/services") }}
+  </div>
+  <div class="flex flex-wrap justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold ">Solicitudes del servicio</h1>
+  </div>
+
+  <h2 class="text-2xl font-semibold mb-4">Opciones de filtrado</h2>
+  <form method="get" action="/institutions/{{institution_id}}/services/{{service_id}}/requests/{{request.id}}"
+    class="flex flex-col max-w-lg ">
+    {{ Form.new_csrf_token() }}
+    <div class="form-group flex flex-col">
+      <label for="user_email">Email de usuario:</label>
+      <input type="text" name="user_email" id="user_email" placeholder="Filtrar por Email"
+        value="{{ user_email or "" }}"" class=" w-full">
+    </div>
+    <div class="form-group flex flex-col">
+      <label for="status">Estado:</label>
+      <select name="status" id="status" class="w-full">
+        <option value="">Todos</option>
+        <option value="ACCEPTED" {% if status=="ACCEPTED" %}selected{% endif %}>Aceptada</option>
+        <option value="REJECTED" {% if status=="REJECTED" %}selected{% endif %}>Rechazada</option>
+        <option value="IN_PROCESS" {% if status=="IN_PROCESS" %}selected{% endif %}>En Proceso</option>
+        <option value="FINISHED" {% if status=="FINISHED" %}selected{% endif %}>Finalizada</option>
+        <option value="CANCELED" {% if status=="CANCELED" %}selected{% endif %}>Cancelada</option>
+      </select>
+    </div>
+    <div class="form-group flex flex-col">
+      <label for="start_date">Fecha de inicio:</label>
+      <input type="date" name="start_date" id="start_date" class="w-full" value="{{ start_date }}">
+    </div>
+    <div class=" form-group flex flex-col">
+      <label for="end_date">Fecha de fin:</label>
+      <input type="date" name="end_date" id="end_date" class="w-full" value="{{ end_date }}">
+    </div>
+
+    <div class="mt-4 mb-4">
+      {{ Button.primary("Filtrar", type="submit") }}
+    </div>
+  </form>
+
+
+
   <ul>
-    <h2 class="text-2xl font-semibold mb-4">Opciones de filtrado</h2>
-    <form method="get" action="/institutions/{{institution_id}}/services/{{service_id}}/requests/{{request.id}}"
-      class="flex flex-col max-w-lg ">
-      {{ Form.new_csrf_token() }}
-      <div class="form-group flex flex-col">
-        <label for="user_email">Email de usuario:</label>
-        <input type="text" name="user_email" id="user_email" placeholder="Filtrar por Email"
-          value="{{ user_email or "" }}"" class=" w-full">
-      </div>
-      <div class="form-group flex flex-col">
-        <label for="status">Estado:</label>
-        <select name="status" id="status" class="w-full">
-          <option value="">Todos</option>
-          <option value="ACCEPTED" {% if status=="ACCEPTED" %}selected{% endif %}>Aceptada</option>
-          <option value="REJECTED" {% if status=="REJECTED" %}selected{% endif %}>Rechazada</option>
-          <option value="IN_PROCESS" {% if status=="IN_PROCESS" %}selected{% endif %}>En Proceso</option>
-          <option value="FINISHED" {% if status=="FINISHED" %}selected{% endif %}>Finalizada</option>
-          <option value="CANCELED" {% if status=="CANCELED" %}selected{% endif %}>Cancelada</option>
-        </select>
-      </div>
-      <div class="form-group flex flex-col">
-        <label for="start_date">Fecha de inicio:</label>
-        <input type="date" name="start_date" id="start_date" class="w-full" value="{{ start_date }}">
-      </div>
-      <div class=" form-group flex flex-col">
-        <label for="end_date">Fecha de fin:</label>
-        <input type="date" name="end_date" id="end_date" class="w-full" value="{{ end_date }}">
-      </div>
-
-      <div class="mt-4 mb-4">
-        {{ Button.primary("Filtrar", type="submit") }}
-      </div>
-    </form>
-
-
-
     {% for request in requests %}
-    <li class="flex flex-col md:flex-row mb-4 p-4 border rounded shadow-lg  items-center md:justify-between">
+    <li class="flex flex-col md:flex-row mb-4 p-4 border rounded shadow-lg md:items-center md:justify-between">
       <div class="mb-4 md:mr-4 md:max-w-sm ">
         <h2 class="text-xl font-semibold mb-2">{{ request.title }}</h2>
         <p><strong>Descripcion:</strong> {{ request.description| truncate(20) }}</p>
+        <p><strong>Estado:</strong> {{ request.status.value}}</p>
         <p><strong>Ultima actualizacion:</strong> {{ request.updated_at.strftime("%Y-%m-%d %H:%M") }}</p>
       </div>
 
-      <div class="flex flex-col md:flex-row gap-4 items-center">
+      <div class="flex flex-col gap-4 items-end">
         <div class="">
-          {{ LinkButton.secondary("Ver Solicitud",
-          "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request.id~"/notes") }}
+          {{ LinkButton.primary(
+          "Ver Solicitud",
+          "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request.id~"/notes",
+          class="w-[16ch] block text-center"
+          )}}
         </div>
-
-        <form method="POST"
-          action="/institutions/{{institution_id}}/services/{{service_id}}/requests/{{request.id}}/edit">
-          {{ Form.new_csrf_token() }}
-          <div class="flex flex-col md:flex-row gap-4 items-center">
-            <select id="request-dropdown-select" name="request" class="block  pt-2 pb-1 px-2  text-sm md:text-base shadow-sm
-            rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
-            appearance-none focus:outline-none focus:ring-0 focus:border-orange-600 w-[16ch]">
-              {% for status in statuses %}
-              {% if status == request.status.value %}
-              <option value="{{ status }}" selected>{{ status }}</option>
-              {% else %}
-              <option value="{{ status }}">{{ status }}</option>
-              {% endif %}
-              {% endfor %}
-            </select>
-            {{ Button.primary("Editar Estado", type="submit") }}
-          </div>
-        </form>
+        <div class="">
+          {{ LinkButton.info(
+          "Editar Estado",
+          "/institutions/"~institution_id~"/services/"~service_id~"/requests/"~request.id,
+          class="w-[16ch] block text-center"
+          )}}
+        </div>
       </div>
+    </li>
+    {% else %}
+    <li class="flex mb-4 p-4">
+      <h2 class="text-xl font-semibold mb-2 mx-auto">No hay solicitudes para este servicio</h2>
     </li>
     {% endfor %}
   </ul>
-  <div class="mt-4 flex-none">
+  {% if total %}<div class="mt-4 flex-none">
     {% set query_args =
     (["service_type=" ~ service_type] if service_type else []) + (["user_email=" ~ user_email] if user_email else []) +
     (["status=" ~ status] if status else []) + (["start_date=" ~ start_date] if start_date else []) + (["end_date=" ~
     end_date] if end_date else []) %}
     {{ Pagination(page, per_page, total, query_args) }}
-  </div>
+  </div>{% endif %}
 </main>
 {% endblock %}

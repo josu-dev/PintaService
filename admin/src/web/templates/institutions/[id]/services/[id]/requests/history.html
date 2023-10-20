@@ -1,0 +1,38 @@
+{% extends "_layouts/app.html" %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
+
+{% block head %}
+<title>Informacion de solicitud</title>
+{% endblock %}
+
+{% block content %}
+<main class="flex-1 flex flex-col p-4">
+    <div class="flex">
+        {{ LinkButton.primary("Volver a la solicitud", "/institutions/" ~ param_institution_id ~ "/services/" ~
+        param_service_id ~
+        "/requests/" ~ param_request_id ~ "/notes") }}
+    </div>
+    <div class="flex flex-wrap justify-between">
+        <h1 class="mt-[1em] mb-4 text-3xl font-semibold ">Historial de la solicitud</h1>
+    </div>
+    <ul>
+        {% if history %}
+        {% for change in history %}
+        <li class="flex flex-col gap-4 md:flex-row mb-4 p-4 border rounded shadow-lg justify-between md:items-center">
+            <div>
+                <h2 class="text-xl font-semibold mb-2">Se cambio al estado : {{ change.status.value }}</h2>
+                <p><strong>Observaciones:</strong> {{ change.observations }}</p>
+                <p><strong>Fecha del cambio :</strong> {{ change.created_at.strftime("%Y-%m-%d %H:%M") }}</p>
+            </div>
+        </li>
+        {% endfor %}
+        {% else %}
+        <li>No hay historial de la solicitud.</li>
+        {% endif %}
+    </ul>
+
+
+</main>
+{% endblock %}

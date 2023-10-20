@@ -11,9 +11,12 @@
 
 {% block content %}
 <main class="flex-1 flex flex-col p-4">
-  <div class="flex justify-between">
+  <div class="flex flex-wrap justify-between">
     <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Usuarios</h1>
-    {{ LinkButton.primary("Crear usuario", "/admin/users/new", class="flex mt-auto mb-4") }}
+    <div class="flex flex-wrap gap-4 mt-auto mb-4">
+      {{ LinkButton.success("Crear Usuario", "/admin/users/new") }}
+      {{ LinkButton.primary("Volver al panel", "/admin", class="hidden md:block") }}
+    </div>
   </div>
 
   <form method="get" action="/admin/users">
@@ -24,7 +27,7 @@
       <option value="1" {% if active=="1" %}selected{% endif %}>Activos</option>
       <option value="0" {% if active=="0" %}selected{% endif %}>No Activos</option>
     </select>
-    <button type="submit" class="filter-button">Filtrar</button>
+    {{ Button.success("Filtrar","submit") }}
   </form>
 
   <div class="mt-4 mx-auto md:max-h-[48rem]">
@@ -66,10 +69,10 @@
     {% endcall %}
   </div>
 
-  <div class="mt-4 flex-none">
+  {% if total %}<div class="mt-4 flex-none">
     {% set query_args = (["email=" ~ email] if email else []) + (["active=" ~ active] if active else []) %}
     {{ Pagination(page, per_page, total, query_args) }}
-  </div>
+  </div>{% endif %}
 </main>
 
 <script>

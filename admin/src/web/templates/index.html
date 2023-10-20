@@ -1,11 +1,32 @@
 {% extends "_layouts/app.html" %}
+{% import "_macros/button.html" as Button %}
 
 {% block head %}
 <title>Pinta Service</title>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col">
-
+<main class="flex flex-coll items-center justify-center h-full">
+  <section class="">
+    <div class="py-8 px-4 mx-auto max-w-screen-xl lg:py-16 lg:px-6">
+      <div class="mx-auto max-w-[min(75vw,640px)] text-center">
+        <h1
+          class="mb-4 text-3xl tracking-tight font-extrabold md:text-4xl lg:text-5xl text-orange-600 dark:text-orange-500">
+          Sin instituciones
+        </h1>
+        <p class="mb-4 text-xl tracking-tight font-bold text-zinc-700 md:text-2xl">
+          No estas registrado/a en ninguna institucion
+        </p>
+        <p class="mb-4 text-base md:text-lg font-normal text-zinc-500">
+          Para poder acceder a la plataforma debes estar registrado en una institucion,
+          espera a que un dueño de institucion te añada a su institucion.
+          {% if g.site_config.contact_info %}
+          <br />
+          Si piensas que esto es un error, puedes contactarte por {{ g.site_config.contact_info }}
+          {% endif %}
+        </p>
+      </div>
+    </div>
+  </section>
 </main>
 {% endblock %}

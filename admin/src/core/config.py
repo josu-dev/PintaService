@@ -8,6 +8,12 @@ from sqlalchemy import Engine, create_engine, exc, sql
 
 
 class ConfigurationError(Exception):
+    """Error raised when a configuration error occurs.
+
+    Attributes:
+        message: A human-readable message describing the error.
+    """
+
     def __init__(self, message: str):
         super().__init__(message)
         self.message = message
@@ -82,6 +88,7 @@ def get_local_env_file() -> t.Union[TextFile, int]:
 
 
 def env_update() -> int:
+    """Generates the SQL query to update the .env file in the database."""
     env_file = get_local_env_file()
     if isinstance(env_file, int):
         return env_file
@@ -224,6 +231,12 @@ class Config:
 
 
 def init_app(app: Flask, env: str) -> None:
+    """Initializes the application configuration.
+
+    Loads the environment variables from the .env file if the application
+    is running in development mode, otherwise loads the environment variables
+    from the database.
+    """
     if env == "development":
         load_dotenv()
     else:

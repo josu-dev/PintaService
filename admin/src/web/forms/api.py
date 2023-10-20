@@ -12,10 +12,16 @@ class AuthFormValues(t.TypedDict):
 
 class AuthForm(FlaskForm):
     password = wtforms.PasswordField(
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     user = wtforms.EmailField(
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=64),
+        ],
     )
 
     def values(self) -> AuthFormValues:
@@ -50,13 +56,22 @@ class ServiceRequestFormValues(t.TypedDict):
 
 class ServiceRequestForm(FlaskForm):
     service_id = wtforms.IntegerField(
-        validators=[v.DataRequired(), v.NumberRange(min=0)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.NumberRange(min=0),
+        ],
     )
     title = wtforms.StringField(
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     description = wtforms.StringField(
-        validators=[v.DataRequired(), v.Length(min=0, max=512)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=512),
+        ],
     )
 
     def values(self) -> ServiceRequestFormValues:
@@ -73,7 +88,10 @@ class RequestNoteFormValues(t.TypedDict):
 
 class RequestNoteForm(FlaskForm):
     text = wtforms.StringField(
-        validators=[v.DataRequired(), v.Length(min=8, max=512)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=8, max=512),
+        ],
     )
 
     def values(self) -> RequestNoteFormValues:
@@ -89,7 +107,10 @@ class ServiceSearchFormValues(t.TypedDict):
 
 class ServiceSearchForm(FlaskForm):
     q = wtforms.StringField(
-        validators=[v.DataRequired(), v.Length(min=0, max=32)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
     )
     type = wtforms.StringField(
         validators=[v.Optional(), v.Length(min=0, max=32)],

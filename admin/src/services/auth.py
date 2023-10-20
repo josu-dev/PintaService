@@ -30,11 +30,18 @@ class AuthServiceError(BaseServiceError):
 
 
 class AuthService(BaseService):
+    """Service for handling auth.
+
+    This service is used for handling the first step of the registration
+    process and the general permissions of the users.
+    """
+
     AuthServiceError = AuthServiceError
 
     @classmethod
-    def get_pre_user_by_email(cls, email: str):
-        """returns the user according to email"""
+    def get_pre_user_by_email(
+        cls, email: str
+    ) -> t.Union[PreRegisterUser, None]:
         return (
             db.session.query(PreRegisterUser)
             .filter(PreRegisterUser.email == email)
@@ -42,8 +49,18 @@ class AuthService(BaseService):
         )
 
     @classmethod
-    def create_pre_user(cls, **kwargs: Unpack[PreRegisterUserParams]):
-        """Create parcial user in database"""
+    def create_pre_user(
+        cls, **kwargs: Unpack[PreRegisterUserParams]
+    ) -> PreRegisterUser:
+        """Creates a pre-user.
+
+        This method creates a pre-user that will be used for the first step of
+        the registration process. It will send an email with a token that will
+        be used to complete the registration process.
+
+        Raises:
+            AuthServiceError: If the email already exists.
+        """
         if AuthService.get_pre_user_by_email(kwargs["email"]):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
 
@@ -59,16 +76,25 @@ class AuthService(BaseService):
         return user
 
     @classmethod
-    def delete_pre_user(cls, token: str):
-        """delete pre-user"""
+    def delete_pre_user(cls, token: str) -> bool:
+        """Deletes a pre-user by token.
 
-        db.session.query(PreRegisterUser).where(
-            PreRegisterUser.token == token
-        ).delete()
+        Returns:
+            bool: True if the pre-user exists and was deleted, False if the
+                pre-user was not deleted or if the pre-user does not exist.
+        """
+        delete_count = (
+            db.session.query(PreRegisterUser)
+            .where(PreRegisterUser.token == token)
+            .delete()
+        )
         db.session.commit()
+        return delete_count == 1
 
     @classmethod
-    def get_pre_user_by_token(cls, token: str):
+    def get_pre_user_by_token(
+        cls, token: str
+    ) -> t.Union[PreRegisterUser, None]:
         return (
             db.session.query(PreRegisterUser)
             .filter(PreRegisterUser.token == token)
@@ -76,9 +102,7 @@ class AuthService(BaseService):
         )
 
     @classmethod
-    def exist_pre_user_with_email(cls, email: str):
-        """check if the token is valid"""
-
+    def exist_pre_user_with_email(cls, email: str) -> bool:
         return (
             db.session.query(PreRegisterUser)
             .filter(PreRegisterUser.email == email)
@@ -87,14 +111,17 @@ class AuthService(BaseService):
         )
 
     @classmethod
-    def token_expired(cls, token_date: datetime):
+    def token_expired(cls, token_date: datetime) -> bool:
+        """Checks if the token date is expired (more than one day)."""
         current_date = datetime.now()
         difference = current_date - token_date
         one_day = timedelta(days=1)
         return difference > one_day
 
     @classmethod
-    def get_user_permissions(cls, user_id: int, institution_id: int):
+    def get_user_permissions(
+        cls, user_id: int, institution_id: int
+    ) -> t.Sequence[str]:
         stmt = sa.text(
             """
             SELECT
@@ -119,6 +146,13 @@ class AuthService(BaseService):
     def add_institution_role(
         cls, role: InstitutionsRoles, user_id: int, institution_id: int
     ) -> bool:
+        """Adds a role to a user in an institution.
+
+        No checks are made to see if the user already has the role.
+
+        Returns:
+            bool: True if the role was added, False otherwise.
+        """
         _role = permissions.RoleEnum[role].value
         stmt = sa.text(
             """
@@ -146,8 +180,13 @@ class AuthService(BaseService):
     def remove_institution_role(
         cls, user_id: int, institution_id: int, role: InstitutionsRoles
     ) -> bool:
+        """Removes a role from a user in an institution.
+
+        Returns:
+            bool: True if the role was removed, False if the role was not
+                removed or if the user did not have the role.
+        """
         role_name = permissions.RoleEnum[role].value
-        print(user_id, institution_id, role_name, flush=True)
         try:
             delete_count = (
                 db.session.query(UserInstitutionRole)
@@ -169,14 +208,14 @@ class AuthService(BaseService):
         return delete_count == 1
 
     @classmethod
-    def user_is_site_admin(cls, user_id: int):
+    def user_is_site_admin(cls, user_id: int) -> bool:
         stmt = sa.text("SELECT * FROM site_admins WHERE user_id = :user_id")
         result = db.session.scalars(stmt, {"user_id": user_id}).first()
 
         return result is not None
 
     @classmethod
-    def get_site_admin_permissions(cls, user_id: int):
+    def get_site_admin_permissions(cls, user_id: int) -> t.Sequence[str]:
         stmt = sa.text(
             """
             SELECT

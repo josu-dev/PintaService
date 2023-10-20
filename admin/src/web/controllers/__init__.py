@@ -20,6 +20,11 @@ _blueprints = (
 
 
 def init_app(app: flask.Flask):
+    """Initializes the controllers.
+
+    Registers the blueprints and error handlers for the application.
+    Also registers the before request hook for the application.
+    """
     from src.web.controllers import _errors
 
     _errors.register_error_handlers(app)
@@ -58,6 +63,7 @@ def init_app(app: flask.Flask):
         user_id = flask.session.get("user_id")  # type: ignore
         if user_id is not None:
             user = UserService.get_user(user_id)  # type: ignore
+
             if user is None:
                 flask.session.clear()
             else:
@@ -91,6 +97,7 @@ def init_app(app: flask.Flask):
             not site_config.maintenance_active
             or ("setting_update" in flask.g.user_permissions)
             or flask.request.path.startswith("/login")
+            or flask.request.path.startswith("/logout")
         ):
             return None
 

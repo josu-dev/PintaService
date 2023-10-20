@@ -7,7 +7,7 @@
     class="block mt-1 pt-2 pb-1 px-2 w-full text-sm md:text-base shadow-sm
     rounded border border-b-2 border-zinc-300 bg-white text-zinc-900
     appearance-none focus:outline-none focus:ring-0 focus:border-orange-600">
-    <option value="" hidden>Institucion</option>
+    <option value="" hidden>Institución</option>
     {% for inst in g.institutions %}
     <option value="{{ inst.id }}" {% if current_institution_id==inst.id %}selected{%endif%}>{{ inst.name }}</option>
     {% endfor %}

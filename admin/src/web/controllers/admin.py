@@ -25,7 +25,7 @@ def index_get():
 @h.authenticated_route(module="setting", permissions=("show",))
 def site_config_get():
     site_config = SiteService.get_site_config()
-    form = SiteUpdateForm(request.form, obj=site_config)
+    form = SiteUpdateForm(obj=site_config)
     return render_template("admin/site_config.html", form=form)
 
 
@@ -140,7 +140,7 @@ def users_id_get(user_id: int):
 
     form = ProfileUpdateForm(obj=user)
     return render_template(
-        "profile.html", user=user, genders=genders, form=form
+        "admin/users/update.html", user=user, genders=genders, form=form
     )
 
 
@@ -148,13 +148,18 @@ def users_id_get(user_id: int):
 @h.authenticated_route(module="user", permissions=("update",))
 def users_id_post(user_id: int):
     user = UserService.get_user(user_id)
+
     if not user:
         h.flash_error(f"Usuario con id {user_id} no encontrado al actualizar.")
         return redirect("/admin/users")
 
     form = ProfileUpdateForm(request.form)
     if not form.validate():
-        return render_template("profile.html", user=user, form=form)
+        genders = [(choice.name, choice.value) for choice in GenderOptions]
+
+        return render_template(
+            "admin/users/update.html", user=user, form=form, genders=genders
+        )
 
     UserService.update_user(user_id, **form.values())
     h.flash_success("Usuario actualizado con éxito.")
@@ -289,8 +294,17 @@ def institutions_id_post(institution_id: int):
         h.flash_success("Institución actualizada con éxito.")
         return redirect(f"/admin/institutions/{institution.id}")
 
+    institution_owners = InstitutionService.get_institution_owners(
+        institution_id
+    )
+    form_new_owner = EmailForm()
+
     return render_template(
-        "/admin/institutions/update.html", institution=institution, form=form
+        "/admin/institutions/update.html",
+        form=form,
+        form_new_owner=form_new_owner,
+        institution=institution,
+        institution_owners=institution_owners,
     )
 
 

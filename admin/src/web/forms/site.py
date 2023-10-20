@@ -1,5 +1,5 @@
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, StringField
+from wtforms import BooleanField, IntegerField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.services.site import SiteConfigParams
@@ -8,14 +8,17 @@ from src.services.site import SiteConfigParams
 class SiteUpdateForm(FlaskForm):
     page_size = IntegerField(
         "Tamaño de pagina",
-        validators=[v.DataRequired(), v.NumberRange(min=1, max=100)],
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.NumberRange(min=1, max=100),
+        ],
     )
     contact_info = StringField(
         "Informacion de contacto",
         validators=[v.Length(min=0, max=256)],
     )
     maintenance_active = BooleanField("En mantenimiento")
-    maintenance_message = StringField(
+    maintenance_message = TextAreaField(
         "Mensaje de mantenimiento",
         validators=[v.Length(min=0, max=512)],
     )

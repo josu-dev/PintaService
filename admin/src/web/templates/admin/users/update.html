@@ -1,19 +1,22 @@
 {% extends "_layouts/app.html" %}
-{% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/form.html" as Form %}
+{% import "_macros/link_button.html" as LinkButton %}
 
 {% block head %}
-<title>Pinta Service</title>
-
+<title>Actualizar usuario</title>
 <script src="{{ url_for('static', filename='js/user_setting.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
-<main class="flex-1 flex flex-col my-4">
+<main class="flex-1 flex flex-col p-4">
+  <div class="flex flex-wrap justify-between">
+    <h1 class="mt-[1em] mb-4 text-3xl font-semibold">Actualización de Usuario</h1>
+    <div class="flex flex-wrap gap-4 mt-auto mb-4">
+      {{ LinkButton.primary("Volver a usuarios", "/admin/users") }}
+    </div>
+  </div>
   <div class="flex flex-col mx-auto">
-    <h1 class="mt-[1em] text-3xl font-bold text-center">
-      Actualización de Perfil
-    </h1>
     <form method="post" class="flex flex-col gap-2 p-4 md:gap-4 md:mt-4">
       {{ form.csrf_token }}
       {{ Form.render_field(form.firstname) }}
