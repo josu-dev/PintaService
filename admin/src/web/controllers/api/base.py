@@ -5,6 +5,7 @@ import flask
 import flask_wtf
 from flask import typing as tf
 
+from src.services.user import UserService
 from src.utils import status
 
 API_BAD_REQUEST_RESPONSE = (
@@ -80,7 +81,7 @@ def validation(
                 return API_BAD_REQUEST_RESPONSE
 
             # Replace with real jwt auth on second iteration
-            # Only for testing purposes
+            # Simulate jwt auth by passing user_id in Authorization header
             if require_auth:
                 token = flask.request.headers.get("Authorization")
                 raw_user_id = token.lstrip("Bearer ") if token else ""
@@ -88,7 +89,12 @@ def validation(
                 if not raw_user_id.isdigit():
                     return API_UNAUTHORIZED_RESPONSE
 
-                kwargs["user_id"] = int(raw_user_id)
+                user_id = int(raw_user_id)
+                user = UserService.get_user(user_id)
+                if user is None:
+                    return API_UNAUTHORIZED_RESPONSE
+
+                kwargs["user_id"] = user_id
 
             if schema is not None:
                 if method == "GET":
