@@ -10,8 +10,8 @@
   <header class="flex-none flex justify-between p-2 md:px-3 border-b shadow border-zinc-900">
     <div class="ml-2 flex items-center gap-4">
       <a href="/">
-        <img src="https://cidepint.ing.unlp.edu.ar/wp-content/uploads/2019/09/LOGO-CIDEPINT-tripartito.png"
-          alt="cidepint logo" class='w-10 h-10' />
+        <img src="{{ url_for('static', filename='img/logo_512x512.png') }}"
+          alt="Pinta Service logo" class='w-10 h-10' />
       </a>
       {% if g.user and g.user_has_permissions(["setting_show", "setting_update"]) %}
       <a href="/admin">
@@ -65,7 +65,7 @@
             </svg>
           </button>
           <div id="perfilContainer"
-            class="absolute top-[175%] right-0 md:-right-3">
+            class="absolute hidden top-[175%] right-0 md:-right-3 z-10">
             <ul
               class="flex flex-col gap-4 p-4 items-center rounded-sm text-base bg-orange-200 ring-1 ring-zinc-900">
               <li class="flex shadow-sm hover:shadow-md">
