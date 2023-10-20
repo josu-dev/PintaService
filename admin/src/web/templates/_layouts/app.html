@@ -55,35 +55,30 @@
           </a>
         </li>
         {% endif %}
-        <li class="hidden xs:flex">
+        <li class="hidden xs:flex relative">
           <button id="openPerfil" class="text-zinc-950 inline-block" data-toggle="tab">
             <span class="sr-only md:not-sr-only">Perfil</span>
             <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-              class="lucide lucide-user">
+              fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2" />
               <circle cx="12" cy="7" r="4" />
             </svg>
           </button>
           <div id="perfilContainer"
-            class="absolute box-content md:border md:border-black w-full md:w-fit top-0 md:top-14 right-0 md:right-4 hidden">
-            <ul class="flex flex-col bg-zinc-300 gap-10 md:gap-2 text-3xl md:text-xs items-center md:w-36">
-              <li class="flex shadow self-end mt-5 mr-5 md:hidden">
-                <button id="closePerfil" class=" px-3 py-2 bg-zinc-200 rounded text-xl font-medium">
-                  Cerrar
-                </button>
-              </li>
-              <li class="flex shadow w-[16ch] md:mt-2">
+            class="absolute top-[175%] right-0 md:-right-3">
+            <ul
+              class="flex flex-col gap-4 p-4 items-center rounded-sm text-base bg-orange-200 ring-1 ring-zinc-900">
+              <li class="flex shadow-sm hover:shadow-md">
                 <a href="/profile"
-                  class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50">
+                  class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
                   <span>Configuracion</span>
                 </a>
               </li>
-              <li class="flex shadow mb-10 md:mb-2 w-[16ch]">
+              <li class="flex shadow-sm hover:shadow-md">
                 <form class="w-full" action="/logout" method="post">
                   {{ Form.new_csrf_token() }}
                   <button
-                    class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
+                    class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50 ">
                     <span>Cerrar Sesion</span>
                   </button>
                 </form>
