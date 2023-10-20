@@ -3,7 +3,11 @@ from flask import Blueprint, g, redirect, render_template, request
 from src.core.enums import RequestStatus
 from src.services.request import RequestService
 from src.web.controllers import _helpers as h
-from src.web.forms.request import RequestForm, RequestNoteForm
+from src.web.forms.request import (
+    RequestForm,
+    RequestHistoryForm,
+    RequestNoteForm,
+)
 
 bp = Blueprint("requests", __name__)
 
@@ -88,12 +92,11 @@ def requests_new_post(institution_id: int, service_id: int):
     )
 
 
-@bp.post("/<int:request_id>/edit")
+@bp.get("/<int:request_id>")
 @h.authenticated_route(module="service_request", permissions=("update",))
-def requests_id_edit_post(
+def requests_id_edit_get(
     institution_id: int, service_id: int, request_id: int
 ):
-    """Update a request."""
     requestElement = RequestService.get_request(request_id)
 
     if not requestElement:
@@ -102,17 +105,45 @@ def requests_id_edit_post(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
 
-    selected_status_str = request.form.get("request")
+    form = RequestHistoryForm()
 
-    if selected_status_str is None:
-        h.flash_error("Estado no seleccionado.")
+    return render_template(
+        "institutions/[id]/services/[id]/requests/update.html",
+        form=form,
+        institution_id=institution_id,
+        service_id=service_id,
+        request_id=request_id,
+    )
+
+
+@bp.post("/<int:request_id>")
+@h.authenticated_route(module="service_request", permissions=("update",))
+def requests_id_edit_post(
+    institution_id: int, service_id: int, request_id: int
+):
+    requestElement = RequestService.get_request(request_id)
+
+    if not requestElement:
+        h.flash_error("Solicitud no encontrada.")
         return redirect(
             f"/institutions/{institution_id}/services/{service_id}/requests"
         )
+    form = RequestHistoryForm(request.form)
+    if not form.validate():
+        statuses = [(choice.name, choice.value) for choice in RequestStatus]
 
-    selected_status = RequestStatus(selected_status_str)
-    RequestService.update_state_request(request_id, selected_status)
-    h.flash_success("Solicitud actualizada correctamente.")
+        return render_template(
+            "institutions/[id]/services/[id]/requests/update.html",
+            form=form,
+            statuses=statuses,
+        )
+
+    if RequestService.update_state_request(
+        request_id, **form.values()  # type:ignore
+    ):
+        h.flash_success("Solicitud actualizada correctamente.")
+    else:
+        h.flash_error("No se puede cambiar la solicitud al mismo estado.")
 
     return redirect(
         f"/institutions/{institution_id}/services/{service_id}/requests"
@@ -169,4 +200,20 @@ def requests_id_notes_new_post(
     return render_template(
         "institutions/[id]/services/[id]/requests/new_note.html",
         form=form,
+    )
+
+
+@bp.get("/<int:request_id>/history")
+@h.authenticated_route(module="service_request", permissions=("show",))
+def requests_id_notes_history_post(
+    institution_id: int, service_id: int, request_id: int
+):
+    history = RequestService.get_request_history(request_id)
+
+    return render_template(
+        "institutions/[id]/services/[id]/requests/history.html",
+        history=history,
+        institution_id=institution_id,
+        service_id=service_id,
+        request_id=request_id,
     )
