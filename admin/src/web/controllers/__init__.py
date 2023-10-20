@@ -20,6 +20,11 @@ _blueprints = (
 
 
 def init_app(app: flask.Flask):
+    """Initializes the controllers.
+
+    Registers the blueprints and error handlers for the application.
+    Also registers the before request hook for the application.
+    """
     from src.web.controllers import _errors
 
     _errors.register_error_handlers(app)

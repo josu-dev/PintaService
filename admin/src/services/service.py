@@ -34,6 +34,12 @@ class ServiceServiceError(BaseServiceError):
 
 
 class ServiceService(BaseService):
+    """Service for handling institutions services.
+
+    This service is used for CRUD operations on institutions services and for
+    searching services.
+    """
+
     ServiceServiceError = ServiceServiceError
 
     @classmethod
@@ -50,6 +56,11 @@ class ServiceService(BaseService):
     def create_service(
         cls, institution_id: int, **kwargs: te.Unpack[ServiceParams]
     ) -> Service:
+        """Creates a service for an institution.
+
+        Raises:
+            ServiceServiceError: If the institution does not exist.
+        """
         institution: t.Union[Institution, None] = db.session.query(
             Institution
         ).get(institution_id)
@@ -61,15 +72,24 @@ class ServiceService(BaseService):
             laboratory=institution.name,
             **kwargs,
         )
-
         db.session.add(service)
         db.session.commit()
+
         return service
 
     @classmethod
     def update_service(
         cls, service_id: int, **kwargs: te.Unpack[ServiceParams]
     ) -> t.Union[Service, None]:
+        """Updates a service.
+
+        Returns:
+            Service: The updated service.
+            None: If the service does not exist.
+
+        Raises:
+            ServiceServiceError: If the service could not be updated.
+        """
         service = db.session.query(Service).get(service_id)
         if service is None:
             return None
@@ -87,6 +107,14 @@ class ServiceService(BaseService):
 
     @classmethod
     def delete_service(cls, service_id: int) -> bool:
+        """Deletes a service.
+
+        The deletion is cascaded to all service requests and notes.
+
+        Returns:
+            bool: True if the service was deleted, False if the service was not
+                deleted or if the service did not exist.
+        """
         # Delete using complex join are not supported by SQLAlchemy
         (
             db.session.query(RequestNote)
@@ -113,6 +141,7 @@ class ServiceService(BaseService):
             db.session.query(Service).filter(Service.id == service_id).delete()
         )
         db.session.commit()
+
         return delete_count == 1
 
     @classmethod
@@ -143,6 +172,17 @@ class ServiceService(BaseService):
         page: int,
         per_page: int,
     ) -> t.Tuple[t.List[Service], int]:
+        """Searches services.
+
+        The search is performed by filtering services by name, description,
+        keywords, laboratory and service type.
+
+        Args:
+            q: The query string.
+            service_type: The service type to filter by.
+            page: The page number.
+            per_page: The number of services per page.
+        """
         query = db.session.query(Service)
         if q != "":
             query = query.filter(

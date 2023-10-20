@@ -7,6 +7,7 @@ from src.services.base import BaseService
 class DatabaseService(BaseService):
     @staticmethod
     def health_check() -> bool:
+        """Checks if the database is reachable."""
         try:
             db.session.execute(text("SELECT 1")).close()
             return True
