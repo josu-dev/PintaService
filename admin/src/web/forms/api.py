@@ -20,7 +20,7 @@ class AuthForm(FlaskForm):
     user = wtforms.EmailField(
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=0, max=32),
+            v.Length(min=0, max=64),
         ],
     )
 
