@@ -1,32 +1,21 @@
-# Backend
+![Pinta Service Logo](./static/img/logo_256x256.png)
+
+# Admin
+
+The admin module is the private application for the administration of the public website for the services of [CIDEPINT](https://cidepint.ing.unlp.edu.ar/).
 
 
-## Dev mode
+## Quick start
 
-### Dev server
+1. Install poetry
+2. Install dependencies: `poetry install`
+3. Create a `.env` from `.env.example`
+4. Run docker compose: `docker compose up -d` or add a custom db and mail server in `.env`
+5. Initialize the database: `poetry run flask reset-db` and `poetry run flask seed-db`
+5. Start the application: `poetry run flask run` for a production like enviroment or `poetry run flask-livetw dev` for a development like environment
+6. Open the application in your browser at `http://localhost:5000`
 
-To run the backend in Dev mode run:
 
-```bash
-python dev.py dev
+## Detailed guide
 
-# or
-
-./dev.py dev
-```
-
-> The dev server generates the tailwindcss file on template changes and triggers the client reload to apply the changes.
-
-### Build for production
-
-After you are done with the templating changes, you can build the backend for production with:
-
-```bash
-python dev.py build
-
-# or
-
-./dev.py build
-```
-
-> The build only minimizes the tailwindcss file and does not minify any other files.
+A detailed guide can be found in the [backend documentation](../docs/BACKEND.md).
