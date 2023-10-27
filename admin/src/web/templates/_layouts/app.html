@@ -12,21 +12,15 @@
       <a href="/">
         <img src="/static/img/logo_64x64.png"
           alt="Pinta Service logo" class='w-10 h-10' />
+        <span class="sr-only">Inicio</span>
       </a>
       {% if g.user and g.user_has_permissions(["setting_show", "setting_update"]) %}
-      <a href="/admin" class="underline-offset-2 hover:underline">
-        <span class="sr-only md:not-sr-only text-xl font-medium">Panel Admin</span>
-        <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
-          fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-          class="lucide lucide-layout-panel-left">
-          <rect width="7" height="18" x="3" y="3" rx="1" />
-          <rect width="7" height="7" x="14" y="3" rx="1" />
-          <rect width="7" height="7" x="14" y="14" rx="1" />
-        </svg>
+      <a href="/admin" class="hidden md:inline-block underline-offset-2 hover:underline">
+        <span class="text-xl font-medium">Panel Admin</span>
       </a>
       {% else %}
-      <a href="/" class="underline-offset-2 hover:underline">
-        <span class="sr-only md:not-sr-only text-xl font-medium">Pinta Service</span>
+      <a href="/" class="hidden md:inline-block underline-offset-2 hover:underline">
+        <span class="text-xl font-medium">Pinta Service</span>
       </a>
       {% endif %}
     </div>
@@ -34,8 +28,8 @@
     <nav class="flex md:mr-2">
       <ul class="flex gap-x-2 md:gap-x-4 text-xl font-medium items-center">
         <li class=" xs:hidden">
-          <button id="openMainMenu" class=" px-3 py-1.5 text-lg text-zinc-200 bg-zinc-800 rounded">
-            <span>Menu</span>
+          <button id="openMainMenu" class=" px-3 py-1.5 text-lg text-zinc-100 bg-zinc-800 rounded">
+            Menu
           </button>
         </li>
         {% if g.user %}
@@ -45,18 +39,6 @@
           "/admin/institutions" if g.user_has_permissions(("institution_index",)) else
           "/institutions", param_institution_id
           ) }}
-        </li>
-        {% endif %}
-        {% if g.user_has_permissions([service_index]) %}
-        <li class="hidden xs:block ">
-          <a href="/tracking">
-            <span class="sr-only md:not-sr-only">Seguimientos</span>
-            <svg class="w-8 h-8 md:hidden" xmlns="http://www.w3.org/2000/svg" width="24" height="24"
-              viewBox="0 0 24 24">
-              <path fill="currentColor"
-                d="M13.09 20c.12.72.37 1.39.72 2H6c-1.11 0-2-.89-2-2V4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v9.09c-.33-.05-.66-.09-1-.09c-.34 0-.67.04-1 .09V4h-5v8l-2.5-2.25L8 12V4H6v16h7.09M20 18v-3h-2v3h-3v2h3v3h2v-3h3v-2h-3Z" />
-            </svg>
-          </a>
         </li>
         {% endif %}
         <li class="hidden xs:flex relative">
@@ -76,7 +58,7 @@
               <li class="flex shadow-sm hover:shadow-md">
                 <a href="/profile"
                   class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
-                  <span>Configuracion</span>
+                  <span>Configuración</span>
                 </a>
               </li>
               <li class="flex shadow-sm hover:shadow-md">
@@ -84,7 +66,7 @@
                   {{ Form.new_csrf_token() }}
                   <button
                     class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50 ">
-                    <span>Cerrar Sesion</span>
+                    <span>Cerrar Sesión</span>
                   </button>
                 </form>
                 </a>
@@ -95,38 +77,41 @@
         {% else %}
         <li class="hidden xs:block">
           <a href="/login">
-            <span class="">Iniciar sesion</span>
+            <span class="">Iniciar sesión</span>
           </a>
         </li>
         {% endif %}
       </ul>
 
       <div id="mainMenuContainer"
-        class="hidden fixed top-0 left-0 right-0 bg-orange-200 border-b border-b-zinc-950 xs:hidden">
+        class="hidden fixed top-0 left-0 right-0 z-10 bg-orange-200 border-b border-b-zinc-950 xs:hidden">
         <div class='relative'>
           <div class="absolute top-0 right-0">
             <button id="closeMainMenu"
-              class=" px-3 py-2 ml-auto my-4 mr-4 bg-zinc-50/90 hover:bg-zinc-50 rounded text-xl font-medium">
-              Cerrar
+              class="ml-auto my-4 mr-4">
+              <svg class="w-10 h-10 fill-zinc-50/90 hover:fill-zinc-50" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x-square"><rect width="18" height="18" x="3" y="3" rx="2" ry="2"/><path d="m15 9-6 6"/><path d="m9 9 6 6"/></svg>
+              <span class="sr-only">Cerrar</span>
             </button>
           </div>
-          <ul class="flex  flex-col gap-4 items-center text-xl font-semibold pt-24 pb-24">
+          <ul class="flex flex-col gap-4 items-center text-xl font-semibold pt-24 pb-24">
+            <li class="w-[16ch] flex shadow">
+              <a href="/"
+                class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
+                <span>Inicio</span>
+              </a>
+            </li>
+            {% if g.institutions|length %}
             <li class="w-[16ch] flex shadow">
               <a href="/institutions"
                 class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
                 <span>Instituciones</span>
               </a>
             </li>
-            <li class="w-[16ch] flex shadow">
-              <a href="/"
-                class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
-                <span>Seguimientos</span>
-              </a>
-            </li>
+            {% endif %}
             <li class="w-[16ch] flex shadow">
               <a href="/profile"
                 class="w-full text-center underline-offset-1 hover:underline hover:text-black rounded px-8 py-4 bg-zinc-50/90 hover:bg-zinc-50">
-                <span>Perfil</span>
+                <span>Configuración</span>
               </a>
             </li>
             {% if g.user %}
@@ -135,7 +120,7 @@
                 {{ Form.new_csrf_token() }}
                 <button
                   class="w-full text-center hover:text-black rounded px-8 md:px-0 py-4 md:py-2 bg-zinc-50/90 hover:bg-zinc-50 ">
-                  Cerrar Sesion
+                  Cerrar Sesión
                 </button>
               </form>
             </li>
