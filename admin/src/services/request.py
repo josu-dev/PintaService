@@ -22,14 +22,14 @@ class RequestParams(t.TypedDict):
 
 
 class FilterRequestParams(t.TypedDict):
-    user_email: str
-    service_type: ServiceTypes
-    status: RequestStatus
-    date_from: str
-    date_to: str
+    user_email: te.NotRequired[str]
+    service_type: te.NotRequired[ServiceTypes]
+    status: te.NotRequired[RequestStatus]
+    start_date: te.NotRequired[str]
+    end_date: te.NotRequired[str]
 
 
-class RequestNoteParam(t.TypedDict):
+class RequestNoteParams(t.TypedDict):
     note: str
 
 
@@ -125,14 +125,14 @@ class RequestService(BaseService):
         if request is None:
             raise RequestServiceError("Solicitud no encontrada")
 
-        new_status = kwargs.get("status", None)
+        new_status = kwargs["status"]
         if (
             new_status is not None  # type:ignore
             and new_status != request.status.name  # type:ignore
         ):
             request.status = new_status
             cls.create_request_history(
-                request_id, new_status, kwargs.get("observations")
+                request_id, new_status, kwargs["observations"]
             )
             db.session.add(request)
             db.session.commit()
@@ -267,15 +267,12 @@ class RequestService(BaseService):
         query = db.session.query(ServiceRequest)
         query = query.filter(ServiceRequest.institution_id == institution_id)
         query = query.filter(ServiceRequest.service_id == service_id)
-        if (
-            "user_email" in kwargs
-            and kwargs["user_email"] is not None  # type:ignore
-        ):
+        if "user_email" in kwargs:
             query = query.join(User, User.id == ServiceRequest.user_id)
             email = kwargs["user_email"]
             query = query.filter(User.email.ilike(f"%{email}%"))
 
-        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+        if "status" in kwargs:
             query = query.filter(ServiceRequest.status == kwargs["status"])
 
         if "start_date" in kwargs and kwargs["start_date"]:
@@ -299,21 +296,15 @@ class RequestService(BaseService):
         **kwargs: te.Unpack[FilterRequestParams],
     ) -> t.Tuple[t.List[ServiceRequest], int]:
         query = db.session.query(ServiceRequest)
-        if (
-            "user_email" in kwargs
-            and kwargs["user_email"] is not None  # type:ignore
-        ):
+        if "user_email" in kwargs:
             query = query.join(User, User.id == ServiceRequest.user_id)
             email = kwargs["user_email"]
             query = query.filter(User.email.ilike(f"%{email}%"))
 
-        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+        if "status" in kwargs:
             query = query.filter(ServiceRequest.status == kwargs["status"])
 
-        if (
-            "service_type" in kwargs
-            and kwargs["service_type"] is not None  # type:ignore
-        ):
+        if "service_type" in kwargs:
             query = query.join(
                 Service, Service.id == ServiceRequest.service_id
             )

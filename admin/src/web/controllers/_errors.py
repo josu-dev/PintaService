@@ -22,7 +22,10 @@ def handle_not_found_error(e: exceptions.NotFound):
     if flask.request.path.startswith("/api"):
         return api_base.API_NOT_FOUND_RESPONSE
 
-    return (flask.render_template("_errors/404.html"), 404)
+    return (
+        flask.render_template("_errors/404.html"),
+        404,
+    )
 
 
 def handle_method_not_allowed_error(e: exceptions.MethodNotAllowed):

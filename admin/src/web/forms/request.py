@@ -7,7 +7,7 @@ from wtforms import validators as v
 from src.core.enums import RequestStatus
 from src.services.request import (
     RequestHistoryParams,
-    RequestNoteParam,
+    RequestNoteParams,
     RequestParams,
 )
 
@@ -50,7 +50,7 @@ class RequestNoteForm(FlaskForm):
         ],
     )
 
-    def values(self) -> RequestNoteParam:
+    def values(self) -> RequestNoteParams:
         return {"note": self.note.data}  # type:ignore
 
 

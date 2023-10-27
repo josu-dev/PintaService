@@ -104,24 +104,33 @@ def services_new_post():
 
     form = UserCreateForm(request.form)
     if not form.validate():
-        return render_template(
-            "admin/users/new.html", form=form, genders=genders
+        return (
+            render_template(
+                "admin/users/new.html", form=form, genders=genders
+            ),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     form_values = form.values()
 
     if UserService.exist_user_with_email(form_values["email"]):
         h.flash_error(f"Usuario con email {form_values['email']} ya existe.")
-        return render_template(
-            "admin/users/new.html", form=form, genders=genders
+        return (
+            render_template(
+                "admin/users/new.html", form=form, genders=genders
+            ),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     try:
         _ = UserService.create_user(**form_values)
     except UserService.UserServiceError as e:
         h.flash_error(e.message)
-        return render_template(
-            "admin/users/new.html", form=form, genders=genders
+        return (
+            render_template(
+                "admin/users/new.html", form=form, genders=genders
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     h.flash_success("Usuario creado exitosamente")
@@ -157,8 +166,14 @@ def users_id_post(user_id: int):
     if not form.validate():
         genders = [(choice.name, choice.value) for choice in GenderOptions]
 
-        return render_template(
-            "admin/users/update.html", user=user, form=form, genders=genders
+        return (
+            render_template(
+                "admin/users/update.html",
+                user=user,
+                form=form,
+                genders=genders,
+            ),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     UserService.update_user(user_id, **form.values())
@@ -242,14 +257,19 @@ def institutions_new_get():
 def institutions_new_post():
     form = InstitutionForm(request.form)
     if not form.validate():
-        return render_template("admin/institutions/new.html", form=form)
+        return (
+            render_template("admin/institutions/new.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
 
     try:
         institution = InstitutionService.create_institution(**form.values())
     except InstitutionService.InstitutionServiceError as e:
-        # TODO: handle error on creation
         h.flash_error(e.message)
-        return render_template("admin/institutions/new.html", form=form)
+        return (
+            render_template("admin/institutions/new.html", form=form),
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
+        )
 
     h.flash_success("Institución creada con éxito.")
     return redirect(f"/admin/institutions/{institution.id}")
@@ -299,12 +319,15 @@ def institutions_id_post(institution_id: int):
     )
     form_new_owner = EmailForm()
 
-    return render_template(
-        "/admin/institutions/update.html",
-        form=form,
-        form_new_owner=form_new_owner,
-        institution=institution,
-        institution_owners=institution_owners,
+    return (
+        render_template(
+            "/admin/institutions/update.html",
+            form=form,
+            form_new_owner=form_new_owner,
+            institution=institution,
+            institution_owners=institution_owners,
+        ),
+        status.HTTP_400_BAD_REQUEST,
     )
 
 
@@ -380,7 +403,6 @@ def institutions_id_add_owner_post(institution_id: int):
             "OWNER", new_owner.id, institution_id
         )
     except AuthService.AuthServiceError as e:
-        # TODO: handle error on creation
         h.flash_error(e.message)
         return redirect(f"/admin/institutions/{institution_id}")
 

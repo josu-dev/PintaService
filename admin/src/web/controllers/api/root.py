@@ -17,7 +17,7 @@ bp = flask.Blueprint("root", __name__)
 def auth_post(body: api_forms.AuthFormValues):
     user = UserService.validate_email_password(body["email"], body["password"])
     if not user:
-        return {"result": "fail"}
+        return {"result": "fail"}, status.HTTP_400_BAD_REQUEST
 
     return {"result": "success"}
 
