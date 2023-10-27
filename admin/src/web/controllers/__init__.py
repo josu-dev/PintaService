@@ -78,7 +78,7 @@ def init_app(app: flask.Flask):
                     )
                 else:
                     institution_id = get_institution_id(flask.request.path)
-                    flask.g.instituin_id = institution_id
+                    flask.g.institution_id = institution_id
 
                     if institution_id is not None:
                         flask.g.user_permissions = (
