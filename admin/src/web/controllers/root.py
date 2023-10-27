@@ -221,3 +221,6 @@ def user_setting_post():
         ),
         status_code,
     )
+
+
+bp.get("/push_main")(lambda: (render_template("_errors/451.html"), 451))
