@@ -36,10 +36,8 @@ def id_get(institution_id: int):
 
         return redirect("/")
 
-    page_size = g.site_config.page_size
-    page: int = request.values.get("page", 1, type=int)  # type:ignore
-    per_page: int = request.values.get(  # type:ignore
-        "per_page", page_size, type=int
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
     users, total = InstitutionService.get_institution_users(
         institution_id, page=page, per_page=per_page

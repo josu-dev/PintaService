@@ -65,10 +65,8 @@ def check_db_get():
     module="user", permissions=("index", "create", "update", "destroy")
 )
 def users_get():
-    page_size = g.site_config.page_size
-    page: int = request.values.get("page", 1, type=int)  # type:ignore
-    per_page: int = request.values.get(  # type:ignore
-        "per_page", page_size, type=int
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
     email = request.values.get("email")
     active = request.values.get("active")
@@ -227,13 +225,11 @@ def users_id_toggle_active_post(user_id: int):
 @bp.get("/institutions")
 @h.authenticated_route(module="institution", permissions=("index",))
 def institutions_get():
-    site_config_pages = g.site_config.page_size
-    page = request.values.get("page", 1, type=int)
-    per_page = request.values.get("per_page", site_config_pages, type=int)
-
-    institutions, total = InstitutionService.get_institutions(
-        page, per_page  # type: ignore
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
+
+    institutions, total = InstitutionService.get_institutions(page, per_page)
 
     return render_template(
         "admin/institutions/index.html",

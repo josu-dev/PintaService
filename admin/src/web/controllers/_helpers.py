@@ -103,3 +103,30 @@ def authenticated_route(
         return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator
+
+
+def url_pagination_args(
+    default_page: int = 1,
+    default_per_page: int = 10,
+    max_per_page: int = 100,
+):
+    """Get pagination params from url args.
+
+    Page starts at 1.
+    Per page starts at 1 and max is 100.
+
+    Returns:
+        Tuple[int, int]: page, per_page
+    """
+    arg_page = flask.request.args.get("page", "")
+    arg_per_page = flask.request.args.get("per_page", "")
+
+    page = int(arg_page) if arg_page.isdigit() else default_page
+    per_page = (
+        int(arg_per_page) if arg_per_page.isdigit() else default_per_page
+    )
+
+    page = page if page > 0 else default_page
+    per_page = per_page if 0 < per_page <= max_per_page else default_per_page
+
+    return page, per_page

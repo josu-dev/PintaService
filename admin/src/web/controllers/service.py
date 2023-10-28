@@ -11,10 +11,8 @@ bp = Blueprint("services", __name__)
 @bp.get("/")
 @h.authenticated_route(module="services", permissions=("index",))
 def services_get(institution_id: int):
-    page_size = g.site_config.page_size
-    page: int = request.values.get("page", 1, type=int)  # type:ignore
-    per_page: int = request.values.get(  # type:ignore
-        "per_page", page_size, type=int
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
 
     services, total = ServiceService.get_institution_services_paginated(

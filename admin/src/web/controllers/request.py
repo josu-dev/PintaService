@@ -16,10 +16,8 @@ bp = Blueprint("requests", __name__)
 @bp.get("/")
 @h.authenticated_route(module="service_request", permissions=("index", "show"))
 def requests_get(institution_id: int, service_id: int):
-    page_size: int = g.site_config.page_size
-    page: int = request.values.get("page", 1, type=int)  # type:ignore
-    per_page: int = request.values.get(  # type:ignore
-        "per_page", page_size, type=int
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
     request_status = request.args.get("status", "")
     user_email = request.args.get("user_email", "")
