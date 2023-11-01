@@ -1,7 +1,7 @@
 from flask import Flask
 
 from flask_session import Session
-from src.core import config, csrf, db
+from src.core import config, cors, csrf, db
 from src.services.mail import MailService
 from src.web import controllers
 
@@ -16,6 +16,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     config.init_app(app, env)
     db.init_app(app)
     csrf.init_app(app)
+    cors.init_app(app)
     session.init_app(app)
     MailService.init_app(app)
     controllers.init_app(app)
