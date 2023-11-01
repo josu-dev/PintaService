@@ -48,7 +48,7 @@ Some of the most important files/folders are:
   - [Enviroment variables](#enviroment-variables)
   - [Docker](#docker)
     - [Running the database and mail server](#running-the-database-and-mail-server)
-    - [Runnig pgadmin](#runnig-pgadmin)
+    - [Running pgadmin](#runnig-pgadmin)
     - [Running the application](#running-the-application)
     - [Resetting the database](#resetting-the-database)
     - [Running all the services](#running-all-the-services)
