@@ -2,20 +2,18 @@
 
 # Admin
 
-The admin module is the private application for the administration of the public website for the services of [CIDEPINT](https://cidepint.ing.unlp.edu.ar/).
+The Admin module is the private application for managing the public website for the services of [CIDEPINT](https://cidepint.ing.unlp.edu.ar/).
 
+## Quick Start
 
-## Quick start
+1. Install Poetry.
+2. Install dependencies: Run `poetry install`.
+3. Create a `.env` file from the provided `.env.example`.
+4. Run Docker Compose: Use `docker compose up -d` or add a custom database and mail server in the `.env` file.
+5. Initialize the database: Run `poetry run flask reset-db` and `poetry run flask seed-db`.
+6. Start the application: Use `poetry run flask run` for a production-like environment or `poetry run flask-livetw dev` for a development-like environment.
+7. Open the application in your browser at `http://localhost:5000`.
 
-1. Install poetry
-2. Install dependencies: `poetry install`
-3. Create a `.env` from `.env.example`
-4. Run docker compose: `docker compose up -d` or add a custom db and mail server in `.env`
-5. Initialize the database: `poetry run flask reset-db` and `poetry run flask seed-db`
-5. Start the application: `poetry run flask run` for a production like enviroment or `poetry run flask-livetw dev` for a development like environment
-6. Open the application in your browser at `http://localhost:5000`
+## Detailed Guide
 
-
-## Detailed guide
-
-A detailed guide can be found in the [backend documentation](../docs/BACKEND.md).
+For more information, refer to the detailed guide in the [Backend Documentation](../docs/BACKEND.md).

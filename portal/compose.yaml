@@ -1,0 +1,13 @@
+name: pinta-service-public
+
+services:
+  backend:
+    container_name: ps-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+    env_file:
+      - '${FRONTEND_ENV_FILE:-.env}'
+    ports:
+      - '5174:5173'
+    restart: unless-stopped
