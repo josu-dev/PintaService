@@ -1,3 +1,6 @@
+/* eslint-env node */
+const plugin = require('tailwindcss/plugin')
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: [
@@ -5,7 +8,24 @@ module.exports = {
     "./src/**/*.{vue,js,ts,jsx,tsx}",
   ],
   theme: {
-    extend: {},
+    extend: {
+      screens: {
+        'xs': '360px',
+      },
+    },
   },
-  plugins: [],
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+    require('@tailwindcss/aspect-ratio'),
+    require('@tailwindcss/container-queries'),
+    require("daisyui"),
+    plugin(function ({ addUtilities }) {
+      addUtilities({
+        ".text-balance": {
+          "text-wrap": "balance",
+        },
+      })
+    }),
+  ],
 }

@@ -248,7 +248,9 @@ Recommended extensions:
 - [isort](https://marketplace.visualstudio.com/items?itemName=ms-python.isort)
 
 
-Its recommended to create a local settings file for the project at `.vscode/settings.json` or in `admin/.vscode/settings.json` if you want to open the project from the admin folder. Creating a local settings file allows you to customize the settings without affecting the global settings.
+Its recommended to create a local settings file for the project at `.vscode/settings.json` or in `admin/.vscode/settings.json` if you want to open the project from the admin folder.
+
+> Creating a local settings file allows you to customize the settings without affecting the global settings.
 
 The settings are for the editor itself and the extensions.
 

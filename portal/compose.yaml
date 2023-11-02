@@ -6,13 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+    env_file:
+      - '${FRONTEND_ENV_FILE:-.env}'
     ports:
       - '5174:5173'
-    networks:
-      - database
     restart: unless-stopped
-    attach: true
-
-networks:
-  database:
-    driver: bridge

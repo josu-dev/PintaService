@@ -4,7 +4,7 @@ The Portal module serves as the public application for requesting services avail
 
 ## Quick Start
 
-Ensure you have [Node.js](https://nodejs.org/en/) and [npm](https://www.npmjs.com/) installed before proceeding.
+Ensure you have [Node.js](https://nodejs.org/en/) `v14.21.3` and [npm](https://www.npmjs.com/) installed before proceeding.
 
 1. Install dependencies: Run `npm install`.
 2. Create a `.env` file from the provided `.env.example`.
