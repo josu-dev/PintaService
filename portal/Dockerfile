@@ -1,9 +1,14 @@
-FROM node:14.21.3-bullseye
+# Base image
+FROM node:14.21.3-bullseye as base
 
-WORKDIR /app
+ARG VITE_API_URL
+
+WORKDIR /tmp/app
 
 COPY package.json ./
-RUN npm i
+
+# Can't use npm ci because breaks because of pinia
+RUN npm i --ignore-scripts
 
 COPY public ./public
 COPY src ./src
@@ -12,8 +17,25 @@ COPY vite.config.js ./vite.config.js
 COPY postcss.config.js ./postcss.config.js
 COPY tailwind.config.js ./tailwind.config.js
 
+RUN npm run build
 
-EXPOSE 5173
 
+# Prod image
+FROM node:14.21.3-bullseye as prod
 
-CMD ["npm", "run", "dev", "--", "--host"]
+WORKDIR /app
+
+COPY --from=base /tmp/app/package.json ./
+
+RUN npm i --omit=dev --ignore-scripts
+
+COPY --from=base /tmp/app/dist ./dist
+
+RUN npm i serve
+
+EXPOSE 4173
+
+USER node
+
+# Start the app
+CMD ["npx", "serve", "-s", "dist", "-l", "4173"]
