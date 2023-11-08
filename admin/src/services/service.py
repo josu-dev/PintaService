@@ -201,3 +201,21 @@ class ServiceService(BaseService):
         services = query.offset((page - 1) * per_page).limit(per_page).all()
 
         return services, total
+
+    @classmethod
+    def get_most_requested_services(
+        cls,
+        page: int,
+        per_page: int,
+    ):
+        query = (
+            db.session.query(Service, sa.func.count(ServiceRequest.id))
+            .join(ServiceRequest, ServiceRequest.service_id == Service.id)
+            .group_by(Service.id)
+            .order_by(sa.func.count(ServiceRequest.id).desc())
+        )
+
+        total = query.count()
+        services = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return services, total
