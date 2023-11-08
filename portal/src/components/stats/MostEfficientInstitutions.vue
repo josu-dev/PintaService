@@ -1,32 +1,49 @@
 <script setup>
-  import { ref, watchEffect } from 'vue'
-  import { APIService } from '../../utils/api'
+  import { APIService } from '@/utils/api';
+  import { ref, watchEffect } from 'vue';
 
-  const mostEfficientInstitutions = ref(null)
-  const tData = ref(null)
+  /**
+   * @typedef {{
+   *  institution:{
+   *    id:string,
+   *    name:string,
+   *    enabled:boolean,
+   *  },
+   *  avg_resolution_time:number
+   * }[]} APIResponse
+   */
 
-  APIService.get('/stats/most_efficient_institutions')
-    .then((response) => {
-      mostEfficientInstitutions.value = response.data
-      console.log(response)
-    })
-    .catch((error) => {
-      mostEfficientInstitutions.value = null
-      console.log(error)
-    })
+  /** @type {import('vue').Ref<APIResponse>} */
+  const mostEfficientInstitutions = ref([]);
+
+  /** @type {import('vue').Ref<APIResponse>} */
+  const tData = ref([]);
+
+  APIService.get('/stats/most_efficient_institutions', {
+    onJSON(json) {
+      mostEfficientInstitutions.value = json.data;
+    },
+    onFailure(response) {
+      console.log('Request failed');
+    },
+    onError(error) {
+      console.log(error);
+    }
+  });
 
   watchEffect(() => {
-    const data = []
+    /** @type {APIResponse} */
+    const data = [];
     if (!mostEfficientInstitutions.value) {
-      tData.value = data
-      return
+      tData.value = data;
+      return;
     }
     for (const item of mostEfficientInstitutions.value) {
-      data.push(item)
+      data.push(item);
     }
-    tData.value = data
-    console.log(data)
-  })
+    tData.value = data;
+    console.log(data);
+  });
 </script>
 
 <template>

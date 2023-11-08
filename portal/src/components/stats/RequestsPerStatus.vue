@@ -1,4 +1,6 @@
 <script setup>
+  import { APIService } from '@/utils/api';
+  import { requestStatus } from '@/utils/enums';
   import {
     ArcElement,
     BarElement,
@@ -8,55 +10,75 @@
     LinearScale,
     Title,
     Tooltip
-  } from 'chart.js'
-  import { Pie } from 'vue-chartjs'
+  } from 'chart.js';
+  import { ref, watchEffect } from 'vue';
+  import { Pie } from 'vue-chartjs';
 
-  import { ref, watchEffect } from 'vue'
-  import { APIService } from '../../utils/api'
-  import { RequestStatus } from '../../utils/enums'
-  ChartJS.register(Title, Tooltip, ArcElement, Legend, BarElement, CategoryScale, LinearScale)
+  ChartJS.register(Title, Tooltip, ArcElement, Legend, BarElement, CategoryScale, LinearScale);
 
-  const requestsPerStatus = ref(null)
+  /**
+   * @typedef {{
+   *  status: import('@/utils/enums').RequestStatus,
+   *  count:number
+   * }[]} APIResponse
+   *
+   * @typedef {{
+   *  labels: (import('@/utils/enums').RequestStatus)[],
+   *  datasets:{
+   *    data:any[],
+   *    backgroundColor:string[]
+   *  }[]
+   * }} ChartData
+   */
 
-  APIService.get('/stats/requests_per_status')
-    .then((response) => {
-      requestsPerStatus.value = response.data
-      console.log(response)
-    })
-    .catch((error) => {
-      requestsPerStatus.value = null
-      console.log(error)
-    })
+  /** @type {import('vue').Ref<APIResponse>} */
+  const requestsPerStatus = ref([]);
 
-  const chartData = ref(null)
+  APIService.get('/stats/requests_per_status', {
+    onJSON(json) {
+      requestsPerStatus.value = json.data;
+    },
+    onFailure(response) {
+      requestsPerStatus.value = [];
+      console.log(response);
+    },
+    onError(error) {
+      requestsPerStatus.value = [];
+      console.log(error);
+    }
+  });
+
+  /** @type {import('vue').Ref<ChartData>} */
+  const chartData = ref(/** @type {any} */ (null));
 
   const statusColors = {
-    [RequestStatus.ACCEPTED]: '#3abff8',
-    [RequestStatus.REJECTED]: '#f87272',
-    [RequestStatus.IN_PROCESS]: '#f89123',
-    [RequestStatus.CANCELED]: '#a6adba',
-    [RequestStatus.FINISHED]: '#36d399'
-  }
+    [requestStatus.ACCEPTED]: '#3abff8',
+    [requestStatus.REJECTED]: '#f87272',
+    [requestStatus.IN_PROCESS]: '#f89123',
+    [requestStatus.CANCELED]: '#a6adba',
+    [requestStatus.FINISHED]: '#36d399'
+  };
 
   watchEffect(() => {
-    const data = { labels: [], datasets: [{ data: [], backgroundColor: [] }] }
+    /** @type {ChartData} */
+    const data = { labels: [], datasets: [{ data: [], backgroundColor: [] }] };
     if (!requestsPerStatus.value) {
-      chartData.value = data
-      return
+      chartData.value = data;
+      return;
     }
     for (const status of requestsPerStatus.value) {
-      data.labels.push(status.status)
-      data.datasets[0].backgroundColor.push(statusColors[status.status])
-      data.datasets[0].data.push(status.count)
+      data.labels.push(status.status);
+      data.datasets[0].backgroundColor.push(statusColors[status.status]);
+      data.datasets[0].data.push(status.count);
     }
-    chartData.value = data
-    console.log(data)
-  })
+    chartData.value = data;
+    console.log(data);
+  });
 
   const chartOptions = {
     responsive: true,
     maintainAspectRatio: false
-  }
+  };
 </script>
 
 <template>

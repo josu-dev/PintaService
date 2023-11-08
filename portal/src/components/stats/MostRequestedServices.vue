@@ -1,32 +1,49 @@
 <script setup>
-  import { ref, watchEffect } from 'vue'
-  import { APIService } from '../../utils/api'
+  import { APIService } from '@/utils/api';
+  import { ref, watchEffect } from 'vue';
 
-  const mostRequestedServices = ref(null)
-  const tData = ref(null)
+  /**
+   * @typedef {{
+   *  service:{
+   *    id:string,
+   *    name:string,
+   *    enabled:boolean,
+   *  },
+   *  total_requests:number
+   * }[]} APIResponse
+   */
 
-  APIService.get('/stats/most_requested_services')
-    .then((response) => {
-      mostRequestedServices.value = response.data
-      console.log(response)
-    })
-    .catch((error) => {
-      mostRequestedServices.value = null
-      console.log(error)
-    })
+  /** @type {import('vue').Ref<APIResponse>} */
+  const mostRequestedServices = ref([]);
+
+  /** @type {import('vue').Ref<APIResponse>} */
+  const tData = ref([]);
+
+  APIService.get('/stats/most_requested_services', {
+    onJSON(json) {
+      mostRequestedServices.value = json.data;
+    },
+    onFailure(response) {
+      console.log('Request failed');
+    },
+    onError(error) {
+      console.log(error);
+    }
+  });
 
   watchEffect(() => {
-    const data = []
+    /** @type {APIResponse} */
+    const data = [];
     if (!mostRequestedServices.value) {
-      tData.value = data
-      return
+      tData.value = data;
+      return;
     }
     for (const item of mostRequestedServices.value) {
-      data.push(item)
+      data.push(item);
     }
-    tData.value = data
-    console.log(data)
-  })
+    tData.value = data;
+    console.log(data);
+  });
 </script>
 
 <template>

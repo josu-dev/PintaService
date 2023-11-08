@@ -1,44 +1,41 @@
 <script setup>
-  import { ref } from 'vue'
-  import { apiURL } from '../config.js'
+  import { APIService } from '@/utils/api';
+  import { ref } from 'vue';
 
-  const user = ref('')
-  const password = ref('')
-  const apiEndpoint = `${apiURL}/auth`
+  const form = ref({
+    user: '',
+    password: ''
+  });
 
-  /** @type {(event:SubmitEvent) => Promise<void>} */
+  /** @param {Event} event */
   async function submitLogin(event) {
-    event.preventDefault()
-
-    const response = await fetch(apiEndpoint, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
+    APIService.post('/auth', {
+      body: form.value,
+      onJSON(json) {
+        console.log(json);
       },
-      body: JSON.stringify({
-        user: user.value,
-        password: password.value
-      })
-    })
-
-    const data = await response.json()
-    console.log(data)
-    // Handle the response data here
+      onFailure(response) {
+        console.log(response);
+      },
+      onError(error) {
+        console.log(error);
+      }
+    });
   }
 </script>
 
 <template>
   <main>
     <h1>Login</h1>
-    <form class="flex flex-col gap-4 max-w-md text-zinc-200" @submit="submitLogin">
+    <form class="flex flex-col gap-4 max-w-md text-zinc-200" @submit.prevent="submitLogin">
       <div class="flex flex-col">
         <label for="user">Email</label>
-        <input v-model="user" type="email" id="user" name="user" class="bg-zinc-800" />
+        <input v-model="form.user" type="email" id="user" name="user" class="bg-zinc-800" />
       </div>
       <div class="flex flex-col">
         <label for="password">Password</label>
         <input
-          v-model="password"
+          v-model="form.password"
           type="password"
           id="password"
           name="password"

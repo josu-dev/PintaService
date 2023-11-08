@@ -1,7 +1,7 @@
 <script setup>
-  import MostEfficientInstitutions from '@/components/stats/MostEfficientInstitutions.vue'
-  import MostRequestedServices from '@/components/stats/MostRequestedServices.vue'
-  import RequestsPerStatus from '@/components/stats/RequestsPerStatus.vue'
+  import MostEfficientInstitutions from '@/components/stats/MostEfficientInstitutions.vue';
+  import MostRequestedServices from '@/components/stats/MostRequestedServices.vue';
+  import RequestsPerStatus from '@/components/stats/RequestsPerStatus.vue';
 </script>
 
 <template>

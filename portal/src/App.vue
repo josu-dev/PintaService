@@ -1,12 +1,11 @@
 <script setup>
-  import { RouterLink, RouterView } from 'vue-router'
-  import HelloWorld from './components/HelloWorld.vue'
+  import { RouterLink, RouterView } from 'vue-router';
 </script>
 
 <template>
   <header class="flex-none">
     <div class="">
-      <HelloWorld msg="You did it!" />
+      <p>Pinta Service</p>
 
       <nav>
         <RouterLink to="/">Home</RouterLink>
