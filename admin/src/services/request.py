@@ -1,10 +1,13 @@
 import typing as t
 from datetime import datetime
 
+import sqlalchemy as sa
 import typing_extensions as te
 
 from src.core.db import db
 from src.core.enums import RequestStatus, ServiceTypes
+from src.core.models.auth import Role, UserInstitutionRole
+from src.core.models.institution import Institution
 from src.core.models.service import Service
 from src.core.models.service_requests import (
     RequestHistory,
@@ -12,6 +15,7 @@ from src.core.models.service_requests import (
     ServiceRequest,
 )
 from src.core.models.user import User
+from src.core.permissions import RoleEnum
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -332,3 +336,41 @@ class RequestService(BaseService):
             .filter(RequestHistory.service_request_id == request_id)
             .all()
         )
+
+    @classmethod
+    def get_requests_count_per_status(
+        cls,
+        institution_owner_id: t.Union[int, None] = None,
+        institution_id: t.Union[int, None] = None,
+    ):
+        query = db.session.query(ServiceRequest.status, sa.func.count("*"))
+
+        if institution_owner_id is not None:
+            query = (
+                query.join(Service, Service.id == ServiceRequest.service_id)
+                .join(Institution, Institution.id == Service.institution_id)
+                .join(
+                    UserInstitutionRole,
+                    sa.and_(
+                        UserInstitutionRole.institution_id == Institution.id,
+                        UserInstitutionRole.role_id
+                        == (
+                            sa.select(Role.id)
+                            .where(Role.name == RoleEnum.OWNER.value)
+                            .scalar_subquery()
+                        ),
+                        UserInstitutionRole.user_id == institution_owner_id,
+                    ),
+                )
+            )
+
+        if institution_id is not None:
+            query = query.filter(
+                ServiceRequest.institution_id == institution_id
+            )
+
+        query = query.group_by(ServiceRequest.status)
+
+        res = query.all()
+
+        return res
