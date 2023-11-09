@@ -1,8 +1,11 @@
 <script setup>
+  import ToastNotifications from '@/components/ToastNotifications.vue';
   import { RouterLink, RouterView } from 'vue-router';
 </script>
 
 <template>
+  <ToastNotifications />
+
   <header class="flex-none">
     <div class="">
       <p>Pinta Service</p>

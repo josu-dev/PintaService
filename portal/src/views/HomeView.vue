@@ -1,5 +1,9 @@
-<script setup></script>
+<script setup>
+  import { useUserStore } from '@/stores/user';
+
+  const userStore = useUserStore();
+</script>
 
 <template>
-  <main>Ojala profe</main>
+  <main>usuario: {{ userStore.user?.user }}</main>
 </template>
