@@ -1,8 +1,7 @@
-from authlib.integrations.flask_client import OAuth
 from flask import Flask
 
 from flask_session import Session
-from src.core import config, cors, csrf, db
+from src.core import config, cors, csrf, db, google
 from src.services.mail import MailService
 from src.web import controllers
 
@@ -21,12 +20,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     session.init_app(app)
     MailService.init_app(app)
     controllers.init_app(app)
-    oauth = OAuth(app)
-    oauth.register(
-        name="google",
-        server_metadata_url="https://accounts.google.com/.well-known/openid-configuration",  # noqa: E501
-        client_kwargs={"scope": "openid email profile"},
-    )
+    google.init_app(app)
 
     @app.cli.command("reset-db")
     def reset_db():
