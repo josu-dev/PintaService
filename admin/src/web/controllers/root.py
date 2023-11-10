@@ -240,23 +240,22 @@ def user_setting_post():
 
 
 @bp.get("/login_callback")
-def google_login_get():  # type ignore
-    return oauth.google.authorize_redirect(
+def google_login_get():  # type: ignore
+    return oauth.google.authorize_redirect(  # type: ignore
         url_for("root.google_login_post", _external=True)
     )
 
 
 @bp.get("/login_callback_get")
 def google_login_post():
-    print("----gola-----", flush=True)
-    token = oauth.google.authorize_access_token()
+    token = oauth.google.authorize_access_token()  # type: ignore
 
     if token is None:
         h.flash_success("Parametros invalidos")
         return redirect("/login")
 
-    user_info = token["userinfo"]
-    user = UserService.get_by_email(user_info["email"])
+    user_info = token["userinfo"]  # type: ignore
+    user = UserService.get_by_email(user_info["email"])  # type: ignore
     if user:
         session["user"] = user.email
         session["user_id"] = user.id
@@ -265,14 +264,14 @@ def google_login_post():
         h.flash_success("Se inicio sesion correctamente")
         return redirect(url_for("root.index_get"))
 
-    user = AuthService.get_pre_user_by_email(user_info["email"])
+    user = AuthService.get_pre_user_by_email(user_info["email"])  # type:ignore
     if user:
         return render_template("info_register.html")
 
     user = AuthService.create_pre_user(
-        firstname=user_info["given_name"],
-        lastname=user_info["family_name"],
-        email=user_info["email"],
+        firstname=user_info["given_name"],  # type: ignore
+        lastname=user_info["family_name"],  # type: ignore
+        email=user_info["email"],  # type: ignore
     )
     return render_template("info_register.html")
 
