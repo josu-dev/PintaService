@@ -1,6 +1,7 @@
 import flask
 
 from src.core import enums
+from src.services.auth import AuthService
 from src.services.institution import InstitutionService
 from src.services.request import RequestService
 from src.services.service import ServiceService
@@ -274,4 +275,101 @@ def services_types_get(user_id: int):
         "data": [service_type.value for service_type in enums.ServiceTypes]
     }
 
+    return response
+
+
+@bp.get("/stats/requests_per_status")
+@base.validation(method="GET", require_auth=True, debug=True)
+def stats_requests_per_status_get(user_id: int):
+    user_is_site_admin = AuthService.user_is_site_admin(user_id)
+    user_institutions = InstitutionService.get_institutions_owned_by_user(
+        user_id
+    )
+    if not user_is_site_admin and len(user_institutions) == 0:
+        return base.API_UNAUTHORIZED_RESPONSE
+
+    owner_id = None if user_is_site_admin else user_id
+    res = RequestService.get_requests_count_per_status(owner_id)
+
+    for statusEnum in enums.RequestStatus:
+        if statusEnum not in [status for status, _ in res]:
+            res.append(
+                (statusEnum, 0)  # pyright: ignore[reportGeneralTypeIssues]
+            )
+
+    response = {
+        "data": [
+            {
+                "status": status.value,
+                "count": count,
+            }
+            for status, count in res
+        ]
+    }
+
+    return response
+
+
+@bp.get("/stats/most_requested_services")
+@base.validation(method="GET", require_auth=True, debug=True)
+def stats_most_requested_services_get(user_id: int):
+    user_is_site_admin = AuthService.user_is_site_admin(user_id)
+    user_institutions = InstitutionService.get_institutions_owned_by_user(
+        user_id
+    )
+    if not user_is_site_admin and len(user_institutions) == 0:
+        return base.API_UNAUTHORIZED_RESPONSE
+
+    services, _ = ServiceService.get_most_requested_services(1, 10)
+
+    response = {
+        "data": [
+            {
+                "service": {
+                    "id": service.id,
+                    "name": service.name,
+                    "description": service.description,
+                    "laboratory": service.laboratory,
+                    "keywords": service.keywords,
+                    "enabled": service.enabled,
+                },
+                "total_requests": requests_count,
+            }
+            for service, requests_count in services
+        ]
+    }
+
+    return response
+
+
+@bp.get("/stats/most_efficient_institutions")
+@base.validation(method="GET", require_auth=True, debug=True)
+def stats_most_efficient_institutions_get(user_id: int):
+    print("gola")
+    # print("stats_most_efficient_institutions_get", file=sys.stderr)
+    user_is_site_admin = AuthService.user_is_site_admin(user_id)
+    user_institutions = InstitutionService.get_institutions_owned_by_user(
+        user_id
+    )
+    if not user_is_site_admin and len(user_institutions) == 0:
+        return base.API_UNAUTHORIZED_RESPONSE
+
+    institutions = InstitutionService.get_most_efficient_institutions()
+    # print(institutions, file=sys.stderr)
+    response = {
+        "data": [
+            {
+                "institution": {
+                    "id": institution.id,
+                    "name": institution.name,
+                    "keywords": institution.keywords,
+                    "enabled": institution.enabled,
+                },
+                "avg_resolution_time": avg_resolution_time.total_seconds(),
+            }
+            for institution, avg_resolution_time in institutions
+        ]
+    }
+
+    # print(response, file=sys.stderr)
     return response

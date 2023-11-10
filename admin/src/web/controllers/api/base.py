@@ -99,11 +99,15 @@ def validation(
                 raw_user_id = token.lstrip("Bearer ") if token else ""
 
                 if not raw_user_id.isdigit():
+                    if debug:
+                        print(f"Invalid user_id: {raw_user_id}", flush=True)
                     return API_UNAUTHORIZED_RESPONSE
 
                 user_id = int(raw_user_id)
                 user = UserService.get_user(user_id)
                 if user is None:
+                    if debug:
+                        print(f"User not found: {user_id}", flush=True)
                     return API_UNAUTHORIZED_RESPONSE
 
                 kwargs["user_id"] = user_id
