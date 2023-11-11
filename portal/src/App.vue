@@ -1,18 +1,14 @@
 <script setup>
-  import { RouterLink, RouterView } from 'vue-router';
+  import LayoutHeader from '@/components/LayoutHeader.vue';
+  import ToastNotifications from '@/components/ToastNotifications.vue';
+  import { RouterView } from 'vue-router';
 </script>
 
 <template>
-  <header class="flex-none">
-    <div class="">
-      <p>Pinta Service</p>
+  <ToastNotifications />
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/stats">Stats</RouterLink>
-        <RouterLink to="/login">Login</RouterLink>
-      </nav>
-    </div>
+  <header class="flex-none">
+    <LayoutHeader />
   </header>
 
   <div class="flex-1">

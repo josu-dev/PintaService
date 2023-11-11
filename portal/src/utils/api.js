@@ -1,10 +1,10 @@
-import { apiURL } from '@/config.js';
+import { API_URL } from '@/config.js';
 
 /**
  * A class for making requests to the API and handling the responses.
  */
 export class APIService {
-  static apiURL = apiURL;
+  static apiURL = API_URL;
 
   /**
    * Gets JSON data from the API at the specified endpoint.
@@ -63,7 +63,7 @@ export class APIService {
           'Content-Type': 'application/json',
           Authorization: 'Bearer 1'
         },
-        body: options.body === undefined ? JSON.stringify(options.body) : undefined
+        body: options.body === undefined ? undefined : JSON.stringify(options.body)
       });
       if (!response.ok) {
         options.onFailure?.(response);
