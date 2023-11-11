@@ -1,7 +1,24 @@
 <script setup>
+  import IconInfo from '@/components/icons/IconInfo.vue';
+  import IconMessage from '@/components/icons/IconMessage.vue';
+  import IconThumsDown from '@/components/icons/IconThumbsDown.vue';
+  import IconThumsUp from '@/components/icons/IconThumbsUp.vue';
+  import IconWarning from '@/components/icons/IconWarning.vue';
+  import IconX from '@/components/icons/IconX.vue';
   import { useToastStore } from '@/stores/toast';
+
   const toastStore = useToastStore();
 
+  /** @type {Record<import('@/stores/toast').NotificationType, import('vue').Component>} */
+  const iconMap = {
+    success: IconThumsUp,
+    error: IconThumsDown,
+    info: IconInfo,
+    warning: IconWarning,
+    default: IconMessage
+  };
+
+  /** @type {Record<import('@/stores/toast').NotificationType, string>} */
   const alertClassMap = {
     success: 'alert alert-success',
     error: 'alert alert-error',
@@ -12,34 +29,18 @@
 </script>
 
 <template>
-  <div class="toast toast-top toast-end">
+  <div class="toast toast-top toast-end z-10">
     <div
       v-for="notification in toastStore.notifications"
       v-bind:key="notification.id"
       :class="alertClassMap[notification.type]"
     >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        fill="none"
-        viewBox="0 0 24 24"
-        class="stroke-primary shrink-0 w-6 h-6"
-      >
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-        ></path>
-      </svg>
+      <component :is="iconMap[notification.type]" class="mr-2" />
       <span>{{ notification.message }}</span>
 
       <div v-if="notification.closeable">
-        <button
-          @click.prevent="toastStore.remove(notification)"
-          class="btn btn-sm"
-          aria-label="Close"
-        >
-          Close
+        <button @click.prevent="toastStore.remove(notification)" aria-label="Close">
+          <IconX />
         </button>
       </div>
     </div>

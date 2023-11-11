@@ -51,9 +51,9 @@
 </script>
 
 <template>
-  <main>
-    <div class="w-full p-6 m-auto rounded-md lg:max-w-xl">
-      <h1 class="text-4xl font-bold text-center text-orange-500">Login</h1>
+  <main class="grid grid-rows-[1fr_2fr_2fr] h-full">
+    <div class="row-start-2 w-full p-6 m-auto rounded-md lg:max-w-xl">
+      <h1 class="text-4xl font-bold text-center text-primary">Inicio de Sesion</h1>
       <form
         class="flex flex-col items-center text-primary-content space-y-4 [&>:first-child]:mt-4 md:[&>:first-child]:mt-8"
         @submit.prevent="submitLogin"
@@ -66,7 +66,7 @@
           v-model:value="form.password"
           required
         />
-        <button type="submit" class="btn btn-primary">Login</button>
+        <button type="submit" class="btn btn-primary">Iniciar</button>
         <span class="text-secondary-content"
           >No tienes cuenta?
           <RouterLink to="/register" class="link link-hover font-semibold text-info"
