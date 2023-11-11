@@ -225,6 +225,34 @@ def load_test_data() -> None:
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
+    RequestService.create_request(
+        1,
+        1,
+        title="Pelea44",
+        description=" pelea",
+        status=RequestStatus.ACCEPTED,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        title="Pelea4444",
+        description=" pelea",
+        status=RequestStatus.CANCELED,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        title="Pele2a4444",
+        description=" pelea",
+        status=RequestStatus.CANCELED,
+    )
+    RequestService.create_request(
+        1,
+        1,
+        title="Pele2a4444",
+        description=" pelea",
+        status=RequestStatus.FINISHED,
+    )
 
     RequestService.create_request(
         1,
@@ -232,6 +260,20 @@ def load_test_data() -> None:
         title="Pelea5",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
+    )
+    RequestService.create_request(
+        1,
+        2,
+        title="Pelea5222",
+        description=" pelea",
+        status=RequestStatus.FINISHED,
+    )
+    RequestService.create_request(
+        1,
+        2,
+        title="Pelea512",
+        description=" pelea",
+        status=RequestStatus.FINISHED,
     )
     ServiceService.create_service(
         institution_id=1,

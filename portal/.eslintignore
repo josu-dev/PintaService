@@ -1,0 +1,22 @@
+# node
+.DS_Store
+node_modules
+
+# Ignore files for PNPM, NPM and YARN
+pnpm-lock.yaml
+package-lock.json
+yarn.lock
+
+# Vue
+/dist
+/public
+
+# tailwind
+/tailwind.config.js
+/postcss.config.js
+
+# Custom
+.env
+.env.*
+!.env.example
+/.ignored

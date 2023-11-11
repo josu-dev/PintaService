@@ -1,0 +1,13 @@
+name: pinta-service-public
+
+services:
+  frontend:
+    container_name: ps-frontend
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        - VITE_API_URL=${VITE_API_URL:-http://127.0.0.1:5001/api}
+    ports:
+      - '4174:4173'
+    restart: unless-stopped

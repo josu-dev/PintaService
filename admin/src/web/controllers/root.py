@@ -43,8 +43,8 @@ def logout_post():
         session.clear()
         h.flash_info("La sesion se cerro correctamente")
         return redirect(url_for("root.login_get"))
+
     session.clear()
-    h.flash_info("No hay una sesion iniciada")
     return redirect(url_for("root.login_get"))
 
 
@@ -71,8 +71,10 @@ def login_post():
             return redirect(url_for("root.index_get"))
 
     h.flash_error("Los datos ingresados son invalidos")
-
-    return render_template("login.html", form=form)
+    return (
+        render_template("login.html", form=form),
+        status.HTTP_400_BAD_REQUEST,
+    )
 
 
 @bp.get("/pre_register")
@@ -88,14 +90,20 @@ def pre_register_post():
     form = UserPreRegister(request.form)
     if not form.validate():
         h.flash_error("Los datos ingresados son invalidos")
-        return render_template("pre_register.html", form=form)
+        return (
+            render_template("pre_register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
 
     email = t.cast(str, form.email.data)
     if AuthService.exist_pre_user_with_email(
         email
     ) or UserService.get_by_email(email):
         h.flash_error("El mail ya esta registrado")
-        return render_template("pre_register.html", form=form)
+        return (
+            render_template("pre_register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
 
     AuthService.create_pre_user(**form.values())
     return render_template("info_register.html")
@@ -144,12 +152,18 @@ def register_post():
     form = UserRegister(request.form)
     if not form.validate():
         h.flash_info("Los datos ingresados son invalidos")
-        return render_template("register.html", form=form)
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
 
     form_values = form.values()
     if UserService.exist_user_with_username(form_values["username"]):
         h.flash_info("El nombre de usuario esta utilizado")
-        return render_template("register.html", form=form)
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
 
     UserService.create_user(
         username=form_values["username"],
@@ -202,6 +216,7 @@ def user_setting_post():
             user_setting = UserService.update_user(id_user, **form.values())
             if user_setting is None:
                 return redirect("/login")
+
             form.process(obj=user_setting)
             h.flash_success("Configuracion actualizada")
             status_code = status.HTTP_200_OK
@@ -221,3 +236,6 @@ def user_setting_post():
         ),
         status_code,
     )
+
+
+bp.get("/push_main")(lambda: (render_template("_errors/451.html"), 451))

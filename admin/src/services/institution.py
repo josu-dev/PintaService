@@ -1,10 +1,11 @@
+import datetime
 import typing as t
 
 import sqlalchemy as sa
 import sqlalchemy.exc as sa_exc
 import typing_extensions as te
 
-from src.core import permissions
+from src.core import enums, permissions
 from src.core.db import db
 from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.institution import Institution
@@ -326,3 +327,49 @@ class InstitutionService(BaseService):
             return False
 
         return True
+
+    @classmethod
+    def get_institutions_owned_by_user(
+        cls, user_id: int
+    ) -> t.List[Institution]:
+        institutions = (
+            db.session.query(Institution)
+            .join(
+                UserInstitutionRole,
+                sa.and_(
+                    UserInstitutionRole.institution_id == Institution.id,
+                    UserInstitutionRole.user_id == user_id,
+                    UserInstitutionRole.role_id
+                    == db.session.query(Role.id)
+                    .filter(Role.name == permissions.RoleEnum.OWNER.value)
+                    .scalar_subquery(),
+                ),
+            )
+            .all()
+        )
+
+        return institutions
+
+    @classmethod
+    def get_most_efficient_institutions(
+        cls,
+    ) -> t.List[t.Tuple[Institution, datetime.timedelta]]:
+        query = (
+            db.session.query(
+                Institution,
+                sa.func.avg(
+                    ServiceRequest.updated_at - ServiceRequest.created_at
+                ).label("avg_resolution_time"),
+            )
+            .join(
+                ServiceRequest,
+                Institution.id == ServiceRequest.institution_id,
+            )
+            .filter(ServiceRequest.status == enums.RequestStatus.FINISHED)
+            .group_by(Institution.id)
+            .order_by("avg_resolution_time")
+            .limit(10)
+        )
+        res = query.all()
+
+        return res  # pyright: ignore[reportGeneralTypeIssues]

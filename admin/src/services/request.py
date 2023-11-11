@@ -1,10 +1,13 @@
 import typing as t
 from datetime import datetime
 
+import sqlalchemy as sa
 import typing_extensions as te
 
 from src.core.db import db
 from src.core.enums import RequestStatus, ServiceTypes
+from src.core.models.auth import Role, UserInstitutionRole
+from src.core.models.institution import Institution
 from src.core.models.service import Service
 from src.core.models.service_requests import (
     RequestHistory,
@@ -12,6 +15,7 @@ from src.core.models.service_requests import (
     ServiceRequest,
 )
 from src.core.models.user import User
+from src.core.permissions import RoleEnum
 from src.services.base import BaseService, BaseServiceError
 
 
@@ -22,14 +26,14 @@ class RequestParams(t.TypedDict):
 
 
 class FilterRequestParams(t.TypedDict):
-    user_email: str
-    service_type: ServiceTypes
-    status: RequestStatus
-    date_from: str
-    date_to: str
+    user_email: te.NotRequired[str]
+    service_type: te.NotRequired[ServiceTypes]
+    status: te.NotRequired[RequestStatus]
+    start_date: te.NotRequired[str]
+    end_date: te.NotRequired[str]
 
 
-class RequestNoteParam(t.TypedDict):
+class RequestNoteParams(t.TypedDict):
     note: str
 
 
@@ -125,14 +129,14 @@ class RequestService(BaseService):
         if request is None:
             raise RequestServiceError("Solicitud no encontrada")
 
-        new_status = kwargs.get("status", None)
+        new_status = kwargs["status"]
         if (
             new_status is not None  # type:ignore
             and new_status != request.status.name  # type:ignore
         ):
             request.status = new_status
             cls.create_request_history(
-                request_id, new_status, kwargs.get("observations")
+                request_id, new_status, kwargs["observations"]
             )
             db.session.add(request)
             db.session.commit()
@@ -267,15 +271,12 @@ class RequestService(BaseService):
         query = db.session.query(ServiceRequest)
         query = query.filter(ServiceRequest.institution_id == institution_id)
         query = query.filter(ServiceRequest.service_id == service_id)
-        if (
-            "user_email" in kwargs
-            and kwargs["user_email"] is not None  # type:ignore
-        ):
+        if "user_email" in kwargs:
             query = query.join(User, User.id == ServiceRequest.user_id)
             email = kwargs["user_email"]
             query = query.filter(User.email.ilike(f"%{email}%"))
 
-        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+        if "status" in kwargs:
             query = query.filter(ServiceRequest.status == kwargs["status"])
 
         if "start_date" in kwargs and kwargs["start_date"]:
@@ -299,21 +300,15 @@ class RequestService(BaseService):
         **kwargs: te.Unpack[FilterRequestParams],
     ) -> t.Tuple[t.List[ServiceRequest], int]:
         query = db.session.query(ServiceRequest)
-        if (
-            "user_email" in kwargs
-            and kwargs["user_email"] is not None  # type:ignore
-        ):
+        if "user_email" in kwargs:
             query = query.join(User, User.id == ServiceRequest.user_id)
             email = kwargs["user_email"]
             query = query.filter(User.email.ilike(f"%{email}%"))
 
-        if "status" in kwargs and kwargs["status"] is not None:  # type:ignore
+        if "status" in kwargs:
             query = query.filter(ServiceRequest.status == kwargs["status"])
 
-        if (
-            "service_type" in kwargs
-            and kwargs["service_type"] is not None  # type:ignore
-        ):
+        if "service_type" in kwargs:
             query = query.join(
                 Service, Service.id == ServiceRequest.service_id
             )
@@ -341,3 +336,41 @@ class RequestService(BaseService):
             .filter(RequestHistory.service_request_id == request_id)
             .all()
         )
+
+    @classmethod
+    def get_requests_count_per_status(
+        cls,
+        institution_owner_id: t.Union[int, None] = None,
+        institution_id: t.Union[int, None] = None,
+    ):
+        query = db.session.query(ServiceRequest.status, sa.func.count("*"))
+
+        if institution_owner_id is not None:
+            query = (
+                query.join(Service, Service.id == ServiceRequest.service_id)
+                .join(Institution, Institution.id == Service.institution_id)
+                .join(
+                    UserInstitutionRole,
+                    sa.and_(
+                        UserInstitutionRole.institution_id == Institution.id,
+                        UserInstitutionRole.role_id
+                        == (
+                            sa.select(Role.id)
+                            .where(Role.name == RoleEnum.OWNER.value)
+                            .scalar_subquery()
+                        ),
+                        UserInstitutionRole.user_id == institution_owner_id,
+                    ),
+                )
+            )
+
+        if institution_id is not None:
+            query = query.filter(
+                ServiceRequest.institution_id == institution_id
+            )
+
+        query = query.group_by(ServiceRequest.status)
+
+        res = query.all()
+
+        return res

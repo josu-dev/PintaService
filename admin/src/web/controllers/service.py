@@ -1,6 +1,7 @@
 from flask import Blueprint, g, redirect, render_template, request
 
 from src.services.service import ServiceService
+from src.utils import status
 from src.web.controllers import _helpers as h
 from src.web.forms.service import ServiceForm
 
@@ -10,10 +11,8 @@ bp = Blueprint("services", __name__)
 @bp.get("/")
 @h.authenticated_route(module="services", permissions=("index",))
 def services_get(institution_id: int):
-    page_size = g.site_config.page_size
-    page: int = request.values.get("page", 1, type=int)  # type:ignore
-    per_page: int = request.values.get(  # type:ignore
-        "per_page", page_size, type=int
+    page, per_page = h.url_pagination_args(
+        default_per_page=g.site_config.page_size
     )
 
     services, total = ServiceService.get_institution_services_paginated(
@@ -42,8 +41,9 @@ def services_new_get(institution_id: int):
 def services_new_post(institution_id: int):
     form = ServiceForm()
     if not form.validate():
-        return render_template(
-            "institutions/[id]/services/new.html", form=form
+        return (
+            render_template("institutions/[id]/services/new.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     try:
@@ -52,8 +52,9 @@ def services_new_post(institution_id: int):
         )
     except ServiceService.ServiceServiceError as e:
         h.flash_error(e.message)
-        return render_template(
-            "institutions/[id]/services/new.html", form=form
+        return (
+            render_template("institutions/[id]/services/new.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     h.flash_success("Servicio creado exitosamente")
@@ -61,10 +62,7 @@ def services_new_post(institution_id: int):
 
 
 @bp.get("/<int:service_id>")
-@h.authenticated_route(
-    module="services",
-    permissions=("show", "update"),
-)
+@h.authenticated_route(module="services", permissions=("show", "update"))
 def services_id_get(institution_id: int, service_id: int):
     service = ServiceService.get_service(service_id)
     if not service:
@@ -91,18 +89,24 @@ def services_id_post(institution_id: int, service_id: int):
 
     form = ServiceForm(request.form)
     if not form.validate():
-        return render_template(
-            "institutions/[id]/services/update.html",
-            form=form,
+        return (
+            render_template(
+                "institutions/[id]/services/update.html",
+                form=form,
+            ),
+            status.HTTP_400_BAD_REQUEST,
         )
 
     try:
         result = ServiceService.update_service(service_id, **form.values())
     except ServiceService.ServiceServiceError:
         h.flash_info("No se pudo actualizar el servicio")
-        return render_template(
-            "institutions/[id]/services/update.html",
-            form=form,
+        return (
+            render_template(
+                "institutions/[id]/services/update.html",
+                form=form,
+            ),
+            status.HTTP_500_INTERNAL_SERVER_ERROR,
         )
 
     if not result:
