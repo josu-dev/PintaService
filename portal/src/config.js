@@ -1,6 +1,5 @@
 /**
  * API URL to be used in the application.
- *
  * @type {string}
  */
 export const API_URL =
@@ -11,3 +10,9 @@ export const API_URL =
  * @type {3000}
  */
 export const DEFAULT_TOAST_TIMEOUT = 3000;
+
+/**
+ * Default mode for api maintenance failure handling.
+ * @type {import('@/utils/api').MaintenanceFailureOptions}
+ */
+export const DEFAULT_API_MAINTEINANCE_FAILURE = 'toast';
