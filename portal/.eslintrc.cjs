@@ -13,5 +13,6 @@ module.exports = {
   },
   rules: {
     'no-unused-vars': 'off'
-  }
+  },
+  ignorePatterns: ['**/dist/*', '**/node_modules/*', '**/*.d.ts']
 };
