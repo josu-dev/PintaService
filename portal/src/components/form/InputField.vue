@@ -13,6 +13,10 @@
     required: {
       type: Boolean,
       default: false
+    },
+    autocomplete: {
+      type: String,
+      default: 'off'
     }
   });
 
@@ -32,6 +36,7 @@
       :id="props.name"
       :value="value"
       :required="props.required"
+      :autocomplete="props.autocomplete"
       @input="
         // @ts-expect-error - target.value is valid
         $emit('update:value', $event.target?.value)

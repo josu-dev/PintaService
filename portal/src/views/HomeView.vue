@@ -5,5 +5,5 @@
 </script>
 
 <template>
-  <main>usuario: {{ userStore.user?.user }}</main>
+  <main>usuario: {{ userStore.user?.username }}</main>
 </template>

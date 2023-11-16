@@ -29,7 +29,10 @@
       label: 'Estadisticas',
       path: '/stats',
       icon: IconStats,
-      isRenderable: computed(() => !!userStore.user)
+      isRenderable: computed(
+        () =>
+          !!userStore.user && (userStore.user.is_site_admin || userStore.user.is_institution_owner)
+      )
     },
     {
       label: 'Servicios',
@@ -46,9 +49,22 @@
         ><div class="w-10 xs:-ml-2">
           <img src="/logo_64x64.png" />
         </div>
-        <span class="sr-only xs:not-sr-only ml-2">Pinta Service</span></RouterLink
+        <span class="sr-only lg:not-sr-only ml-2">Pinta Service</span></RouterLink
       >
     </div>
+
+    <nav class="navbar-center flex md:hidden">
+      <ul class="menu menu-sm menu-horizontal px-1">
+        <li v-for="link in menuLinks" :key="link.path" class="">
+          <template v-if="link.isRenderable?.value ?? true">
+            <RouterLink :to="link.path" :active-class="'active'" class="font-semibold">
+              <component :is="link.icon" />
+              <span class="sr-only lg:not-sr-only">{{ link.label }}</span>
+            </RouterLink>
+          </template>
+        </li>
+      </ul>
+    </nav>
 
     <nav class="navbar-center hidden md:flex">
       <ul class="menu menu-sm menu-horizontal px-1">
@@ -72,14 +88,19 @@
       </div>
       <div v-else class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost">
-          <IconUser class="sm:hidden" />
-          <!-- <span class="sr-only lg:not-sr-only !ml-2 normal-case text-base">Menu</span> -->
-          <span class="sr-only sm:not-sr-only normal-case text-lg">Menu</span>
+          <IconUser class="" />
+          <span class="sr-only sm:not-sr-only !ml-2 normal-case text-lg">{{
+            userStore.user.username
+          }}</span>
+          <!-- <span class="sr-only sm:not-sr-only normal-case text-lg">Menu</span> -->
         </label>
         <ul
           tabindex="0"
           class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-48"
         >
+          <!-- <li v-if="userStore.user">
+            <span>{{ userStore.user.username }}</span>
+          </li> -->
           <li>
             <RouterLink to="/profile" class="">Perfil</RouterLink>
           </li>
