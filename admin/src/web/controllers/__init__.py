@@ -101,12 +101,17 @@ def init_app(app: flask.Flask):
         ):
             return None
 
+        # 503 (Service Unavailable) to indicate that the server is in
+        # maintenance mode. 200 (OK) for OPTIONS requests to correctly
+        # handle CORS preflight requests.
+        status_code = 200 if flask.request.method == "OPTIONS" else 503
+
         return (
             flask.render_template(
                 "maintenance.html",
                 maintenance_message=site_config.maintenance_message,
             ),
-            503,
+            status_code,
         )
 
     app.before_request(before_request_hook)

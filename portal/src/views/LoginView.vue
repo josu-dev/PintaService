@@ -1,6 +1,14 @@
 <script setup>
+  import InputField from '@/components/form/InputField.vue';
+  import { useToastStore } from '@/stores/toast';
+  import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
   import { ref } from 'vue';
+  import { RouterLink, useRouter } from 'vue-router';
+
+  const router = useRouter();
+  const toastStore = useToastStore();
+  const userStore = useUserStore();
 
   const form = ref({
     user: '',
@@ -10,39 +18,62 @@
   /** @param {Event} event */
   async function submitLogin(event) {
     APIService.post('/auth', {
-      body: form.value,
+      body: {
+        user: form.value.user,
+        password: form.value.password
+      },
       onJSON(json) {
-        console.log(json);
+        if (json.result !== 'success') {
+          toastStore.error('Error al iniciar sesión');
+          return;
+        }
+
+        toastStore.success('Inicio de sesión exitoso');
+
+        APIService.get('/me/profile', {
+          onJSON(json) {
+            userStore.setUser(json);
+
+            router.push({ name: 'home' });
+          }
+        });
       },
       onFailure(response) {
         console.log(response);
+        toastStore.error('Error al iniciar sesión');
       },
       onError(error) {
         console.log(error);
+        toastStore.error('Error al iniciar sesión');
       }
     });
   }
 </script>
 
 <template>
-  <main>
-    <h1>Login</h1>
-    <form class="flex flex-col gap-4 max-w-md text-zinc-200" @submit.prevent="submitLogin">
-      <div class="flex flex-col">
-        <label for="user">Email</label>
-        <input v-model="form.user" type="email" id="user" name="user" class="bg-zinc-800" />
-      </div>
-      <div class="flex flex-col">
-        <label for="password">Password</label>
-        <input
-          v-model="form.password"
+  <main class="grid grid-rows-[1fr_2fr_2fr] h-full">
+    <div class="row-start-2 w-full p-6 m-auto rounded-md lg:max-w-xl">
+      <h1 class="text-4xl font-bold text-center text-primary">Inicio de Sesion</h1>
+      <form
+        class="flex flex-col items-center text-primary-content space-y-4 [&>:first-child]:mt-4 md:[&>:first-child]:mt-8"
+        @submit.prevent="submitLogin"
+      >
+        <InputField type="email" name="user" label="Email" v-model:value="form.user" required />
+        <InputField
           type="password"
-          id="password"
           name="password"
-          class="bg-zinc-800"
+          label="Contraseña"
+          v-model:value="form.password"
+          required
         />
-      </div>
-      <button type="submit" class="btn btn-success btn-sm">Login</button>
-    </form>
+        <button type="submit" class="btn btn-primary">Iniciar</button>
+        <span class="text-secondary-content"
+          >No tienes cuenta?
+          <RouterLink to="/register" class="link link-hover font-semibold text-info"
+            >Registrate</RouterLink
+          ></span
+        >
+      </form>
+    </div>
   </main>
 </template>
