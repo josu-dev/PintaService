@@ -11,7 +11,7 @@
     <LayoutHeader />
   </header>
 
-  <div class="flex-1">
+  <div class="flex-1 overflow-hidden">
     <RouterView />
   </div>
 </template>

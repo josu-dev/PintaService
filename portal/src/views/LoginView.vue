@@ -22,7 +22,7 @@
         user: form.value.user,
         password: form.value.password
       },
-      onJSON(json) {
+      async onJSON(json) {
         if (json.result !== 'success') {
           toastStore.error('Error al iniciar sesión');
           return;
@@ -30,20 +30,40 @@
 
         toastStore.success('Inicio de sesión exitoso');
 
-        APIService.get('/me/profile', {
-          onJSON(json) {
-            userStore.setUser(json);
+        const onJSON = { onJSON() {} };
 
-            router.push({ name: 'home' });
-          }
+        const [user, isSiteAdmin, isInstitutionOwner] = await Promise.allSettled([
+          APIService.get('/me/profile', onJSON),
+          APIService.get('/me/rol/site_admin', onJSON),
+          APIService.get('/me/rol/institution_owner', onJSON)
+        ]);
+        if (user.status === 'rejected') {
+          toastStore.error('Error al iniciar sesión');
+          return;
+        }
+
+        let is_site_admin = false;
+        let is_institution_owner = false;
+        if (isSiteAdmin.status === 'fulfilled') {
+          is_site_admin = isSiteAdmin.value.data.is_site_admin;
+        }
+        if (isInstitutionOwner.status === 'fulfilled') {
+          is_institution_owner = isInstitutionOwner.value.data.is_institution_owner;
+        }
+
+        userStore.setUser(user.value, {
+          is_site_admin: is_site_admin,
+          is_institution_owner: is_institution_owner
         });
+
+        router.push({ name: 'home' });
       },
       onFailure(response) {
-        console.log(response);
+        console.warn('login failure: ', response);
         toastStore.error('Error al iniciar sesión');
       },
       onError(error) {
-        console.log(error);
+        console.error('login error: ', error);
         toastStore.error('Error al iniciar sesión');
       }
     });
@@ -58,7 +78,14 @@
         class="flex flex-col items-center text-primary-content space-y-4 [&>:first-child]:mt-4 md:[&>:first-child]:mt-8"
         @submit.prevent="submitLogin"
       >
-        <InputField type="email" name="user" label="Email" v-model:value="form.user" required />
+        <InputField
+          type="email"
+          name="user"
+          label="Email"
+          v-model:value="form.user"
+          required
+          autocomplete="email"
+        />
         <InputField
           type="password"
           name="password"

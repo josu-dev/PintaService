@@ -24,10 +24,10 @@
       mostEfficientInstitutions.value = json.data;
     },
     onFailure(response) {
-      console.log('Request failed');
+      console.warn('Request failed');
     },
     onError(error) {
-      console.log(error);
+      console.error(error);
     }
   });
 
@@ -47,23 +47,23 @@
 </script>
 
 <template>
-  <div class="overflow-x-auto text-primary-content">
-    <table class="table">
+  <div class="overflow-x-auto text-primary-content rounded-3xl shadow">
+    <table class="table w-full">
       <thead>
         <tr>
           <th class=""></th>
           <th class="">Nombre</th>
-          <th class="">Habilitada</th>
           <th class="">Tiempo de resolucion promedio</th>
+          <th class="">Habilitada</th>
         </tr>
       </thead>
       <tbody class="">
         <template v-for="(item, index) in tData" :key="item.id">
-          <tr class="hover [&>td]:">
+          <tr class="hover text-center">
             <td>{{ index + 1 }}</td>
             <td>{{ item.institution.name }}</td>
-            <td>{{ item.institution.enabled ? '✅' : '❌' }}</td>
             <td>{{ item.avg_resolution_time }}</td>
+            <td>{{ item.institution.enabled ? '✅' : '❌' }}</td>
           </tr>
         </template>
         <template v-if="tData.length === 0">

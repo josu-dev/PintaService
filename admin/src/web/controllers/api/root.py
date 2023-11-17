@@ -345,8 +345,6 @@ def stats_most_requested_services_get(user_id: int):
 @bp.get("/stats/most_efficient_institutions")
 @base.validation(method="GET", require_auth=True, debug=True)
 def stats_most_efficient_institutions_get(user_id: int):
-    print("gola")
-    # print("stats_most_efficient_institutions_get", file=sys.stderr)
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -355,7 +353,7 @@ def stats_most_efficient_institutions_get(user_id: int):
         return base.API_UNAUTHORIZED_RESPONSE
 
     institutions = InstitutionService.get_most_efficient_institutions()
-    # print(institutions, file=sys.stderr)
+
     response = {
         "data": [
             {
@@ -371,5 +369,34 @@ def stats_most_efficient_institutions_get(user_id: int):
         ]
     }
 
-    # print(response, file=sys.stderr)
+    return response
+
+
+@bp.get("/me/rol/site_admin")
+@base.validation(method="GET", require_auth=True)
+def me_rol_site_admin_get(user_id: int):
+    is_site_admin = AuthService.user_is_site_admin(user_id)
+
+    response = {
+        "data": {
+            "is_site_admin": is_site_admin,
+        },
+    }
+
+    return response
+
+
+@bp.get("/me/rol/institution_owner")
+@base.validation(method="GET", require_auth=True)
+def me_rol_institution_owner(user_id: int):
+    is_institution_owner = InstitutionService.get_institutions_owned_by_user(
+        user_id
+    )
+
+    response = {
+        "data": {
+            "is_institution_owner": len(is_institution_owner) > 0,
+        },
+    }
+
     return response
