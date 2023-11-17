@@ -58,7 +58,6 @@ export const useUserStore = defineStore('user', () => {
       is_site_admin: isSiteAdmin,
       is_institution_owner: isInstitutionOwner
     };
-    console.log(user.value);
   }
 
   /**

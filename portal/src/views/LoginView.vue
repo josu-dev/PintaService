@@ -59,11 +59,11 @@
         router.push({ name: 'home' });
       },
       onFailure(response) {
-        console.log(response);
+        console.warn('login failure: ', response);
         toastStore.error('Error al iniciar sesión');
       },
       onError(error) {
-        console.log(error);
+        console.error('login error: ', error);
         toastStore.error('Error al iniciar sesión');
       }
     });
@@ -78,7 +78,14 @@
         class="flex flex-col items-center text-primary-content space-y-4 [&>:first-child]:mt-4 md:[&>:first-child]:mt-8"
         @submit.prevent="submitLogin"
       >
-        <InputField type="email" name="user" label="Email" v-model:value="form.user" required />
+        <InputField
+          type="email"
+          name="user"
+          label="Email"
+          v-model:value="form.user"
+          required
+          autocomplete="email"
+        />
         <InputField
           type="password"
           name="password"

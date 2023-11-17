@@ -40,11 +40,11 @@
     },
     onFailure(response) {
       requestsPerStatus.value = [];
-      console.log(response);
+      console.warn(response);
     },
     onError(error) {
       requestsPerStatus.value = [];
-      console.log(error);
+      console.error(error);
     }
   });
 
@@ -72,7 +72,6 @@
       data.datasets[0].data.push(status.count);
     }
     chartData.value = data;
-    console.log(data);
   });
 
   const chartOptions = {
