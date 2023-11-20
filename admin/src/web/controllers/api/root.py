@@ -1,4 +1,5 @@
 import flask
+from flask_jwt_extended import utils as jwt
 
 from src.core import enums
 from src.services.auth import AuthService
@@ -17,10 +18,33 @@ bp = flask.Blueprint("root", __name__)
 @base.validation(api_forms.AuthForm)
 def auth_post(body: api_forms.AuthFormValues):
     user = UserService.validate_email_password(body["email"], body["password"])
+    if user:
+        access_token = jwt.create_access_token(identity=user.id)
+
+        return flask.jsonify(result="success", access_token=access_token), 200
+        # return response, 201
+    return {"result": "fail"}, status.HTTP_400_BAD_REQUEST
+    # return flask.jsonify(message="fail"), 401
+
+
+@bp.get("/user_jwt")
+@base.validation(method="GET", require_auth=True)
+def user_jwt():
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if not user:
         return {"result": "fail"}, status.HTTP_400_BAD_REQUEST
-
-    return {"result": "success"}
+    response = {
+        "user": user.username,
+        "email": user.email,
+        "document_type": user.document_type.value,
+        "document_number": user.document_number,
+        "gender": user.gender.value,
+        "gender_other": user.gender_other,
+        "address": user.address,
+        "phone": user.phone,
+    }
+    return response, 201
 
 
 @bp.get("/institutions")
@@ -57,8 +81,9 @@ def institutions_get(args: api_forms.PaginationFormValues):
 
 @bp.get("/me/profile")
 @base.validation(method="GET", require_auth=True)
-def me_profile_get(user_id: int):
-    user = UserService.get_user(user_id)
+def me_profile_get():
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -82,8 +107,9 @@ def me_profile_get(user_id: int):
     method="GET",
     require_auth=True,
 )
-def me_requests_get(args: api_forms.PaginationFormValues, user_id: int):
-    user = UserService.get_user(user_id)
+def me_requests_get(args: api_forms.PaginationFormValues):
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -124,8 +150,9 @@ def me_requests_get(args: api_forms.PaginationFormValues, user_id: int):
 
 @bp.get("/me/requests/<int:request_id>")
 @base.validation(method="GET", require_auth=True)
-def me_requests_id_get(request_id: int, user_id: int):
-    user = UserService.get_user(user_id)
+def me_requests_id_get(request_id: int):
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -154,8 +181,9 @@ def me_requests_id_get(request_id: int, user_id: int):
 
 @bp.post("/me/requests")
 @base.validation(api_forms.ServiceRequestForm, require_auth=True)
-def me_requests_post(body: api_forms.ServiceRequestFormValues, user_id: int):
-    user = UserService.get_user(user_id)
+def me_requests_post(body: api_forms.ServiceRequestFormValues):
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -189,9 +217,10 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues, user_id: int):
 @bp.post("/me/requests/<int:request_id>/notes")
 @base.validation(api_forms.RequestNoteForm, require_auth=True)
 def me_requests_id_notes_post(
-    body: api_forms.RequestNoteFormValues, request_id: int, user_id: int
+    body: api_forms.RequestNoteFormValues, request_id: int
 ):
-    user = UserService.get_user(user_id)
+    user_id = jwt.get_jwt_identity()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -252,7 +281,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 @bp.get("/services/<int:service_id>")
 @base.validation(method="GET", require_auth=True)
-def services_id_get(service_id: int, user_id: int):
+def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
     except ServiceService.ServiceServiceError:
@@ -270,7 +299,7 @@ def services_id_get(service_id: int, user_id: int):
 
 @bp.get("/services_types")
 @base.validation(method="GET", require_auth=True)
-def services_types_get(user_id: int):
+def services_types_get():
     response = {
         "data": [service_type.value for service_type in enums.ServiceTypes]
     }
@@ -280,7 +309,8 @@ def services_types_get(user_id: int):
 
 @bp.get("/stats/requests_per_status")
 @base.validation(method="GET", require_auth=True, debug=True)
-def stats_requests_per_status_get(user_id: int):
+def stats_requests_per_status_get():
+    user_id = jwt.get_jwt_identity()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -312,7 +342,8 @@ def stats_requests_per_status_get(user_id: int):
 
 @bp.get("/stats/most_requested_services")
 @base.validation(method="GET", require_auth=True, debug=True)
-def stats_most_requested_services_get(user_id: int):
+def stats_most_requested_services_get():
+    user_id = jwt.get_jwt_identity()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -344,7 +375,8 @@ def stats_most_requested_services_get(user_id: int):
 
 @bp.get("/stats/most_efficient_institutions")
 @base.validation(method="GET", require_auth=True, debug=True)
-def stats_most_efficient_institutions_get(user_id: int):
+def stats_most_efficient_institutions_get():
+    user_id = jwt.get_jwt_identity()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -374,7 +406,8 @@ def stats_most_efficient_institutions_get(user_id: int):
 
 @bp.get("/me/rol/site_admin")
 @base.validation(method="GET", require_auth=True)
-def me_rol_site_admin_get(user_id: int):
+def me_rol_site_admin_get():
+    user_id = jwt.get_jwt_identity()
     is_site_admin = AuthService.user_is_site_admin(user_id)
 
     response = {
@@ -388,7 +421,8 @@ def me_rol_site_admin_get(user_id: int):
 
 @bp.get("/me/rol/institution_owner")
 @base.validation(method="GET", require_auth=True)
-def me_rol_institution_owner(user_id: int):
+def me_rol_institution_owner():
+    user_id = jwt.get_jwt_identity()
     is_institution_owner = InstitutionService.get_institutions_owned_by_user(
         user_id
     )

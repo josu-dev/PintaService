@@ -191,6 +191,9 @@ class Config:
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
 
+    # Jwt
+    JWT_SECRET_KEY: str
+
     @classmethod
     def load_env_config(cls) -> None:
         # DB environment variables names CAN'T be changed
@@ -228,6 +231,8 @@ class Config:
         cls.MAIL_USERNAME = env_or_error("MAIL_USERNAME")
         cls.MAIL_PASSWORD = env_or_error("MAIL_PASSWORD")
         cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
+
+        cls.JWT_SECRET_KEY = env_or_error("JWT_SECRET_KEY")
 
 
 def init_app(app: Flask, env: str) -> None:

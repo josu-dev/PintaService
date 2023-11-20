@@ -10,6 +10,7 @@ import { API_URL, DEFAULT_API_MAINTEINANCE_FAILURE } from '@/config.js';
 export class APIService {
   static apiURL = API_URL;
 
+
   /**
    * The default handler for when a maintenance failure occurs.
    *
@@ -28,6 +29,7 @@ export class APIService {
    *  onFailure?: (response: Response) => void,
    *  onError?: (error: unknown) => void,
    *  maintenanceFailure?: MaintenanceFailureOptions,
+   *  token?: string,
    * }} options - The options for handling the API response.
    */
   static async get(path, options) {
@@ -37,12 +39,19 @@ export class APIService {
 
     let data;
     try {
+      const token = options.token || localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      };
+
       const response = await fetch(`${APIService.apiURL}${path}`, {
-        headers: {
-          Authorization: 'Bearer 1'
-        }
+        headers,
       });
       if (!response.ok) {
+        if ((response.status === 401) && ((localStorage.getItem('token')!== null))){
+          localStorage.removeItem('token');
+        }
         if (response.status === 503) {
           if (options.maintenanceFailure === 'ignore') {
             return;
@@ -84,6 +93,7 @@ export class APIService {
    *  onFailure?: (response: Response) => void,
    *  onError?: (error: unknown) => void,
    *  maintenanceFailure?: MaintenanceFailureOptions,
+   *  token?: string,
    * }} options - The options for handling the API response.
    */
   static async post(path, options) {
@@ -93,15 +103,20 @@ export class APIService {
 
     let data;
     try {
+      const token = options.token || localStorage.getItem('token');
+      const headers = {
+        'Content-Type': 'application/json',
+        ...(token && { 'Authorization': `Bearer ${token}` })
+      };
       const response = await fetch(`${APIService.apiURL}${path}`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: 'Bearer 1'
-        },
+        headers,
         body: options.body === undefined ? undefined : JSON.stringify(options.body)
       });
       if (!response.ok) {
+        if ((response.status === 401) && ((localStorage.getItem('token')!== null))){
+            localStorage.removeItem('token');
+        }
         if (response.status === 503) {
           if (options.maintenanceFailure === 'ignore') {
             return;

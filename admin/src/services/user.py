@@ -149,6 +149,10 @@ class UserService(BaseService):
         return db.session.query(User).filter(User.email == email).first()
 
     @classmethod
+    def get_by_id(cls, id: int) -> t.Union[User, None]:
+        return db.session.query(User).filter(User.id == id).first()
+
+    @classmethod
     def get_by_username(cls, username: str) -> t.Union[User, None]:
         return db.session.query(User).filter(User.username == username).first()
 

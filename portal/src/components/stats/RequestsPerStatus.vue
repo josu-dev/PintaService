@@ -1,4 +1,6 @@
 <script setup>
+  import { useToastStore } from '@/stores/toast';
+  import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
   import { requestStatus } from '@/utils/enums';
   import {
@@ -13,6 +15,18 @@
   } from 'chart.js';
   import { ref, watchEffect } from 'vue';
   import { Pie } from 'vue-chartjs';
+  import { useRouter } from 'vue-router';
+
+  const router = useRouter();
+  const userStore = useUserStore();
+  const toastStore = useToastStore();
+
+  function submitLogout() {
+    userStore.clearUser();
+    router.push({
+      name: 'login'
+    });
+  }
 
   ChartJS.register(Title, Tooltip, ArcElement, Legend, BarElement, CategoryScale, LinearScale);
 
@@ -39,6 +53,10 @@
       requestsPerStatus.value = json.data;
     },
     onFailure(response) {
+      if (response.status === 401) {
+        submitLogout();
+        toastStore.error('Expiro la sesion');
+      }
       requestsPerStatus.value = [];
       console.warn(response);
     },

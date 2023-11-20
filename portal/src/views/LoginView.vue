@@ -28,10 +28,10 @@
           return;
         }
 
+        localStorage.setItem('token', json.access_token);
         toastStore.success('Inicio de sesión exitoso');
 
         const onJSON = { onJSON() {} };
-
         const [user, isSiteAdmin, isInstitutionOwner] = await Promise.allSettled([
           APIService.get('/me/profile', onJSON),
           APIService.get('/me/rol/site_admin', onJSON),
