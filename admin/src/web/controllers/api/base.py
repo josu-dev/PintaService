@@ -4,8 +4,8 @@ import typing as t
 import flask
 import flask_wtf
 from flask import typing as tf
+from flask_jwt_extended import view_decorators
 
-from src.services.user import UserService
 from src.utils import status
 
 API_BAD_REQUEST_RESPONSE = (
@@ -92,25 +92,8 @@ def validation(
             if _content_type == "json" and not flask.request.is_json:
                 return API_BAD_REQUEST_RESPONSE
 
-            # Replace with real jwt auth on second iteration
-            # Simulate jwt auth by passing user_id in Authorization header
             if require_auth:
-                token = flask.request.headers.get("Authorization")
-                raw_user_id = token.lstrip("Bearer ") if token else ""
-
-                if not raw_user_id.isdigit():
-                    if debug:
-                        print(f"Invalid user_id: {raw_user_id}", flush=True)
-                    return API_UNAUTHORIZED_RESPONSE
-
-                user_id = int(raw_user_id)
-                user = UserService.get_user(user_id)
-                if user is None:
-                    if debug:
-                        print(f"User not found: {user_id}", flush=True)
-                    return API_UNAUTHORIZED_RESPONSE
-
-                kwargs["user_id"] = user_id
+                view_decorators.verify_jwt_in_request()
 
             if schema is not None:
                 if method == "GET":

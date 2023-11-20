@@ -1,7 +1,7 @@
 from flask import Flask
 
 from flask_session import Session
-from src.core import config, cors, csrf, db
+from src.core import config, cors, csrf, db, jwt
 from src.services.mail import MailService
 from src.web import controllers
 
@@ -12,7 +12,6 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     app = Flask(
         __name__, static_folder=static_folder, template_folder="./templates"
     )
-
     config.init_app(app, env)
     db.init_app(app)
     csrf.init_app(app)
@@ -20,6 +19,7 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
     session.init_app(app)
     MailService.init_app(app)
     controllers.init_app(app)
+    jwt.init_app(app)
 
     @app.cli.command("reset-db")
     def reset_db():
