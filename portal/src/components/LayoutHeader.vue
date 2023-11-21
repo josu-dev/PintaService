@@ -110,7 +110,7 @@
       <div v-else class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost">
           <IconUser class="" />
-          <span class="sr-only sm:not-sr-only !ml-2 normal-case text-lg">{{
+          <span class="sr-only sm:not-sr-only !ml-2 capitalize text-lg">{{
             userStore.user.username
           }}</span>
           <!-- <span class="sr-only sm:not-sr-only normal-case text-lg">Menu</span> -->
@@ -121,7 +121,7 @@
         >
           <li class="sm:hidden">
             <div class="flex justify-between w-full">
-              <span>{{ userStore.user.username }}</span>
+              <span class="capitalize">{{ userStore.user.username }}</span>
             </div>
           </li>
           <div class="sm:hidden border-b border-neutral-content my-2"></div>
