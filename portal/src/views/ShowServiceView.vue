@@ -13,35 +13,38 @@ const props = defineProps({
 
 /**
  * @typedef {{
- *    description:string,
- *    enabled:boolean,
- *    keywords:string,
- *    laboratory:string,
- *    name:string,
- * }} APIResponse
+ *    name: string,
+ *    description: string,
+ *    laboratory: string,
+ *    keywords: string[],
+ *    enabled: boolean,
+ * }} institutionData
  */
+
+/**
+ * @typedef {{
+ *    name: string,
+ *    information: string,
+ *    address: string,
+ *    web: string,
+ *    keywords: string[],
+ *    location: string,
+ *    enabled: boolean,
+ *    email: string,
+ *    days_and_opening_hours: string,
+ * }} serviceData
+ */
+
+
 
 const serviceData = ref([]);
 const institutionData = ref([]);
 const service_id = props.service_id ? props.service_id : '-1';
 
-APIService.get(`/services/${service_id}`, {
-    onJSON(json) {
-        serviceData.value = json;
-        console.log(service_id, json)
-    },
-    onFailure(response) {
-        console.log('Request failed');
-    },
-    onError(error) {
-        console.log(error);
-    }
-});
-
 APIService.get(`/service_institution/${service_id}`, {
     onJSON(json) {
-        institutionData.value = json;
-
+        institutionData.value = json.data.institution;
+        serviceData.value = json.data.service;
     },
     onFailure(response) {
         console.log('Request failed');

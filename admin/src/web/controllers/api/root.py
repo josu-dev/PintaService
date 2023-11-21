@@ -85,21 +85,34 @@ def institutions_id_get(service_id: int):
     institution_id = ServiceService.get_institution_of(service_id)
     if institution_id is None:
         return base.API_BAD_REQUEST_RESPONSE
-    institution = InstitutionService.get_institution(institution_id)  # type: ignore
-    if institution is None:
+
+    institution = InstitutionService.get_institution(institution_id)  # type: ignore # noqa: E501
+    service = ServiceService.get_service(service_id)
+    if institution is None or service is None:
         return base.API_BAD_REQUEST_RESPONSE
 
-    response = institution.asdict(
-        (
-            "name",
-            "information",
-            "address",
-            "web",
-            "keywords",
-            "email",
-            "days_and_opening_hours",
-        ),
-    )
+    response = {
+        "data": {
+            "service": {
+                "name": service.name,
+                "description": service.description,
+                "laboratory": service.laboratory,
+                "keywords": service.keywords,
+                "enabled": service.enabled,
+            },
+            "institution": {
+                "name": institution.name,
+                "information": institution.information,
+                "address": institution.address,
+                "web": institution.web,
+                "keywords": institution.keywords,
+                "location": institution.location,
+                "enabled": institution.enabled,
+                "email": institution.email,
+                "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
+            },
+        }
+    }
 
     return response
 
@@ -305,7 +318,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 
 @bp.get("/services/<int:service_id>")
-@base.validation(method="GET")
+@base.validation(method="GET", require_auth=True)
 def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
