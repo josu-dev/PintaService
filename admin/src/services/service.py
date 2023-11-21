@@ -153,6 +153,14 @@ class ServiceService(BaseService):
         )
 
     @classmethod
+    def get_institution_of(cls, service_id: int) -> t.Union[Institution, None]:
+        service = db.session.query(Service).get(service_id)
+        if service is None:
+            return None
+
+        return service.institution_id
+
+    @classmethod
     def get_institution_services_paginated(
         cls, institution_id: int, page: int, per_page: int
     ) -> t.Tuple[t.List[Service], int]:
