@@ -6,7 +6,7 @@
 
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="flex flex-col gap-8 w-full p-2 pt-4 md:pt-8">
+    <main class="flex flex-col gap-8 w-full p-2 py-4 md:py-8">
       <div class="mx-auto max-w-full">
         <h1 class="text-2xl font-semibold leading-relaxed">Estadisticas generales</h1>
         <div class="flex flex-col gap-8 mt-4 sm:pl-4">
