@@ -186,6 +186,13 @@ class UserService(BaseService):
         return None
 
     @classmethod
+    def exist_user(cls, user_id: int) -> bool:
+        return (
+            db.session.query(User.id).filter(User.id == user_id).first()
+            is not None
+        )
+
+    @classmethod
     def exist_user_with_email(cls, email: str) -> bool:
         return (
             db.session.query(User).filter(User.email == email).first()

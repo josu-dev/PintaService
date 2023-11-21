@@ -23,43 +23,37 @@
         password: form.value.password
       },
       async onJSON(json) {
-        if (json.result !== 'success') {
-          toastStore.error('Error al iniciar sesión');
-          return;
-        }
+        /** @type {string} */
+        const token = json.token;
+        APIService.setJWT(token);
 
-        localStorage.setItem('token', json.access_token);
-        toastStore.success('Inicio de sesión exitoso');
-
-        const onJSON = { onJSON() {} };
         const [user, isSiteAdmin, isInstitutionOwner] = await Promise.allSettled([
-          APIService.get('/me/profile', onJSON),
-          APIService.get('/me/rol/site_admin', onJSON),
-          APIService.get('/me/rol/institution_owner', onJSON)
+          APIService.get('/me/profile', { jwtError: 'throw' }),
+          APIService.get('/me/rol/site_admin', { jwtError: 'throw' }),
+          APIService.get('/me/rol/institution_owner', { jwtError: 'throw' })
         ]);
-        if (user.status === 'rejected') {
+        if (
+          user.status === 'rejected' ||
+          isSiteAdmin.status === 'rejected' ||
+          isInstitutionOwner.status === 'rejected'
+        ) {
           toastStore.error('Error al iniciar sesión');
           return;
         }
 
-        let is_site_admin = false;
-        let is_institution_owner = false;
-        if (isSiteAdmin.status === 'fulfilled') {
-          is_site_admin = isSiteAdmin.value.data.is_site_admin;
-        }
-        if (isInstitutionOwner.status === 'fulfilled') {
-          is_institution_owner = isInstitutionOwner.value.data.is_institution_owner;
-        }
+        const is_site_admin = isSiteAdmin.value.data.is_site_admin;
+        const is_institution_owner = isInstitutionOwner.value.data.is_institution_owner;
 
         userStore.setUser(user.value, {
           is_site_admin: is_site_admin,
           is_institution_owner: is_institution_owner
         });
 
+        toastStore.success('Inicio de sesión exitoso');
+
         router.push({ name: 'home' });
       },
       onFailure(response) {
-        console.warn('login failure: ', response);
         toastStore.error('Error al iniciar sesión');
       },
       onError(error) {

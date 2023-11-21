@@ -1,12 +1,15 @@
+import datetime
 import functools
 import typing as t
 
 import flask
+import flask_jwt_extended
 import flask_wtf
 from flask import typing as tf
-from flask_jwt_extended import view_decorators
 
 from src.utils import status
+
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
 
 API_BAD_REQUEST_RESPONSE = (
     {"error": "Parametros invalidos"},
@@ -93,7 +96,7 @@ def validation(
                 return API_BAD_REQUEST_RESPONSE
 
             if require_auth:
-                view_decorators.verify_jwt_in_request()
+                flask_jwt_extended.verify_jwt_in_request()
 
             if schema is not None:
                 if method == "GET":
@@ -115,3 +118,15 @@ def validation(
         return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator
+
+
+def create_access_token(user_id: int) -> str:
+    return flask_jwt_extended.create_access_token(
+        identity=user_id,
+        expires_delta=JWT_ACCESS_TOKEN_EXPIRES,
+    )
+
+
+def user_id_from_access_token() -> int:
+    user_id = flask_jwt_extended.get_jwt_identity()
+    return user_id
