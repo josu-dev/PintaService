@@ -13,35 +13,40 @@ const props = defineProps({
 
 /**
  * @typedef {{
- *    description:string,
- *    enabled:boolean,
- *    keywords:string,
- *    laboratory:string,
- *    name:string,
- * }} APIResponse
+ *    name: string,
+ *    description: string,
+ *    laboratory: string,
+ *    keywords: string[],
+ *    enabled: boolean,
+ * }} ServiceData
  */
 
-const serviceData = ref([]);
-const institutionData = ref([]);
-const service_id = props.service_id ? props.service_id : '-1';
+/**
+ * @typedef {{
+ *    name: string,
+ *    information: string,
+ *    address: string,
+ *    web: string,
+ *    keywords: string[],
+ *    location: string,
+ *    enabled: boolean,
+ *    email: string,
+ *    days_and_opening_hours: string,
+ * }} InstitutionData
+ */
 
-APIService.get(`/services/${service_id}`, {
-    onJSON(json) {
-        serviceData.value = json;
-        console.log(service_id, json)
-    },
-    onFailure(response) {
-        console.log('Request failed');
-    },
-    onError(error) {
-        console.log(error);
-    }
-});
+
+/** @type {import('vue').Ref<ServiceData>} */
+const serviceData = ref(/** @type {any} */(null));
+
+/** @type {import('vue').Ref<InstitutionData>} */
+const institutionData = ref(/** @type {any} */(null));
+const service_id = props.service_id ? props.service_id : '-1';
 
 APIService.get(`/service_institution/${service_id}`, {
     onJSON(json) {
-        institutionData.value = json;
-
+        institutionData.value = json.data.institution;
+        serviceData.value = json.data.service;
     },
     onFailure(response) {
         console.log('Request failed');
@@ -73,11 +78,13 @@ APIService.get(`/service_institution/${service_id}`, {
             <!-- Map and Location -->
             <div class="flex flex-col items-center justify-center mt-4  sm:mt-0">
                 <div style="width: 100%; height: 500px;">
-                    <LocationMap />
+                    <LocationMap v-if="institutionData.location" :location="institutionData.location" />
+                    <div v-else class="text-center text-gray-500">Cargando ubicación...</div>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Solicitar</button>
             </div>
         </main>
     </div>
-</template>
+</template> 
   
