@@ -34,9 +34,9 @@ class InstitutionForm(FlaskForm):
         validators=[
             v.DataRequired("Este campo es requerido"),
             v.NumberRange(
-                min=-74,
-                max=-59,
-                message="La latitud debe estar en el rango de -74 a -59.",
+                min=-55,
+                max=-25.672960,
+                message="La latitud debe estar en el rango de Argentina -55 a -22.",
             ),
         ],
     )
@@ -46,9 +46,9 @@ class InstitutionForm(FlaskForm):
         validators=[
             v.DataRequired("Este campo es requerido"),
             v.NumberRange(
-                min=-53,
-                max=-22,
-                message="La longitud debe estar en el rango de -53 a -22.",
+                min=-70,
+                max=-54,
+                message="La longitud debe estar en el rango de argentina -70 a -54.",
             ),
         ],
     )

@@ -40,14 +40,14 @@ export default {
                 })
             ],
             view: new View({
-                center: fromLonLat([lat, lon]),
+                center: fromLonLat([lon, lat]),
                 zoom: 10
             })
         });
 
         let marker = new Feature({
             geometry: new Point(
-                fromLonLat([lat, lon])
+                fromLonLat([lon, lat])
             )
         });
 
