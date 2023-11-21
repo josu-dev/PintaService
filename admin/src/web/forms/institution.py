@@ -1,7 +1,7 @@
 import typing as t
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, StringField, TextAreaField
+from wtforms import EmailField, IntegerField, StringField, TextAreaField
 from wtforms import validators as v
 
 from src.services.institution import InstitutionParams
@@ -29,11 +29,27 @@ class InstitutionForm(FlaskForm):
             v.Length(min=0, max=256),
         ],
     )
-    location = StringField(
-        "Ubicación",
+    latitude = IntegerField(
+        "Latitud",
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=0, max=256),
+            v.NumberRange(
+                min=-74,
+                max=-59,
+                message="La latitud debe estar en el rango de -74 a -59.",
+            ),
+        ],
+    )
+
+    longitude = IntegerField(
+        "Longitud",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.NumberRange(
+                min=-53,
+                max=-22,
+                message="La longitud debe estar en el rango de -53 a -22.",
+            ),
         ],
     )
     web = StringField(
@@ -66,11 +82,12 @@ class InstitutionForm(FlaskForm):
     )
 
     def values(self) -> InstitutionParams:
+        location = f"{self.latitude.data},{self.longitude.data}"
         return {  # type: ignore
             "name": self.name.data,
             "information": self.information.data,
             "address": self.address.data,
-            "location": self.location.data,
+            "location": location,
             "web": self.web.data,
             "keywords": self.keywords.data,
             "email": self.email.data,
