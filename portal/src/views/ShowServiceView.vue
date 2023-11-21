@@ -59,8 +59,8 @@ APIService.get(`/service_institution/${service_id}`, {
 
 </script>
 <template>
-    <div class="min-h-screen overflow-hidden mt-8">
-        <main class="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 overflow-y-auto min-h-full">
+    <div class="h-full overflow-y-auto">
+        <main class="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 mt-8">
 
             <!-- Service and institution detail -->
             <div>
