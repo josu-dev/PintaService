@@ -276,9 +276,15 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
-        service.asdict(
-            ("name", "description", "laboratory", "keywords", "enabled"),
-        )
+        {
+            "id": service.id,
+            "name": service.name,
+            "description": service.description,
+            "laboratory": service.laboratory,
+            "keywords": service.keywords,
+            "enabled": service.enabled,
+            "service_type": service.service_type.value,
+        }
         for service in raw_services
     ]
 

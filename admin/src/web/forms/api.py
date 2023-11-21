@@ -108,7 +108,6 @@ class ServiceSearchFormValues(t.TypedDict):
 class ServiceSearchForm(FlaskForm):
     q = wtforms.StringField(
         validators=[
-            v.DataRequired("Este campo es requerido"),
             v.Length(min=0, max=32),
         ],
     )
