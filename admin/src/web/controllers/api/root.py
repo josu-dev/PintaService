@@ -79,6 +79,31 @@ def institutions_get(args: api_forms.PaginationFormValues):
     return response
 
 
+@bp.get("/service_institution/<int:service_id>")
+@base.validation(method="GET")
+def institutions_id_get(service_id: int):
+    institution_id = ServiceService.get_institution_of(service_id)
+    if institution_id is None:
+        return base.API_BAD_REQUEST_RESPONSE
+    institution = InstitutionService.get_institution(institution_id)  # type: ignore
+    if institution is None:
+        return base.API_BAD_REQUEST_RESPONSE
+
+    response = institution.asdict(
+        (
+            "name",
+            "information",
+            "address",
+            "web",
+            "keywords",
+            "email",
+            "days_and_opening_hours",
+        ),
+    )
+
+    return response
+
+
 @bp.get("/me/profile")
 @base.validation(method="GET", require_auth=True)
 def me_profile_get():
@@ -280,7 +305,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 
 @bp.get("/services/<int:service_id>")
-@base.validation(method="GET", require_auth=True)
+@base.validation(method="GET")
 def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
