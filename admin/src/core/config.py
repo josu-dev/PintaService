@@ -191,8 +191,11 @@ class Config:
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
 
-    # Jwt
+    # Flask-JWT-Extended config
     JWT_SECRET_KEY: str
+    JWT_TOKEN_LOCATION: t.List[str]
+    JWT_HEADER_TYPE: str
+    JWT_ERROR_MESSAGE_KEY: str
 
     @classmethod
     def load_env_config(cls) -> None:
@@ -233,6 +236,13 @@ class Config:
         cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
 
         cls.JWT_SECRET_KEY = env_or_error("JWT_SECRET_KEY")
+        cls.JWT_TOKEN_LOCATION = env_or_error(
+            "JWT_TOKEN_LOCATION", "headers"
+        ).split(",")
+        cls.JWT_HEADER_TYPE = env_or_error("JWT_HEADER_TYPE", "JWT")
+        cls.JWT_ERROR_MESSAGE_KEY = env_or_error(
+            "JWT_ERROR_MESSAGE_KEY", "jwt_error_message"
+        )
 
 
 def init_app(app: Flask, env: str) -> None:

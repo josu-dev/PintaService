@@ -5,6 +5,7 @@
   import IconStats from '@/components/icons/IconStats.vue';
   import IconUser from '@/components/icons/IconUser.vue';
   import { useUserStore } from '@/stores/user';
+  import { APIService } from '@/utils/api';
   import { computed } from 'vue';
   import { RouterLink, useRouter } from 'vue-router';
 
@@ -12,7 +13,9 @@
   const userStore = useUserStore();
 
   function submitLogout() {
+    APIService.clearJWT();
     userStore.clearUser();
+
     router.push({
       name: 'login'
     });
