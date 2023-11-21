@@ -4,11 +4,16 @@
 export const DEFAULT_TOAST_TIMEOUT = 3000;
 
 /**
- * API URL to be used in the application.
+ * Base URL for the backend.
  * @type {string}
  */
-export const API_URL =
-  import.meta.env.VITE_API_URL ?? 'https://admin-grupo04.proyecto2023.linti.unlp.edu.ar/api';
+export const BACKEND_BASE_URL =
+  import.meta.env.VITE_BACKEND_BASE_URL ?? 'https://admin-grupo04.proyecto2023.linti.unlp.edu.ar';
+
+/**
+ * API URL for the backend.
+ */
+export const BACKEND_API_URL = `${BACKEND_BASE_URL}/api`;
 
 /**
  * Default key for the jwt error message.

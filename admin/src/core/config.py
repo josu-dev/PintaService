@@ -190,6 +190,7 @@ class Config:
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
+    MAIL_DEBUG: int
 
     # Flask-JWT-Extended config
     JWT_SECRET_KEY: str
@@ -234,6 +235,7 @@ class Config:
         cls.MAIL_USERNAME = env_or_error("MAIL_USERNAME")
         cls.MAIL_PASSWORD = env_or_error("MAIL_PASSWORD")
         cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
+        cls.MAIL_DEBUG = int(env_or_error("MAIL_DEBUG", "0"))
 
         cls.JWT_SECRET_KEY = env_or_error("JWT_SECRET_KEY")
         cls.JWT_TOKEN_LOCATION = env_or_error(

@@ -1,4 +1,5 @@
 import typing as t
+import urllib.parse
 
 from flask import (
     Blueprint,
@@ -12,6 +13,7 @@ from flask import (
 
 from src.core.enums import DocumentTypes, GenderOptions
 from src.services.auth import AuthService
+from src.services.mail import MailService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
@@ -105,7 +107,18 @@ def pre_register_post():
             status.HTTP_400_BAD_REQUEST,
         )
 
-    AuthService.create_pre_user(**form.values())
+    user = AuthService.create_pre_user(**form.values())
+
+    register_link = f"{request.host_url}register?token={user.token}"
+    redirect_to_arg = request.args.get("redirect_to")
+    if redirect_to_arg is not None:
+        register_link += f"&redirect_to={urllib.parse.quote(redirect_to_arg + '?email=' + user.email)}"  # noqa: E501
+
+    MailService.send_mail(
+        "Confirmacion de Registro",
+        user.email,
+        f'Finalice el registro entrando a <a href="{register_link}">este link</a> completando la informacion restante.',  # noqa: E501
+    )
     return render_template("info_register.html")
 
 
@@ -179,8 +192,13 @@ def register_post():
         phone="",
     )
     AuthService.delete_pre_user(token)
+
+    redirect_to_link = request.args.get("redirect_to")
+    if redirect_to_link is not None:
+        return redirect(redirect_to_link)
+
     h.flash_success("Se ha registrado exitosamente")
-    return redirect(url_for("root.login_get"))
+    return redirect("/login")
 
 
 @bp.get("/account_disabled")
