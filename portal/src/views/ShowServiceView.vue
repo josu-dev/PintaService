@@ -18,7 +18,7 @@ const props = defineProps({
  *    laboratory: string,
  *    keywords: string[],
  *    enabled: boolean,
- * }} institutionData
+ * }} ServiceData
  */
 
 /**
@@ -32,13 +32,15 @@ const props = defineProps({
  *    enabled: boolean,
  *    email: string,
  *    days_and_opening_hours: string,
- * }} serviceData
+ * }} InstitutionData
  */
 
 
+/** @type {import('vue').Ref<ServiceData>} */
+const serviceData = ref(/** @type {any} */(null));
 
-const serviceData = ref([]);
-const institutionData = ref([]);
+/** @type {import('vue').Ref<InstitutionData>} */
+const institutionData = ref(/** @type {any} */(null));
 const service_id = props.service_id ? props.service_id : '-1';
 
 APIService.get(`/service_institution/${service_id}`, {
@@ -76,11 +78,13 @@ APIService.get(`/service_institution/${service_id}`, {
             <!-- Map and Location -->
             <div class="flex flex-col items-center justify-center mt-4  sm:mt-0">
                 <div style="width: 100%; height: 500px;">
-                    <LocationMap />
+                    <LocationMap v-if="institutionData.location" :location="institutionData.location" />
+                    <div v-else class="text-center text-gray-500">Cargando ubicación...</div>
                 </div>
+
                 <button type="submit" class="btn btn-primary">Solicitar</button>
             </div>
         </main>
     </div>
-</template>
+</template> 
   

@@ -18,7 +18,18 @@ export default {
             map: null
         };
     },
+    props: {
+        location: {
+            type: String,
+            required: true
+        }
+    },
     mounted() {
+        const [latitude, longitude] = this.location.split(',');
+
+        const lat = Number(latitude);
+        const lon = Number(longitude);
+
         // @ts-ignore
         this.map = new Map({
             // @ts-ignore
@@ -29,14 +40,14 @@ export default {
                 })
             ],
             view: new View({
-                center: fromLonLat([-58.3816, -34.6037]), // TODO añadir coordenadas por paametro actual es  Coordenadas de Buenos Aires
+                center: fromLonLat([lat, lon]),
                 zoom: 10
             })
         });
 
         let marker = new Feature({
             geometry: new Point(
-                fromLonLat([-58.3816, -34.6037]) //TODO añadir coordenadas por paametro actual es  Coordenadas de Buenos Aires
+                fromLonLat([lat, lon])
             )
         });
 
