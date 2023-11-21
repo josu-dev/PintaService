@@ -1,5 +1,5 @@
 import {
-  API_URL,
+  BACKEND_API_URL,
   DEFAULT_API_JWT_ERROR,
   DEFAULT_API_JWT_ERROR_MESSAGE_KEY,
   DEFAULT_API_MAINTEINANCE_ERROR
@@ -38,7 +38,7 @@ const JWT_LS_KEY = 'LAST_JWT';
  * A class for making requests to the API and handling the responses.
  */
 export class APIService {
-  static apiURL = API_URL;
+  static apiURL = BACKEND_API_URL;
   /** @type {Record<string, string>} */
   static defaultHeaders = {};
 
