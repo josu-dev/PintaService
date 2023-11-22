@@ -17,10 +17,17 @@ bp = flask.Blueprint("root", __name__)
 @base.validation(api_forms.AuthForm)
 def auth_post(body: api_forms.AuthFormValues):
     user = UserService.validate_email_password(body["email"], body["password"])
-    if not user:
-        return {"result": "fail"}, status.HTTP_400_BAD_REQUEST
+    if user is None:
+        return base.API_BAD_REQUEST_RESPONSE
 
-    return {"result": "success"}
+    access_token = base.create_access_token(user.id)
+    response = (
+        {
+            "token": access_token,
+        },
+        status.HTTP_200_OK,
+    )
+    return response
 
 
 @bp.get("/institutions")
@@ -55,10 +62,49 @@ def institutions_get(args: api_forms.PaginationFormValues):
     return response
 
 
+@bp.get("/service_institution/<int:service_id>")
+@base.validation(method="GET")
+def institutions_id_get(service_id: int):
+    institution_id = ServiceService.get_institution_of(service_id)
+    if institution_id is None:
+        return base.API_BAD_REQUEST_RESPONSE
+
+    institution = InstitutionService.get_institution(institution_id)  # type: ignore # noqa: E501
+    service = ServiceService.get_service(service_id)
+    if institution is None or service is None:
+        return base.API_BAD_REQUEST_RESPONSE
+
+    response = {
+        "data": {
+            "service": {
+                "name": service.name,
+                "description": service.description,
+                "laboratory": service.laboratory,
+                "keywords": service.keywords,
+                "enabled": service.enabled,
+            },
+            "institution": {
+                "name": institution.name,
+                "information": institution.information,
+                "address": institution.address,
+                "web": institution.web,
+                "keywords": institution.keywords,
+                "location": institution.location,
+                "enabled": institution.enabled,
+                "email": institution.email,
+                "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
+            },
+        }
+    }
+
+    return response
+
+
 @bp.get("/me/profile")
 @base.validation(method="GET", require_auth=True)
-def me_profile_get(user_id: int):
-    user = UserService.get_user(user_id)
+def me_profile_get():
+    user_id = base.user_id_from_access_token()
+    user = UserService.get_by_id(user_id)
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
@@ -77,14 +123,10 @@ def me_profile_get(user_id: int):
 
 
 @bp.get("/me/requests")
-@base.validation(
-    api_forms.PaginationForm,
-    method="GET",
-    require_auth=True,
-)
-def me_requests_get(args: api_forms.PaginationFormValues, user_id: int):
-    user = UserService.get_user(user_id)
-    if user is None:
+@base.validation(api_forms.PaginationForm, method="GET", require_auth=True)
+def me_requests_get(args: api_forms.PaginationFormValues):
+    user_id = base.user_id_from_access_token()
+    if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
     page = args["page"]
@@ -124,9 +166,9 @@ def me_requests_get(args: api_forms.PaginationFormValues, user_id: int):
 
 @bp.get("/me/requests/<int:request_id>")
 @base.validation(method="GET", require_auth=True)
-def me_requests_id_get(request_id: int, user_id: int):
-    user = UserService.get_user(user_id)
-    if user is None:
+def me_requests_id_get(request_id: int):
+    user_id = base.user_id_from_access_token()
+    if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
     try:
@@ -154,9 +196,9 @@ def me_requests_id_get(request_id: int, user_id: int):
 
 @bp.post("/me/requests")
 @base.validation(api_forms.ServiceRequestForm, require_auth=True)
-def me_requests_post(body: api_forms.ServiceRequestFormValues, user_id: int):
-    user = UserService.get_user(user_id)
-    if user is None:
+def me_requests_post(body: api_forms.ServiceRequestFormValues):
+    user_id = base.user_id_from_access_token()
+    if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
     service_id = body["service_id"]
@@ -189,10 +231,10 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues, user_id: int):
 @bp.post("/me/requests/<int:request_id>/notes")
 @base.validation(api_forms.RequestNoteForm, require_auth=True)
 def me_requests_id_notes_post(
-    body: api_forms.RequestNoteFormValues, request_id: int, user_id: int
+    body: api_forms.RequestNoteFormValues, request_id: int
 ):
-    user = UserService.get_user(user_id)
-    if user is None:
+    user_id = base.user_id_from_access_token()
+    if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
     text = body["text"]
@@ -234,9 +276,15 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
-        service.asdict(
-            ("name", "description", "laboratory", "keywords", "enabled"),
-        )
+        {
+            "id": service.id,
+            "name": service.name,
+            "description": service.description,
+            "laboratory": service.laboratory,
+            "keywords": service.keywords,
+            "enabled": service.enabled,
+            "service_type": service.service_type.value,
+        }
         for service in raw_services
     ]
 
@@ -252,7 +300,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 @bp.get("/services/<int:service_id>")
 @base.validation(method="GET", require_auth=True)
-def services_id_get(service_id: int, user_id: int):
+def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
     except ServiceService.ServiceServiceError:
@@ -270,7 +318,7 @@ def services_id_get(service_id: int, user_id: int):
 
 @bp.get("/services_types")
 @base.validation(method="GET", require_auth=True)
-def services_types_get(user_id: int):
+def services_types_get():
     response = {
         "data": [service_type.value for service_type in enums.ServiceTypes]
     }
@@ -280,7 +328,8 @@ def services_types_get(user_id: int):
 
 @bp.get("/stats/requests_per_status")
 @base.validation(method="GET", require_auth=True, debug=True)
-def stats_requests_per_status_get(user_id: int):
+def stats_requests_per_status_get():
+    user_id = base.user_id_from_access_token()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -311,8 +360,9 @@ def stats_requests_per_status_get(user_id: int):
 
 
 @bp.get("/stats/most_requested_services")
-@base.validation(method="GET", require_auth=True, debug=True)
-def stats_most_requested_services_get(user_id: int):
+@base.validation(method="GET", require_auth=True)
+def stats_most_requested_services_get():
+    user_id = base.user_id_from_access_token()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -343,10 +393,9 @@ def stats_most_requested_services_get(user_id: int):
 
 
 @bp.get("/stats/most_efficient_institutions")
-@base.validation(method="GET", require_auth=True, debug=True)
-def stats_most_efficient_institutions_get(user_id: int):
-    print("gola")
-    # print("stats_most_efficient_institutions_get", file=sys.stderr)
+@base.validation(method="GET", require_auth=True)
+def stats_most_efficient_institutions_get():
+    user_id = base.user_id_from_access_token()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
     user_institutions = InstitutionService.get_institutions_owned_by_user(
         user_id
@@ -355,7 +404,7 @@ def stats_most_efficient_institutions_get(user_id: int):
         return base.API_UNAUTHORIZED_RESPONSE
 
     institutions = InstitutionService.get_most_efficient_institutions()
-    # print(institutions, file=sys.stderr)
+
     response = {
         "data": [
             {
@@ -371,5 +420,36 @@ def stats_most_efficient_institutions_get(user_id: int):
         ]
     }
 
-    # print(response, file=sys.stderr)
+    return response
+
+
+@bp.get("/me/rol/site_admin")
+@base.validation(method="GET", require_auth=True)
+def me_rol_site_admin_get():
+    user_id = base.user_id_from_access_token()
+    is_site_admin = AuthService.user_is_site_admin(user_id)
+
+    response = {
+        "data": {
+            "is_site_admin": is_site_admin,
+        },
+    }
+
+    return response
+
+
+@bp.get("/me/rol/institution_owner")
+@base.validation(method="GET", require_auth=True)
+def me_rol_institution_owner():
+    user_id = base.user_id_from_access_token()
+    is_institution_owner = InstitutionService.get_institutions_owned_by_user(
+        user_id
+    )
+
+    response = {
+        "data": {
+            "is_institution_owner": len(is_institution_owner) > 0,
+        },
+    }
+
     return response

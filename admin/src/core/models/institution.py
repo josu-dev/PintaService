@@ -7,6 +7,7 @@ from src.core.models.base import (
     CreatedAt,
     IntPK,
     Str32,
+    Str64,
     Str256,
     Str512,
     UpdatedAt,
@@ -21,7 +22,7 @@ class Institution(BaseModel):
     name: Mapped[Str32]
     information: Mapped[Str512]
     address: Mapped[Str256]
-    location: Mapped[Str256]
+    location: Mapped[Str64]
     web: Mapped[Str256]
     keywords: Mapped[Str256]
     email: Mapped[Str256]

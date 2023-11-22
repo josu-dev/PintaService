@@ -10,14 +10,37 @@ const router = createRouter({
       component: HomeView
     },
     {
-      path: '/stats',
-      name: 'stats',
-      component: () => import('../views/StatsView.vue')
-    },
-    {
       path: '/login',
       name: 'login',
       component: () => import('../views/LoginView.vue')
+    },
+    {
+      path: '/services/search',
+      name: 'services',
+      component: () => import('../views/SearchServicesView.vue')
+    },
+    {
+      path: '/services/:service_id(\\d+)',
+      props: true,
+      name: 'service',
+      component: () => import('../views/ShowServiceView.vue')
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: () => import('../views/ProfileView.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
+      path: '/stats',
+      name: 'stats',
+      component: () => import('../views/StatsView.vue'),
+      meta: {
+        requiresAuth: true,
+        requiresSiteAdminOrInstitutionOwner: true
+      }
     }
   ]
 });

@@ -1,4 +1,6 @@
 <script setup>
+  import { onMounted, onUnmounted, ref } from 'vue';
+
   const props = defineProps({
     value: {
       type: String,
@@ -13,10 +15,23 @@
     required: {
       type: Boolean,
       default: false
+    },
+    autocomplete: {
+      type: String,
+      default: 'off'
     }
   });
 
-  defineEmits(['update:value']);
+  const emit = defineEmits(['update:value', 'ref:input']);
+
+  const inputRef = ref(null);
+
+  onMounted(() => {
+    emit('ref:input', inputRef.value);
+  });
+  onUnmounted(() => {
+    emit('ref:input', null);
+  });
 </script>
 
 <template>
@@ -32,10 +47,12 @@
       :id="props.name"
       :value="value"
       :required="props.required"
+      :autocomplete="props.autocomplete"
       @input="
         // @ts-expect-error - target.value is valid
         $emit('update:value', $event.target?.value)
       "
+      ref="inputRef"
       class="input input-bordered w-full max-w-xs input-sm md:input-md"
     />
   </div>
