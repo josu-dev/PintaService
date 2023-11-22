@@ -178,22 +178,23 @@ def load_test_data() -> None:
     )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        name="Brillo y pintura",
+        description="Pintamos su auto",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
-        keywords="servicio1, servicio, 1",
+        name="Laca y barniz",
+        description="Barnizamos su auto con laca de primera calidad",
+        keywords="laca, barniz, auto",
         service_type=ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Doble pintado al solvente",
+        description="Pintamos su auto con pintura al solvente durante \
+            la mañana y la tarde",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.DEVELOPMENT,
     )
@@ -276,23 +277,23 @@ def load_test_data() -> None:
         status=RequestStatus.FINISHED,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Colores mate",
+        description="Pintamos su auto con colores mate de garantía",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Colores brillantes",
+        description="Brillantina para sus vehículos",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
-        keywords="servicio1, servicio, 1",
+        name="Pintado al agua",
+        description="Acualux para sus vehículos",
+        keywords="agua, suave, lavado",
         service_type=enums.ServiceTypes.DEVELOPMENT,
     )

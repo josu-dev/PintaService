@@ -1,4 +1,4 @@
-"""Model for service."""
+import sqlalchemy as sa
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
@@ -12,6 +12,7 @@ from src.core.models.base import (
     Str512,
     UpdatedAt,
 )
+from src.core.models.search import TSVectorType
 
 
 class Service(BaseModel):
@@ -32,3 +33,33 @@ class Service(BaseModel):
     )
 
     enabled: Mapped[bool] = mapped_column(default=True)
+
+    search_tsv = sa.Column(  # pyright: ignore[reportUnknownVariableType]
+        TSVectorType(
+            "name",
+            "laboratory",
+            "description",
+            "keywords",
+            regconfig="argentino",
+        ),
+        sa.Computed(
+            "to_tsvector('argentino', \"name\" || ' ' || \"laboratory\" || ' ' || \"description\" || ' ' || \"keywords\")",  # noqa E501
+            persisted=True,
+        ),
+    )
+    #   equivalent to:
+    #   COLUMN search_tsv TSVECTOR GENERATED ALWAYS AS (
+    #       to_tsvector(
+    #           'argentino',
+    #           "name" || ' ' || "laboratory" || ' ' || "description" || ' ' || "keywords" # noqa E501
+    #       )
+    #   ) STORED;
+
+    __table_args__ = (
+        # Indexing the TSVector column
+        sa.Index(
+            "idx_service_search_tsv",
+            search_tsv,  # pyright: ignore[reportUnknownArgumentType]
+            postgresql_using="gin",
+        ),
+    )

@@ -193,13 +193,11 @@ class ServiceService(BaseService):
         """
         query = db.session.query(Service)
         if q != "":
-            query = query.filter(
-                sa.or_(
-                    Service.name.ilike(f"%{q}%"),
-                    Service.description.ilike(f"%{q}%"),
-                    Service.keywords.ilike(f"%{q}%"),
-                    Service.laboratory.ilike(f"%{q}%"),
-                )
+            qterm = " & ".join(word + ":*" for word in q.split())
+            tsquery = sa.func.to_tsquery("argentino", qterm)
+            query = query.filter(Service.search_tsv.op("@@")(tsquery))
+            query = query.order_by(
+                sa.func.ts_rank(Service.search_tsv, tsquery).desc()
             )
 
         if service_type is not None:
