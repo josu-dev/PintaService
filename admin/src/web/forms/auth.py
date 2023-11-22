@@ -73,6 +73,64 @@ class UserRegisterFormValues(TypedDict):
     password_confirmation: str
 
 
+class UserRegisterGoogleFormValues(TypedDict):
+    firstname: str
+    lastname: str
+    username: str
+    password: str
+    password_confirmation: str
+
+
+class UserRegisterGoogle(FlaskForm):
+    firstname = StringField(
+        "Nombre",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
+    )
+    lastname = StringField(
+        "Apellido",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
+    )
+    username = StringField(
+        "Nombre de usuario",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
+    )
+    password = PasswordField(
+        "Contraseña",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+            v.EqualTo(
+                "password_confirmation", message="Las contraseñas no coinciden"
+            ),
+        ],
+    )
+    password_confirmation = PasswordField(
+        "Confirmar contraseña",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.Length(min=0, max=32),
+        ],
+    )
+
+    def values(self) -> UserRegisterGoogleFormValues:
+        return {  # type: ignore
+            "firstname": self.firstname.data,
+            "lastname": self.lastname.data,
+            "username": self.username.data,
+            "password": self.password.data,
+            "password_confirmation": self.password_confirmation.data,
+        }
+
+
 class UserRegister(FlaskForm):
     username = StringField(
         "Nombre de usuario",

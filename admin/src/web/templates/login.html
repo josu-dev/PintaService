@@ -1,6 +1,7 @@
 {% extends "_layouts/auth.html" %}
 {% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
 
 {% block head %}
 <title>Iniciar sesion</title>
@@ -9,7 +10,9 @@
 {% block content %}
 <div class="flex flex-col items-center md:basis-1/2">
   {% call Form.render_form(form) %}
-  {{Button.success("Confirmar","submit")}}
+  {{Button.success("Iniciar sesion","submit")}}
+  {{ LinkButton.secondary("Iniciar sesion con
+  Google", "/login_callback") }}
   {% endcall %}
   <div class="flex flex-row gap-2 mt-2">
     <p>¿No tienes cuenta?</p>

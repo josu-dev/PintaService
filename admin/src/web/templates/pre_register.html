@@ -1,6 +1,7 @@
 {% extends "_layouts/auth.html" %}
 {% import "_macros/form.html" as Form %}
 {% import "_macros/button.html" as Button %}
+{% import "_macros/link_button.html" as LinkButton %}
 
 {% block head %}
 <title>Pre registro</title>
@@ -10,8 +11,10 @@
 <div class="flex flex-col items-center md:basis-1/2">
   {% call Form.render_form(form) %}
   {{Button.success("Registrarme","submit")}}
-  {{Button.default("Registrarme con
-  Google")}}
+  {% if not redirect_to and redirect_to != ''%}
+  {{ LinkButton.secondary("Registrarme con
+  Google", "/login_callback") }}
+  {% endif %}
   {% endcall %}
   <div class="flex flex-row gap-2 mt-2">
     <p>¿Tienes cuenta?</p>

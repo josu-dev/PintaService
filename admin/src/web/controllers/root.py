@@ -18,7 +18,12 @@ from src.services.mail import MailService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.auth import UserLogin, UserPreRegister, UserRegister
+from src.web.forms.auth import (
+    UserLogin,
+    UserPreRegister,
+    UserRegister,
+    UserRegisterGoogle,
+)
 from src.web.forms.user import ProfileUpdateForm
 
 bp = Blueprint("root", __name__)
@@ -84,7 +89,11 @@ def login_post():
 @h.require_no_session()
 def pre_register_get():
     form = UserPreRegister()
-    return render_template("pre_register.html", form=form)
+    redirect_to = request.args.get("redirect_to")
+    print(redirect_to, flush=True)
+    return render_template(
+        "pre_register.html", redirect_to=redirect_to, form=form
+    )
 
 
 @bp.post("/pre_register")
@@ -143,9 +152,22 @@ def register_get():
         h.flash_info("El token expiro, realice el registro nuevamente")
         return redirect(url_for("root.pre_register_get"))
 
+    google_register = request.args.get("google")
+    if (
+        google_register is not None
+        and user.register_type == RegisterTypes.GOOGLE
+    ):
+        form = UserRegisterGoogle()
+        return render_template(
+            "register.html",
+            form=form,
+            form_action="/register_google" + "?token=" + user.token,
+        )
+
     form = UserRegister()
     return render_template(
-        "register.html", form=form, form_action=f"/register?token={token}"
+        "register.html",
+        form=form,
     )
 
 
@@ -219,12 +241,7 @@ def register_google_post():
         h.flash_info("Realice el registro")
         return redirect(url_for("root.login_get"))
 
-    if AuthService.token_expired(user.created_at):
-        AuthService.delete_pre_user(token)
-        h.flash_info("El token expiro, realice el registro nuevamente")
-        return redirect(url_for("root.pre_register_get"))
-
-    form = UserRegister(request.form)
+    form = UserRegisterGoogle(request.form)
     if not form.validate():
         h.flash_info("Los datos ingresados son invalidos")
         return (
@@ -243,9 +260,9 @@ def register_google_post():
     UserService.create_user(
         username=form_values["username"],
         password=form_values["password"],
-        **user.asdict(
-            ("email", "firstname", "lastname"),
-        ),
+        firstname=form_values["firstname"],
+        lastname=form_values["lastname"],
+        email=user.email,
         document_type=DocumentTypes.DNI,
         document_number="",
         gender=GenderOptions.NOT_SPECIFIED,
@@ -340,7 +357,12 @@ def google_login_post():
 
     user = AuthService.get_pre_user_by_email(user_info["email"])  # type:ignore
     if user:
-        return render_template("info_register.html")  # realizar registro
+        h.flash_info(
+            "Complete el registro para tener acceso a las funcionalidades"
+        )
+        return redirect(
+            url_for("root.register_get") + f"?token={user.token}&google=google"
+        )
 
     register_type = RegisterTypes.GOOGLE
 
@@ -350,7 +372,13 @@ def google_login_post():
         email=user_info["email"],  # type: ignore
         register_type=register_type,
     )
-    return render_template("info_register.html")
+
+    h.flash_info(
+        "Complete el registro para tener acceso a las funcionalidades"
+    )
+    return redirect(
+        url_for("root.register_get") + f"?token={user.token}&google=google"
+    )
 
 
 bp.get("/push_main")(lambda: (render_template("_errors/451.html"), 451))
