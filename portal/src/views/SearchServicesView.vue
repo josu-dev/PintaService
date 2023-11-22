@@ -26,7 +26,6 @@ let totalServices = ref(0);
 
 const filterServices = () => {
   loading.value = true;
-  console.log('CurrentPage', currentPage.value)
   const url = `/services/search?q=${qFilter.value}&type=${typeFilter.value}&page=${currentPage.value}`;
   APIService.get(url, {
     onJSON(json) {
@@ -99,7 +98,7 @@ const changePage = (page) => {
 
       <div class="mt-4">
         <div v-if="Math.ceil(totalServices / perPage) > 0">
-          <button class="btn btn-primary m-1" v-for="page in Math.ceil(totalServices / perPage)" :key="page"
+          <button class="btnbtn-primary m-1" v-for="page in Math.ceil(totalServices / perPage)" :key="page"
             @click="changePage(page)"
             :class="{ 'bg-orange-600 text-orange-50': page === currentPage, 'bg-orange-200 text-zinc-800': page !== currentPage }">
             {{ page }}
