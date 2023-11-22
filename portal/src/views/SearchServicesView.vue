@@ -34,7 +34,6 @@ const filterServices = () => {
       currentPage.value = json.page;
       perPage.value = json.per_page;
       totalServices.value = json.total;
-      console.log(currentPage.value);
       loading.value = false;
     },
     onFailure(response) {
@@ -100,7 +99,7 @@ const changePage = (page) => {
 
       <div class="mt-4">
         <div v-if="Math.ceil(totalServices / perPage) > 0">
-          <button class="item btn" v-for="page in Math.ceil(totalServices / perPage)" :key="page"
+          <button class="btn btn-primary m-1" v-for="page in Math.ceil(totalServices / perPage)" :key="page"
             @click="changePage(page)"
             :class="{ 'bg-orange-600 text-orange-50': page === currentPage, 'bg-orange-200 text-zinc-800': page !== currentPage }">
             {{ page }}
