@@ -107,7 +107,7 @@ const changePage = (page) => {
           </button>
           <p class="text-center">Página {{ currentPage }} de {{ Math.ceil(totalServices / perPage) }}</p>
         </div>
-        <div v-else class="bg-white rounded-lg overflow-hidden shadow-md">
+        <div v-else-if="!loading" class="bg-white rounded-lg overflow-hidden shadow-md">
           <div class="p-4">
             <p class="text-lg font-bold text-gray-800">No se encontraron Servicios</p>
           </div>
