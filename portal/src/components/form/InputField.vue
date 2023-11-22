@@ -19,6 +19,10 @@
     autocomplete: {
       type: String,
       default: 'off'
+    },
+    inputClass: {
+      type: String,
+      default: ''
     }
   });
 
@@ -53,7 +57,7 @@
         $emit('update:value', $event.target?.value)
       "
       ref="inputRef"
-      class="input input-bordered w-full max-w-xs input-sm md:input-md"
+      :class="'input input-bordered w-full max-w-xs input-sm md:input-md ' + props.inputClass"
     />
   </div>
 </template>

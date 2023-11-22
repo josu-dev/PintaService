@@ -20,6 +20,7 @@ import {
  * @property {(error: unknown) => void} [onError] - The callback for when an error occurs.
  * @property {MaintenanceErrorOptions} [maintenanceError] - The option for how to handle maintenance failures.
  * @property {JWTErrorOptions} [jwtError] - The option for how to handle JWT errors.
+ * @property {() => void} [afterRequest] - The callback for after the request is made, regardless of whether it succeeded or not.
  */
 
 /**
@@ -30,6 +31,7 @@ import {
  * @property {(error: unknown) => void} [onError] - The callback for when an error occurs.
  * @property {MaintenanceErrorOptions} [maintenanceError] - The option for how to handle maintenance failures.
  * @property {JWTErrorOptions} [jwtError] - The option for how to handle JWT errors.
+ * @property {() => void} [afterRequest] - The callback for after the request is made, regardless of whether it succeeded or not.
  */
 
 const JWT_LS_KEY = 'LAST_JWT';
@@ -123,6 +125,8 @@ export class APIService {
       }
 
       throw error;
+    } finally {
+      options.afterRequest?.();
     }
 
     return data;
@@ -193,6 +197,8 @@ export class APIService {
       }
 
       throw error;
+    } finally {
+      options.afterRequest?.();
     }
 
     return data;
