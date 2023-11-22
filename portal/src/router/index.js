@@ -16,14 +16,14 @@ const router = createRouter({
     },
     {
       path: '/services/search',
-      name:'services',
-      component: () => import('../views/SearchServices.vue'),
+      name: 'services',
+      component: () => import('../views/SearchServicesView.vue')
     },
     {
-      path:'/services/:service_id(\\d+)',
-      props:true,
-      name:'service',
-      component: () => import('../views/ShowServiceView.vue'),
+      path: '/services/:service_id(\\d+)',
+      props: true,
+      name: 'service',
+      component: () => import('../views/ShowServiceView.vue')
     },
     {
       path: '/profile',

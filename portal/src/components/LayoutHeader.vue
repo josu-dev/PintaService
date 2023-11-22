@@ -2,6 +2,7 @@
   import IconLogin from '@/components/icons/IconLogin.vue';
   import IconMenu from '@/components/icons/IconMenu.vue';
   import IconPaintbrush from '@/components/icons/IconPaintbrush.vue';
+  import IconSearch from '@/components/icons/IconSearch.vue';
   import IconStats from '@/components/icons/IconStats.vue';
   import IconUser from '@/components/icons/IconUser.vue';
   import { useUserStore } from '@/stores/user';
@@ -39,6 +40,11 @@
       )
     },
     {
+      label: 'Busqueda',
+      path: '/services/search',
+      icon: IconSearch
+    },
+    {
       label: 'Servicios',
       path: '/services',
       icon: IconPaintbrush
@@ -47,14 +53,14 @@
 </script>
 
 <template>
-  <div class="navbar shadow bg-orange-800 text-white sticky top-0 z-10">
+  <div class="navbar shadow">
     <div class="navbar-start">
       <RouterLink to="/" class="btn btn-ghost normal-case text-xl">
         <div class="w-10 -ml-2">
           <img src="/logo_64x64.png" />
         </div>
-        <span class="sr-only xs:not-sr-only ml-2 ">Pinta Service</span></RouterLink
-      >
+        <span class="sr-only lg:not-sr-only ml-2">Pinta Service</span>
+      </RouterLink>
     </div>
 
     <nav class="dropdown md:hidden">
@@ -66,14 +72,14 @@
         tabindex="0"
         class="menu menu-sm dropdown-content -left-[calc(6.25rem-50%)] w-48 mt-3 z-[1] p-2 shadow bg-base-100 rounded-box"
       >
-        <li v-for="link in menuLinks" :key="link.path" class="">
-          <template v-if="link.isRenderable?.value ?? true">
+        <template v-for="link in menuLinks" :key="link.path">
+          <li v-if="link.isRenderable?.value ?? true" class="">
             <RouterLink :to="link.path" :active-class="'active'" class="font-semibold">
               <component :is="link.icon" class="hidden xs:block" />
               <span class="">{{ link.label }}</span>
             </RouterLink>
-          </template>
-        </li>
+          </li>
+        </template>
       </ul>
     </nav>
 
@@ -92,15 +98,19 @@
 
     <div class="navbar-end">
       <div v-if="!userStore.user" class="flex justify-center items-center">
-        <RouterLink to="/login" class="btn btn-ghost normal-case text-lg">
-          <IconLogin class="sm:hidden" />
-          <span class="sr-only sm:not-sr-only">Iniciar Sesion</span></RouterLink
+        <RouterLink
+          to="/login"
+          :active-class="'!btn-primary btn-active'"
+          class="btn btn-ghost normal-case text-lg"
         >
+          <IconLogin class="sm:hidden" />
+          <span class="sr-only sm:not-sr-only">Iniciar Sesion</span>
+        </RouterLink>
       </div>
       <div v-else class="dropdown dropdown-end">
         <label tabindex="0" class="btn btn-ghost">
           <IconUser class="" />
-          <span class="sr-only sm:not-sr-only !ml-2 normal-case text-lg">{{
+          <span class="sr-only sm:not-sr-only !ml-2 capitalize text-lg">{{
             userStore.user.username
           }}</span>
           <!-- <span class="sr-only sm:not-sr-only normal-case text-lg">Menu</span> -->
@@ -111,7 +121,7 @@
         >
           <li class="sm:hidden">
             <div class="flex justify-between w-full">
-              <span>{{ userStore.user.username }}</span>
+              <span class="capitalize">{{ userStore.user.username }}</span>
             </div>
           </li>
           <div class="sm:hidden border-b border-neutral-content my-2"></div>
