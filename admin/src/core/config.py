@@ -198,6 +198,10 @@ class Config:
     JWT_HEADER_TYPE: str
     JWT_ERROR_MESSAGE_KEY: str
 
+    # Google config
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
+
     @classmethod
     def load_env_config(cls) -> None:
         # DB environment variables names CAN'T be changed
@@ -245,6 +249,9 @@ class Config:
         cls.JWT_ERROR_MESSAGE_KEY = env_or_error(
             "JWT_ERROR_MESSAGE_KEY", "jwt_error_message"
         )
+
+        cls.GOOGLE_CLIENT_ID = env_or_error("GOOGLE_CLIENT_ID")
+        cls.GOOGLE_CLIENT_SECRET = env_or_error("GOOGLE_CLIENT_SECRET")
 
 
 def init_app(app: Flask, env: str) -> None:

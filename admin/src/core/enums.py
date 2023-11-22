@@ -26,3 +26,8 @@ class RequestStatus(Enum):
     IN_PROCESS = "En Proceso"
     FINISHED = "Finalizada"
     CANCELED = "Cancelada"
+
+
+class RegisterTypes(Enum):
+    GOOGLE = "Google"
+    MANUAL = "Manual"

@@ -41,7 +41,12 @@ const router = createRouter({
         requiresAuth: true,
         requiresSiteAdminOrInstitutionOwner: true
       }
-    }
+    },
+    {
+      path: '/me/requests',
+      name:'my-requests',
+      component: () => import('../views/ListRequest.vue'),
+    },
   ]
 });
 
