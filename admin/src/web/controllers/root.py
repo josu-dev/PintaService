@@ -107,8 +107,10 @@ def pre_register_post():
             render_template("pre_register.html", form=form),
             status.HTTP_400_BAD_REQUEST,
         )
-
-    user = AuthService.create_pre_user(**form.values())
+    register_type = RegisterTypes.MANUAL
+    user = AuthService.create_pre_user(
+        register_type=register_type, **form.values()
+    )
 
     register_link = f"{request.host_url}register?token={user.token}"
     redirect_to_arg = request.args.get("redirect_to")
