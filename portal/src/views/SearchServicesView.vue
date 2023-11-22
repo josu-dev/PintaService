@@ -99,12 +99,21 @@ const changePage = (page) => {
       </div>
 
       <div class="mt-4">
-        <button class="item btn" v-for="page in Math.ceil(totalServices / perPage)" :key="page" @click="changePage(page)"
-          :class="{ 'bg-orange-600 text-orange-50': page === currentPage, 'bg-orange-200 text-zinc-800': page !== currentPage }">
-          {{ page }}
-        </button>
+        <div v-if="Math.ceil(totalServices / perPage) > 0">
+          <button class="item btn" v-for="page in Math.ceil(totalServices / perPage)" :key="page"
+            @click="changePage(page)"
+            :class="{ 'bg-orange-600 text-orange-50': page === currentPage, 'bg-orange-200 text-zinc-800': page !== currentPage }">
+            {{ page }}
+          </button>
+          <p class="text-center">Página {{ currentPage }} de {{ Math.ceil(totalServices / perPage) }}</p>
+        </div>
+        <div v-else class="bg-white rounded-lg overflow-hidden shadow-md">
+          <div class="p-4">
+            <p class="text-lg font-bold text-gray-800">No se encontraron Servicios</p>
+          </div>
+        </div>
       </div>
-      <p class="text-center">Página {{ currentPage }} de {{ Math.ceil(totalServices / perPage) }}</p>
+
 
     </main>
   </div>
