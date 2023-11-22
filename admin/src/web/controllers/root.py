@@ -10,7 +10,7 @@ from flask import (
     url_for,
 )
 
-from src.core.enums import DocumentTypes, GenderOptions
+from src.core.enums import DocumentTypes, GenderOptions, RegisterTypes
 from src.core.google import oauth
 from src.services.auth import AuthService
 from src.services.user import UserService
@@ -105,8 +105,8 @@ def pre_register_post():
             render_template("pre_register.html", form=form),
             status.HTTP_400_BAD_REQUEST,
         )
-
-    AuthService.create_pre_user(**form.values())
+    register_type = RegisterTypes.MANUAL
+    AuthService.create_pre_user(register_type=register_type, **form.values())
     return render_template("info_register.html")
 
 
@@ -129,7 +129,9 @@ def register_get():
         return redirect(url_for("root.pre_register_get"))
 
     form = UserRegister()
-    return render_template("register.html", form=form)
+    return render_template(
+        "register.html", form=form, form_action=f"/register?token={token}"
+    )
 
 
 @bp.post("/register")
@@ -143,6 +145,58 @@ def register_post():
     user = AuthService.get_pre_user_by_token(token)
     if user is None:
         h.flash_info("Realice el registro o revise su casilla de email")
+        return redirect(url_for("root.login_get"))
+
+    if AuthService.token_expired(user.created_at):
+        AuthService.delete_pre_user(token)
+        h.flash_info("El token expiro, realice el registro nuevamente")
+        return redirect(url_for("root.pre_register_get"))
+
+    form = UserRegister(request.form)
+    if not form.validate():
+        h.flash_info("Los datos ingresados son invalidos")
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    form_values = form.values()
+    if UserService.exist_user_with_username(form_values["username"]):
+        h.flash_info("El nombre de usuario esta utilizado")
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    UserService.create_user(
+        username=form_values["username"],
+        password=form_values["password"],
+        **user.asdict(
+            ("email", "firstname", "lastname"),
+        ),
+        document_type=DocumentTypes.DNI,
+        document_number="",
+        gender=GenderOptions.NOT_SPECIFIED,
+        gender_other="",
+        address="",
+        phone="",
+    )
+    AuthService.delete_pre_user(token)
+    h.flash_success("Se ha registrado exitosamente")
+    return redirect(url_for("root.login_get"))
+
+
+@bp.post("/register_google")
+@h.require_no_session()
+def register_google_post():
+    token = request.args.get("token")
+    if not token:
+        h.flash_info("Realice el registro")
+        return redirect(url_for("root.login_get"))
+
+    user = AuthService.get_pre_user_by_token(token)
+    if user is None:
+        h.flash_info("Realice el registro")
         return redirect(url_for("root.login_get"))
 
     if AuthService.token_expired(user.created_at):
@@ -266,12 +320,15 @@ def google_login_post():
 
     user = AuthService.get_pre_user_by_email(user_info["email"])  # type:ignore
     if user:
-        return render_template("info_register.html")
+        return render_template("info_register.html")  # realizar registro
+
+    register_type = RegisterTypes.GOOGLE
 
     user = AuthService.create_pre_user(
-        firstname=user_info["given_name"],  # type: ignore
-        lastname=user_info["family_name"],  # type: ignore
+        firstname="",
+        lastname="",
         email=user_info["email"],  # type: ignore
+        register_type=register_type,
     )
     return render_template("info_register.html")
 

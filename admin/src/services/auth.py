@@ -9,6 +9,7 @@ from typing_extensions import Unpack
 
 from src.core import permissions
 from src.core.db import db
+from src.core.enums import RegisterTypes
 from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.user import PreRegisterUser
 from src.services.base import BaseService, BaseServiceError
@@ -50,7 +51,9 @@ class AuthService(BaseService):
 
     @classmethod
     def create_pre_user(
-        cls, **kwargs: Unpack[PreRegisterUserParams]
+        cls,
+        register_type: RegisterTypes,
+        **kwargs: Unpack[PreRegisterUserParams],
     ) -> PreRegisterUser:
         """Creates a pre-user.
 
@@ -65,14 +68,17 @@ class AuthService(BaseService):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
 
         token = secrets.token_urlsafe(64)
-        user = PreRegisterUser(**kwargs, token=token)
+        user = PreRegisterUser(
+            **kwargs, token=token, register_type=register_type
+        )
         db.session.add(user)
         db.session.commit()
-        MailService.send_mail(
-            "Confirmacion de Registro",
-            user.email,
-            f"Finalice el registro entrando al siguiente link y completando con sus datos: <br/>{request.host_url}register?token={token}",  # noqa: E501
-        )
+        if register_type == RegisterTypes.MANUAL:
+            MailService.send_mail(
+                "Confirmacion de Registro",
+                user.email,
+                f"Finalice el registro entrando al siguiente link y completando con sus datos: <br/>{request.host_url}register?token={token}",  # noqa: E501
+            )
         return user
 
     @classmethod
