@@ -7,6 +7,7 @@ from src.core.models import all_models  # pyright: ignore # noqa: F401
 from src.core.models import base
 
 db = SQLAlchemy(model_class=base.BaseModel)
+# db = SQLAlchemy(model_class=base.BaseModel, engine_options={"echo": True})
 
 
 def init_app(app: Flask) -> None:
