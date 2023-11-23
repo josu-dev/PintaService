@@ -3,7 +3,7 @@
   import { APIService } from '@/utils/api';
   import { ref, watch } from 'vue';
 
-  const PER_PAGE = 1;
+  const PER_PAGE = 2;
   /**
    * @typedef {Object} Institution
    * @property {number} id
@@ -89,37 +89,63 @@
 <template>
   <div class="h-full overflow-y-auto">
     <main class="flex flex-col gap-8 w-full p-2 py-4 md:py-8">
-      <div class="mx-auto max-w-full">
-        <h1 class="text-2xl font-semibold leading-relaxed">Servicios por Institucion</h1>
+      <div class="mx-auto w-full">
+        <h1 class="text-2xl md:text-3xl font-semibold leading-relaxed">
+          Servicios por Institucion
+        </h1>
 
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 place-items-center gap-8 mt-4 sm:pl-4">
-          <section class="flex flex-col gap-2">
-            <h2 v-if="loadingInstitutions" class="text-lg font-medium">Cargando instituciones</h2>
-            <template v-else-if="!institutions.length">
-              <h2 class="text-lg font-medium">No hay instituciones disponibles</h2>
-            </template>
-            <template v-else>
-              <h2 class="text-lg font-medium">Instituciones</h2>
-              <ul>
-                <li
-                  v-for="institution in institutions"
-                  :key="institution.id"
-                  class="flex flex-col gap-2"
-                >
-                  <div class="flex flex-row items-center justify-between">
-                    <h2 class="text-lg font-medium">{{ institution.name }}</h2>
-                    <button
-                      class="text-sm text-blue-500 hover:text-blue-700"
-                      @click="currentInstitution = institution"
-                    >
-                      Ver servicios
-                    </button>
+        <div
+          class="w-full grid md:grid-cols-2 lg:grid-cols-3 place-items-center gap-8 my-4 sm:pl-4"
+        >
+          <section class="col-start-1 w-full flex flex-col ring-1 ring-fuchsia-500">
+            <header>
+              <h2 class="text-lg md:text-xl font-medium">Instituciones</h2>
+              <p class="text-sm text-neutral-500">
+                Seleccione una institucion para ver sus servicios
+              </p>
+            </header>
+            <div class="my-4">
+              <p
+                v-show="loadingInstitutions"
+                class="flex justify-center items-center text-sm font-medium text-neutral-500"
+              >
+                Cargando instituciones...
+              </p>
+              <p
+                v-show="!loadingInstitutions && institutions.length === 0"
+                class="flex justify-center items-center text-sm font-medium text-neutral-500"
+              >
+                No hay instituciones disponibles
+              </p>
+              <ul
+                v-show="!loadingInstitutions && institutions.length > 0"
+                class="flex flex-col gap-4 px-4 md:px-2"
+              >
+                <li v-for="institution in institutions" :key="institution.id">
+                  <div
+                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-lg"
+                    :class="{ '!ring-2': currentInstitution?.id === institution.id }"
+                  >
+                    <div class="card-body">
+                      <h3 class="card-title text-base md:text-lg">{{ institution.name }}</h3>
+                      <p class="text-pretty">
+                        {{ institution.information }}
+                      </p>
+                      <div class="card-actions justify-end">
+                        <button
+                          class="btn btn-sm btn-primary normal-case"
+                          @click="currentInstitution = institution"
+                        >
+                          Ver servicios
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <p class="text-sm text-gray-500">{{ institution.information }}</p>
                 </li>
               </ul>
-            </template>
-            <div class="mx-auto" :class="{ hidden: institutionsTotal === 0 }">
+            </div>
+
+            <div class="mx-auto mt-4" :class="{ hidden: institutionsTotal === 0 }">
               <PaginationBar
                 v-model:value="institutionsPage"
                 :total="institutionsTotal"
@@ -129,7 +155,7 @@
             </div>
           </section>
 
-          <section v-if="institutions.length" class="lg:col-span-2 flex flex-col gap-2">
+          <section class="lg:col-span-2 flex flex-col gap-2 ring-1 ring-fuchsia-500">
             <h2 v-if="!currentInstitution" class="text-lg font-medium">
               Institucion no selecionada
             </h2>
