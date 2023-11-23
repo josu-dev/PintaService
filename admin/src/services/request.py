@@ -237,6 +237,25 @@ class RequestService(BaseService):
         return query
 
     @classmethod
+    def get_requests_notes_with_users(
+        cls,
+        request_id: int,
+        page: int = 1,
+        per_page: int = 10,
+    ) -> t.Tuple[t.List[t.Tuple[RequestNote, User]], int]:
+        query = (
+            db.session.query(RequestNote, User)
+            .join(User, RequestNote.user_id == User.id)
+            .filter(RequestNote.service_request_id == request_id)
+            .order_by(RequestNote.created_at.desc())
+        )
+
+        total = query.count()
+        requests = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return requests, total  # pyright: ignore[reportGeneralTypeIssues]
+
+    @classmethod
     def create_note(
         cls, service_request_id: int, user_id: int, note: str
     ) -> RequestNote:
