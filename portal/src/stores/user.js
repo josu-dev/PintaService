@@ -43,8 +43,8 @@ export const useUserStore = defineStore('user', () => {
    * @returns {void}
    */
   function setUser(userProfile, userRol) {
-    const isSiteAdmin = userRol?.is_institution_owner === true;
-    const isInstitutionOwner = userRol?.is_site_admin === true;
+    const isSiteAdmin = userRol?.is_site_admin === true;
+    const isInstitutionOwner = userRol?.is_institution_owner === true;
 
     user.value = {
       username: userProfile.user,

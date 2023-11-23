@@ -1,5 +1,6 @@
 <script setup>
   import IconLogin from '@/components/icons/IconLogin.vue';
+  import IconMailbox from '@/components/icons/IconMailbox.vue';
   import IconMenu from '@/components/icons/IconMenu.vue';
   import IconPaintbrush from '@/components/icons/IconPaintbrush.vue';
   import IconSearch from '@/components/icons/IconSearch.vue';
@@ -48,6 +49,12 @@
       label: 'Servicios',
       path: '/services',
       icon: IconPaintbrush
+    },
+    {
+      label: 'Solicitudes',
+      path: '/me/requests',
+      icon: IconMailbox,
+      isRenderable: computed(() => !!userStore.user && !userStore.user.is_site_admin)
     }
   ];
 </script>

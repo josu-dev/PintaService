@@ -123,24 +123,39 @@ def me_profile_get():
 
 
 @bp.get("/me/requests")
-@base.validation(api_forms.PaginationForm, method="GET", require_auth=True)
-def me_requests_get(args: api_forms.PaginationFormValues):
+@base.validation(api_forms.MeRequestsForm, method="GET", require_auth=True)
+def me_requests_get(args: api_forms.MeRequestsFormValues):
     user_id = base.user_id_from_access_token()
     if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
     page = args["page"]
     per_page = args["per_page"] or flask.g.site_config.page_size
+    raw_status = args["status"]
+    status = (
+        None
+        if raw_status is None
+        else [
+            rstatus
+            for rstatus in enums.RequestStatus
+            if rstatus.value == raw_status
+        ][0]
+    )
 
     try:
         raw_requests, total = RequestService.get_requests_by_user(
-            user_id, page=page, per_page=per_page
+            user_id,
+            page=page,
+            per_page=per_page,
+            status=status,
+            order=args["order"],
         )
     except RequestService.RequestServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     requests = [
         {
+            "id": req.id,
             "title": req.title,
             "creation_date": funcs.date_as_yyyy_mm_dd(req.created_at),
             "close_date": (

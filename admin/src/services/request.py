@@ -86,11 +86,23 @@ class RequestService(BaseService):
 
     @classmethod
     def get_requests_by_user(
-        cls, user_id: int, page: int = 1, per_page: int = 10
+        cls,
+        user_id: int,
+        page: int = 1,
+        per_page: int = 10,
+        status: t.Union[RequestStatus, None] = None,
+        order: t.Union[t.Literal["asc", "desc"], None] = None,
     ) -> t.Tuple[t.List[ServiceRequest], int]:
         query = db.session.query(ServiceRequest).filter(
             ServiceRequest.user_id == user_id
         )
+        if status is not None:
+            query = query.filter(ServiceRequest.status == status)
+
+        if order == "asc":
+            query = query.order_by(ServiceRequest.created_at.asc())
+        elif order == "desc":
+            query = query.order_by(ServiceRequest.created_at.desc())
 
         total = query.count()
         requests = query.offset((page - 1) * per_page).limit(per_page).all()

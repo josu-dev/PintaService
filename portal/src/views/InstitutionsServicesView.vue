@@ -84,9 +84,9 @@
 
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="flex flex-col gap-8 w-full p-2 py-4 md:py-8">
+    <main class="flex flex-col p-2 py-4 md:py-8">
       <div class="mx-auto w-full">
-        <h1 class="text-2xl md:text-3xl font-semibold leading-relaxed text-center">
+        <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
           Servicios por Institucion
         </h1>
 
@@ -119,7 +119,7 @@
               >
                 <li v-for="institution in institutions" :key="institution.id">
                   <div
-                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-md transition"
+                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-md transition duration-150"
                     :class="{
                       '!ring-2 !ring-primary !shadow-lg': currentInstitution?.id === institution.id
                     }"
@@ -183,7 +183,7 @@
               >
                 <li v-for="service in services" :key="service.id">
                   <div
-                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-lg"
+                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-md transition duration-150 hover:ring-2 hover:ring-primary hover:shadow-lg"
                   >
                     <div class="card-body">
                       <h3 class="card-title text-base md:text-lg">{{ service.name }}</h3>
