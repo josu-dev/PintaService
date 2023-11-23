@@ -453,3 +453,76 @@ def me_rol_institution_owner():
     }
 
     return response
+
+
+@bp.get("/enabled/institutions")
+@base.validation(api_forms.PaginationForm, method="GET")
+def enabled_institutions_get(args: api_forms.PaginationFormValues):
+    page = args["page"]
+    per_page = args["per_page"] or 1
+
+    try:
+        (
+            raw_institutions,
+            total,
+        ) = InstitutionService.get_enabled_institutions(
+            page=page, per_page=per_page
+        )
+    except InstitutionService.InstitutionServiceError:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    institutions = [
+        inst.asdict(("id", "name", "information", "email"))
+        for inst in raw_institutions
+    ]
+
+    response = {
+        "data": institutions,
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+    }
+
+    return response
+
+
+@bp.get("/enabled/institutions/<int:institution_id>/services")
+@base.validation(api_forms.PaginationForm, method="GET")
+def enabled_institutions_id_services_get(
+    institution_id: int, args: api_forms.PaginationFormValues
+):
+    page = args["page"]
+    per_page = args["per_page"] or 1
+
+    try:
+        (
+            raw_services,
+            total,
+        ) = ServiceService.get_enabled_institution_services(
+            institution_id=institution_id, page=page, per_page=per_page
+        )
+    except InstitutionService.InstitutionServiceError:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    services = [
+        {
+            "id": service.id,
+            "institution_id": service.institution_id,
+            "name": service.name,
+            "description": service.description,
+            "laboratory": service.laboratory,
+            "keywords": service.keywords,
+            "enabled": service.enabled,
+            "service_type": service.service_type.value,
+        }
+        for service in raw_services
+    ]
+
+    response = {
+        "data": services,
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+    }
+
+    return response

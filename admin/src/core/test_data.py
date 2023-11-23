@@ -163,8 +163,19 @@ def load_test_data() -> None:
         keywords="institucion2, institucion, 2",
         email="ins2@ins2.com",
     )
+    ins3 = institution.Institution(
+        name="Grupo grisaseo 54",
+        address="Calle 45 y 54",
+        days_and_opening_hours="Lunes a Viernes de 8:00 a 17:00",
+        information="Conjunto de instituciones de la ciudad de La Plata",
+        location="-45,-69",
+        web="https://www.institucion2.com",
+        keywords="institucion2, institucion, 2",
+        email="ins3@ins3.com",
+    )
     db.session.add(ins1)
     db.session.add(ins2)
+    db.session.add(ins3)
     db.session.commit()
 
     AuthService.add_institution_role(
@@ -175,6 +186,9 @@ def load_test_data() -> None:
     )
     AuthService.add_institution_role(
         "OWNER", user_id=4, institution_id=ins2.id
+    )
+    AuthService.add_institution_role(
+        "OWNER", user_id=2, institution_id=ins3.id
     )
     ServiceService.create_service(
         institution_id=1,

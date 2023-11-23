@@ -153,6 +153,19 @@ class ServiceService(BaseService):
         )
 
     @classmethod
+    def get_enabled_institution_services(
+        cls, institution_id: int, page: int, per_page: int
+    ) -> t.Tuple[t.List[Service], int]:
+        query = db.session.query(Service).filter(
+            Service.institution_id == institution_id, Service.enabled
+        )
+
+        total = query.count()
+        services = query.offset((page - 1) * per_page).limit(per_page).all()
+
+        return services, total
+
+    @classmethod
     def get_institution_of(cls, service_id: int) -> t.Union[Institution, None]:
         service = db.session.query(Service).get(service_id)
         if service is None:

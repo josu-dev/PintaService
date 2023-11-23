@@ -1,4 +1,5 @@
 <script setup>
+  import PaginationBar from '@/components/PaginationBar.vue';
   import IconLoader from '@/components/icons/IconLoader.vue';
   import { useToastStore } from '@/stores/toast';
   import { APIService } from '@/utils/api';
@@ -31,13 +32,11 @@
   let currentPage = ref(1);
   let perPage = ref(1);
   let totalServices = ref(0);
-  let initialized = false;
 
   /** @type {ReturnType<typeof setTimeout>} */
   let searchTimeout;
 
   async function filterServices() {
-    initialized = true;
     searching.value = true;
     const url = `/services/search?q=${searchQuery.value}&type=${searchType.value}&page=${currentPage.value}`;
     APIService.get(url, {
@@ -79,9 +78,9 @@
   });
 
   watchEffect(() => {
-    if (!canScheduleSearch) return;
     searchQuery.value;
     searchType.value;
+    if (!canScheduleSearch) return;
     scheduledSearch = true;
 
     clearTimeout(searchTimeout);
@@ -184,29 +183,14 @@
           </template>
         </ul>
 
-        <div class="mt-4">
-          <div v-if="Math.ceil(totalServices / perPage) > 0">
-            <button
-              class="btn btn-primary m-1"
-              v-for="page in Math.ceil(totalServices / perPage)"
-              :key="page"
-              @click="changePage(page)"
-              :class="{
-                'bg-orange-600 text-orange-50': page === currentPage,
-                'bg-orange-200 text-zinc-800': page !== currentPage
-              }"
-            >
-              {{ page }}
-            </button>
-            <p class="text-center">
-              Página {{ currentPage }} de {{ Math.ceil(totalServices / perPage) }}
-            </p>
-          </div>
-          <div v-else-if="initialized" class="bg-white rounded-lg overflow-hidden shadow-md">
-            <div class="p-4">
-              <p class="text-lg font-bold text-gray-800">No se encontraron Servicios</p>
-            </div>
-          </div>
+        <div class="mt-4" :class="{ hidden: totalServices === 0 }">
+          <PaginationBar
+            :value="currentPage"
+            :total="totalServices"
+            :per-page="perPage"
+            :loading="searching"
+            @update:value="changePage($event)"
+          />
         </div>
       </div>
     </main>

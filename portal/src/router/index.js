@@ -15,8 +15,13 @@ const router = createRouter({
       component: () => import('../views/LoginView.vue')
     },
     {
-      path: '/services/search',
+      path: '/services',
       name: 'services',
+      component: () => import('../views/InstitutionsServicesView.vue')
+    },
+    {
+      path: '/services/search',
+      name: 'services_search',
       component: () => import('../views/SearchServicesView.vue')
     },
     {
@@ -44,9 +49,9 @@ const router = createRouter({
     },
     {
       path: '/me/requests',
-      name:'my-requests',
-      component: () => import('../views/ListRequest.vue'),
-    },
+      name: 'me_requests',
+      component: () => import('../views/ListRequest.vue')
+    }
   ]
 });
 
