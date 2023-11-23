@@ -3,7 +3,7 @@
   import { APIService } from '@/utils/api';
   import { ref, watch } from 'vue';
 
-  const PER_PAGE = 2;
+  const PER_PAGE = 5;
   /**
    * @typedef {Object} Institution
    * @property {number} id
@@ -31,7 +31,7 @@
         onJSON(json) {
           institutions.value = json.data;
           institutionsPerPage.value = json.per_page;
-          institutionsTotal.value = json.total + json.total + json.total;
+          institutionsTotal.value = json.total;
         },
         afterRequest() {
           loadingInstitutions.value = false;
@@ -57,27 +57,23 @@
   const services = ref(undefined);
 
   const loadingServices = ref(false);
-  const servicesPagination = ref({
-    total: 0,
-    page: 1,
-    per_page: PER_PAGE
-  });
+  const servicesPage = ref(1);
+  const servicesPerPage = ref(PER_PAGE);
+  const servicesTotal = ref(0);
 
-  watch(currentInstitution, () => {
+  watch([currentInstitution, servicesPage], () => {
     if (!currentInstitution.value) {
       services.value = undefined;
       return;
     }
+
     loadingServices.value = true;
-    const url = `/enabled/institutions/${currentInstitution.value.id}/services?page=${servicesPagination.value.page}&per_page=${servicesPagination.value.per_page}`;
+    const url = `/enabled/institutions/${currentInstitution.value.id}/services?page=${servicesPage.value}&per_page=${servicesPerPage.value}`;
     APIService.get(url, {
       onJSON(json) {
         services.value = json.data;
-        servicesPagination.value = {
-          total: json.total,
-          page: json.page,
-          per_page: json.per_page
-        };
+        servicesPerPage.value = json.per_page;
+        servicesTotal.value = json.total;
       },
       afterRequest() {
         loadingServices.value = false;
@@ -90,14 +86,14 @@
   <div class="h-full overflow-y-auto">
     <main class="flex flex-col gap-8 w-full p-2 py-4 md:py-8">
       <div class="mx-auto w-full">
-        <h1 class="text-2xl md:text-3xl font-semibold leading-relaxed">
+        <h1 class="text-2xl md:text-3xl font-semibold leading-relaxed text-center">
           Servicios por Institucion
         </h1>
 
         <div
-          class="w-full grid md:grid-cols-2 lg:grid-cols-3 place-items-center gap-8 my-4 sm:pl-4"
+          class="w-full grid md:grid-cols-2 lg:grid-cols-3 justify-items-center gap-8 my-4 sm:px-4"
         >
-          <section class="col-start-1 w-full flex flex-col ring-1 ring-fuchsia-500">
+          <section class="col-start-1 w-full flex flex-col">
             <header>
               <h2 class="text-lg md:text-xl font-medium">Instituciones</h2>
               <p class="text-sm text-neutral-500">
@@ -123,12 +119,14 @@
               >
                 <li v-for="institution in institutions" :key="institution.id">
                   <div
-                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-lg"
-                    :class="{ '!ring-2': currentInstitution?.id === institution.id }"
+                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-md transition"
+                    :class="{
+                      '!ring-2 !ring-primary !shadow-lg': currentInstitution?.id === institution.id
+                    }"
                   >
                     <div class="card-body">
                       <h3 class="card-title text-base md:text-lg">{{ institution.name }}</h3>
-                      <p class="text-pretty">
+                      <p class="text-pretty line-clamp-4">
                         {{ institution.information }}
                       </p>
                       <div class="card-actions justify-end">
@@ -155,31 +153,65 @@
             </div>
           </section>
 
-          <section class="lg:col-span-2 flex flex-col gap-2 ring-1 ring-fuchsia-500">
-            <h2 v-if="!currentInstitution" class="text-lg font-medium">
-              Institucion no selecionada
-            </h2>
-            <template v-else-if="loadingServices">
-              <h2 class="text-lg font-medium">
-                Cargando servicios de {{ currentInstitution.name }}
-              </h2>
-            </template>
-            <template v-else-if="!services?.length">
-              <h2 class="text-lg font-medium">
+          <section class="lg:col-span-2 w-full flex flex-col">
+            <header>
+              <h2 class="text-lg md:text-xl font-medium">Servicios</h2>
+              <p v-show="!currentInstitution" class="text-sm text-neutral-500">
+                No hay institucion seleccionada
+              </p>
+              <p v-show="currentInstitution" class="text-sm text-neutral-500">
+                Servicios de la institucion {{ currentInstitution?.name }}
+              </p>
+            </header>
+
+            <div v-if="currentInstitution" class="my-4">
+              <p
+                v-show="loadingServices"
+                class="flex justify-center items-center text-sm font-medium text-neutral-500"
+              >
+                Cargando servicios...
+              </p>
+              <p
+                v-show="!loadingServices && !services?.length"
+                class="flex justify-center items-center text-sm font-medium text-neutral-500"
+              >
                 No hay servicios de {{ currentInstitution.name }} disponibles
-              </h2>
-            </template>
-            <template v-else>
-              <h2 class="text-lg font-medium">Servicios de {{ currentInstitution.name }}</h2>
-              <div class="sm:pl-4">
-                <ul>
-                  <li v-for="service in services" :key="service.id" class="flex flex-col gap-2">
-                    <h3 class="text-md font-medium">{{ service.name }}</h3>
-                    <p class="text-sm text-gray-500">{{ service.description }}</p>
-                  </li>
-                </ul>
-              </div>
-            </template>
+              </p>
+              <ul
+                v-show="!loadingServices && !!services?.length"
+                class="flex flex-col gap-4 px-4 md:px-2"
+              >
+                <li v-for="service in services" :key="service.id">
+                  <div
+                    class="card card-compact bg-base-100 text-primary-content ring-1 ring-primary/50 shadow-lg"
+                  >
+                    <div class="card-body">
+                      <h3 class="card-title text-base md:text-lg">{{ service.name }}</h3>
+                      <p class="text-pretty">
+                        {{ service.description }}
+                      </p>
+                      <div class="card-actions justify-end">
+                        <RouterLink
+                          :to="`/services/${service.id}`"
+                          class="btn btn-sm btn-primary normal-case"
+                        >
+                          Ver en detalle
+                        </RouterLink>
+                      </div>
+                    </div>
+                  </div>
+                </li>
+              </ul>
+            </div>
+
+            <div class="mx-auto mt-4" :class="{ hidden: servicesTotal === 0 }">
+              <PaginationBar
+                v-model:value="servicesPage"
+                :total="servicesTotal"
+                :per-page="servicesPerPage"
+                :loading="loadingServices"
+              />
+            </div>
           </section>
         </div>
       </div>
