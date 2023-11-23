@@ -35,10 +35,12 @@
       v-bind:key="notification.id"
       :class="alertClassMap[notification.type]"
     >
-      <component :is="iconMap[notification.type]" class="mr-2" />
-      <span>{{ notification.message }}</span>
+      <div>
+        <component :is="iconMap[notification.type]" class="mr-2" />
+        <span>{{ notification.message }}</span>
+      </div>
 
-      <div v-if="notification.closeable">
+      <div v-if="notification.closeable" class="flex-none !mt-0">
         <button @click.prevent="toastStore.remove(notification)" aria-label="Close">
           <IconX />
         </button>
