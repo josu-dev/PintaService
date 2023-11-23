@@ -31,6 +31,15 @@ const router = createRouter({
       component: () => import('../views/ShowServiceView.vue')
     },
     {
+      path: '/services/:service_id(\\d+)/request',
+      props: true,
+      name: 'request',
+      component: () => import('../views/RequestServiceView.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
       path: '/profile',
       name: 'profile',
       component: () => import('../views/ProfileView.vue'),
