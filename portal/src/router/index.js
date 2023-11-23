@@ -39,6 +39,14 @@ const router = createRouter({
       }
     },
     {
+      path: '/me/requests',
+      name: 'me_requests',
+      component: () => import('../views/MeRequestsView.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
       path: '/stats',
       name: 'stats',
       component: () => import('../views/StatsView.vue'),
@@ -46,11 +54,6 @@ const router = createRouter({
         requiresAuth: true,
         requiresSiteAdminOrInstitutionOwner: true
       }
-    },
-    {
-      path: '/me/requests',
-      name: 'me_requests',
-      component: () => import('../views/ListRequest.vue')
     }
   ]
 });

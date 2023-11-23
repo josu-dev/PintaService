@@ -128,3 +128,33 @@ class ServiceSearchForm(FlaskForm):
             "page": self.page.data or 1,
             "per_page": self.per_page.data,
         }
+
+
+class MeRequestsFormValues(t.TypedDict):
+    status: t.Union[str, None]
+    order: t.Union[t.Literal["asc", "desc"], None]
+    page: int
+    per_page: t.Union[int, None]
+
+
+class MeRequestsForm(FlaskForm):
+    status = wtforms.StringField(
+        validators=[v.Optional(), v.Length(min=0, max=32)],
+    )
+    order = wtforms.StringField(
+        validators=[v.Optional(), v.Length(min=0, max=32)],
+    )
+    page = wtforms.IntegerField(
+        validators=[v.Optional(), v.NumberRange(min=1, max=100)],
+    )
+    per_page = wtforms.IntegerField(
+        validators=[v.Optional(), v.NumberRange(min=1, max=100)],
+    )
+
+    def values(self) -> MeRequestsFormValues:
+        return {  # type: ignore
+            "status": self.status.data,
+            "order": self.order.data,
+            "page": self.page.data or 1,
+            "per_page": self.per_page.data,
+        }
