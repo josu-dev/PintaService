@@ -93,7 +93,7 @@
   <div class="h-full overflow-y-auto">
     <main class="min-h-full flex flex-col px-2 py-4 md:py-8">
       <template v-if="initializing">
-        <div class="flex-1 grid place-items-center border border-fuchsia-500">
+        <div class="flex-1 grid place-items-center">
           <p
             class="text-lg md:text-xl flex flex-wrap max-w-[80%] justify-center text-balance items-center gap-2 font-semibold text-center text-neutral-800"
           >

@@ -4,10 +4,12 @@ import { createPinia } from 'pinia';
 import { createApp } from 'vue';
 
 import App from './App.vue';
-import router from './router';
+import router, { INITIAL_CLIENT_URL } from './router';
+import { useSplashStore } from './stores/splashScreen';
 import { useToastStore } from './stores/toast';
 import { useUserStore } from './stores/user';
 import { APIService } from './utils/api';
+import { log } from './utils/logging';
 
 const app = createApp(App);
 
@@ -57,6 +59,8 @@ window.addEventListener('beforeunload', () => {
   APIService.saveJWTToLS();
 });
 
+const splashStore = useSplashStore();
+
 if (APIService.setJWTFromLS()) {
   Promise.allSettled([
     APIService.get('/me/profile', { jwtError: 'throw' }),
@@ -70,6 +74,7 @@ if (APIService.setJWTFromLS()) {
         isInstitutionOwner.status === 'rejected'
       ) {
         APIService.clearJWT();
+        splashStore.initializing = false;
         return;
       }
 
@@ -82,11 +87,18 @@ if (APIService.setJWTFromLS()) {
       });
 
       if (router.currentRoute.value.name === 'login') {
-        router.push({ name: 'home' });
+        router.push('/');
+      } else if (router.currentRoute.value.path !== INITIAL_CLIENT_URL.pathname) {
+        router.push(INITIAL_CLIENT_URL.pathname);
       }
+
+      splashStore.initializing = false;
     })
     .catch((error) => {
-      console.error('Error while initializing APIService: ', error);
+      log.error('main', 'Error while initializing APIService: ', error);
       APIService.clearJWT();
+      splashStore.initializing = false;
     });
+} else {
+  splashStore.enabled = false;
 }
