@@ -10,6 +10,10 @@
   import OSM from 'ol/source/OSM';
   import VectorSource from 'ol/source/Vector';
   import { Icon, Style } from 'ol/style';
+  import { useToastStore } from '@/stores/toast';
+  import { TIMEOUT } from 'dns';
+
+  const toastStore = useToastStore();
 
   export default {
     name: 'MapComponent',
@@ -20,6 +24,10 @@
     },
     props: {
       location: {
+        type: String,
+        required: true
+      },
+      contact: {
         type: String,
         required: true
       }
@@ -63,9 +71,19 @@
           features: [marker]
         })
       });
+      // Add this after defining the marker
+      // @ts-ignore
 
       // @ts-ignore
       this.map.addLayer(vectorLayer);
+      // @ts-ignore
+      this.map.on('click', (e) => {
+        // @ts-ignore
+        let features = this.map.getFeaturesAtPixel(e.pixel);
+        if (features.length > 0) {
+          toastStore.success('Contactanos!  ' + this.contact, { timeout: 5000 });
+        }
+      });
     }
   };
 </script>
