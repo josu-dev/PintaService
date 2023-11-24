@@ -31,3 +31,16 @@ export const DEFAULT_API_JWT_ERROR = 'toast';
  * @type {import('@/utils/api').MaintenanceErrorOptions}
  */
 export const DEFAULT_API_MAINTEINANCE_ERROR = 'toast';
+
+/**
+ * Default log level.
+ *
+ * - 0: No logs.
+ * - 1: Only errors.
+ * - 2: Errors and warnings.
+ * - 3: Errors, warnings and info.
+ * - 4: Errors, warnings, info and debug.
+ *
+ * @type {number}
+ */
+export const logLevel = parseInt(import.meta.env.VITE_LOG_LEVEL || '0');

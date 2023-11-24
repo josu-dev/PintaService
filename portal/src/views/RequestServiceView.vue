@@ -1,59 +1,104 @@
 <script setup>
-import InputField from '@/components/form/InputField.vue';
-import { APIService } from '@/utils/api';
-import { defineProps, ref } from 'vue';
-import { useToastStore } from '@/stores/toast';
-import { useRouter } from 'vue-router';
+  import GoBackButton from '@/components/GoBackButton.vue';
+  import InputField from '@/components/form/InputField.vue';
+  import TextareaField from '@/components/form/TextareaField.vue';
+  import IconLoader from '@/components/icons/IconLoader.vue';
+  import { useToastStore } from '@/stores/toast';
+  import { APIService } from '@/utils/api';
+  import { log } from '@/utils/logging';
+  import { defineProps, ref } from 'vue';
+  import { useRouter } from 'vue-router';
 
-const props = defineProps({
+  const props = defineProps({
     service_id: String
-});
-const router = useRouter();
-const toastStore = useToastStore();
+  });
 
-const service_id = props.service_id ? props.service_id : '-1';
+  const router = useRouter();
+  const toastStore = useToastStore();
 
-const form = ref({
+  if (!props.service_id) {
+    router.push('/');
+  }
+
+  const creatingRequest = ref(false);
+
+  const form = ref({
     title: '',
     description: ''
-});
-const loading = ref(false);
-const submitForm = () => {
-    loading.value = true;
+  });
+
+  function submitRequest(event) {
+    if (creatingRequest.value) {
+      return;
+    }
+
+    creatingRequest.value = true;
+
     APIService.post('/me/requests', {
-        body: {
-            service_id: service_id,
-            title: form.value.title,
-            description: form.value.description
-        },
-        async onJSON(json) {
-            toastStore.success('Servicio solicitado exitosamente');
-            router.push(`/services/${service_id}`)
-            loading.value = false;
-        },
-        onFailure(response) {
-            toastStore.error('No se pudo solicitar el servicio, intente mas tarde');
-        },
-        onError(error) {
-            console.log(error);
-        }
+      body: {
+        service_id: props.service_id,
+        title: form.value.title,
+        description: form.value.description
+      },
+      async onJSON(json) {
+        toastStore.success('Servicio solicitado exitosamente');
+        router.push(`/services/${props.service_id}`);
+      },
+      onFailure(response) {
+        log.warn('request service', 'failed to request service', response);
+        toastStore.error('No se pudo solicitar el servicio, intente mas tarde');
+      },
+      onError(error) {
+        log.error('request service', 'error requesting service', error);
+        toastStore.error('No se pudo solicitar el servicio, intente mas tarde');
+      },
+      afterRequest() {
+        creatingRequest.value = false;
+      }
     });
-};
+  }
 </script>
 
 <template>
-    <main class="flex flex-col items-center min-h-screen">
-        <div>
-            <h1 class="text-4xl font-bold text-primary mt-4 mb-4">Solicitar Servicio</h1>
-            <form class="mx-auto max-w-md" @submit.prevent="submitForm">
-                <InputField v-model:value="form.title" name="title" label="Titulo" required />
-                <InputField v-model:value="form.description" name="description" label="Descripción" required />
-                <div class="flex justify-center mt-4">
-                    <button class='btn btn-primary' type="submit" :disabled="loading">
-                        {{ loading ? 'Creando solicitud...' : 'Solicitar' }}</button>
-                </div>
-            </form>
+  <div class="h-full overflow-y-auto">
+    <main class="h-full flex flex-col px-2 py-4 md:py-8">
+      <div class="flex-none flex flex-col justify-center items-center">
+        <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
+          Solicitar Servicio
+        </h1>
+      </div>
 
-        </div>
+      <div class="flex-1 flex flex-col my-4 md:my-8">
+        <form
+          class="flex flex-col gap-2 w-full max-w-[min(512px,90%)] mx-auto"
+          @submit.prevent="submitRequest"
+        >
+          <InputField v-model:value="form.title" name="title" label="Titulo" required />
+          <TextareaField
+            v-model:value="form.description"
+            name="description"
+            label="Descripción"
+            required
+          />
+
+          <div class="flex flex-wrap-reverse justify-around gap-2 md:gap-4 mt-4">
+            <GoBackButton
+              class="btn-ghost bg-base-content bg-opacity-10 normal-case"
+              :disabled="creatingRequest"
+            >
+              Volver
+            </GoBackButton>
+
+            <button class="btn btn-primary normal-case" type="submit" :disabled="creatingRequest">
+              <template v-if="creatingRequest">
+                <IconLoader class="animate-spin mr-1 xs:mr-2" />
+                Creando solicitud
+              </template>
+              <template v-else>Solicitar</template>
+            </button>
+          </div>
+        </form>
+      </div>
     </main>
+  </div>
 </template>
