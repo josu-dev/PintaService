@@ -28,6 +28,7 @@
   const searchQuery = ref('');
   const searchType = ref('todos');
   const autoSearch = ref(true);
+  const serviceTypes = ref([]);
 
   let currentPage = ref(1);
   let perPage = ref(1);
@@ -35,6 +36,20 @@
 
   /** @type {ReturnType<typeof setTimeout>} */
   let searchTimeout;
+
+  APIService.get('/services_types', {
+    onJSON(json) {
+      serviceTypes.value = json.data;
+    },
+    onFailure(response) {
+      console.error(response);
+      toastStore.error('Error al buscar servicios');
+    },
+    onError(error) {
+      console.error(error);
+      toastStore.error('Error al buscar servicios');
+    }
+  });
 
   async function filterServices() {
     searching.value = true;
@@ -122,9 +137,9 @@
             >
             <select v-model="searchType" class="mt-1 p-2 border rounded-md w-full">
               <option value="todos">Todos</option>
-              <option value="analisis">Análisis</option>
-              <option value="consultoria">Consultoría</option>
-              <option value="desarrollo">Desarrollo</option>
+              <option v-for="type in serviceTypes" :key="type" :value="type" class="capitalize">
+                {{ type }}
+              </option>
             </select>
           </div>
 
