@@ -190,6 +190,17 @@ class Config:
     MAIL_USERNAME: str
     MAIL_PASSWORD: str
     MAIL_DEFAULT_SENDER: str
+    MAIL_DEBUG: int
+
+    # Flask-JWT-Extended config
+    JWT_SECRET_KEY: str
+    JWT_TOKEN_LOCATION: t.List[str]
+    JWT_HEADER_TYPE: str
+    JWT_ERROR_MESSAGE_KEY: str
+
+    # Google config
+    GOOGLE_CLIENT_ID: str
+    GOOGLE_CLIENT_SECRET: str
 
     @classmethod
     def load_env_config(cls) -> None:
@@ -228,6 +239,19 @@ class Config:
         cls.MAIL_USERNAME = env_or_error("MAIL_USERNAME")
         cls.MAIL_PASSWORD = env_or_error("MAIL_PASSWORD")
         cls.MAIL_DEFAULT_SENDER = env_or_error("MAIL_DEFAULT_SENDER")
+        cls.MAIL_DEBUG = int(env_or_error("MAIL_DEBUG", "0"))
+
+        cls.JWT_SECRET_KEY = env_or_error("JWT_SECRET_KEY")
+        cls.JWT_TOKEN_LOCATION = env_or_error(
+            "JWT_TOKEN_LOCATION", "headers"
+        ).split(",")
+        cls.JWT_HEADER_TYPE = env_or_error("JWT_HEADER_TYPE", "JWT")
+        cls.JWT_ERROR_MESSAGE_KEY = env_or_error(
+            "JWT_ERROR_MESSAGE_KEY", "jwt_error_message"
+        )
+
+        cls.GOOGLE_CLIENT_ID = env_or_error("GOOGLE_CLIENT_ID")
+        cls.GOOGLE_CLIENT_SECRET = env_or_error("GOOGLE_CLIENT_SECRET")
 
 
 def init_app(app: Flask, env: str) -> None:

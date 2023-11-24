@@ -3,16 +3,15 @@ import typing as t
 from datetime import datetime, timedelta
 
 import sqlalchemy as sa
-from flask import request
 from sqlalchemy import exc as sa_exc
 from typing_extensions import Unpack
 
 from src.core import permissions
 from src.core.db import db
+from src.core.enums import RegisterTypes
 from src.core.models.auth import Role, UserInstitutionRole
 from src.core.models.user import PreRegisterUser
 from src.services.base import BaseService, BaseServiceError
-from src.services.mail import MailService
 
 # flake8: noqa E501
 
@@ -50,13 +49,14 @@ class AuthService(BaseService):
 
     @classmethod
     def create_pre_user(
-        cls, **kwargs: Unpack[PreRegisterUserParams]
+        cls,
+        register_type: RegisterTypes,
+        **kwargs: Unpack[PreRegisterUserParams],
     ) -> PreRegisterUser:
         """Creates a pre-user.
 
         This method creates a pre-user that will be used for the first step of
-        the registration process. It will send an email with a token that will
-        be used to complete the registration process.
+        the registration process.
 
         Raises:
             AuthServiceError: If the email already exists.
@@ -65,14 +65,12 @@ class AuthService(BaseService):
             raise AuthServiceError(f"{kwargs['email']} Email already exists")
 
         token = secrets.token_urlsafe(64)
-        user = PreRegisterUser(**kwargs, token=token)
+        user = PreRegisterUser(
+            **kwargs, token=token, register_type=register_type
+        )
         db.session.add(user)
         db.session.commit()
-        MailService.send_mail(
-            "Confirmacion de Registro",
-            user.email,
-            f"Finalice el registro entrando al siguiente link y completando con sus datos: <br/>{request.host_url}register?token={token}",  # noqa: E501
-        )
+
         return user
 
     @classmethod

@@ -1,12 +1,15 @@
+import datetime
 import functools
 import typing as t
 
 import flask
+import flask_jwt_extended
 import flask_wtf
 from flask import typing as tf
 
-from src.services.user import UserService
 from src.utils import status
+
+JWT_ACCESS_TOKEN_EXPIRES = datetime.timedelta(hours=1)
 
 API_BAD_REQUEST_RESPONSE = (
     {"error": "Parametros invalidos"},
@@ -92,25 +95,8 @@ def validation(
             if _content_type == "json" and not flask.request.is_json:
                 return API_BAD_REQUEST_RESPONSE
 
-            # Replace with real jwt auth on second iteration
-            # Simulate jwt auth by passing user_id in Authorization header
             if require_auth:
-                token = flask.request.headers.get("Authorization")
-                raw_user_id = token.lstrip("Bearer ") if token else ""
-
-                if not raw_user_id.isdigit():
-                    if debug:
-                        print(f"Invalid user_id: {raw_user_id}", flush=True)
-                    return API_UNAUTHORIZED_RESPONSE
-
-                user_id = int(raw_user_id)
-                user = UserService.get_user(user_id)
-                if user is None:
-                    if debug:
-                        print(f"User not found: {user_id}", flush=True)
-                    return API_UNAUTHORIZED_RESPONSE
-
-                kwargs["user_id"] = user_id
+                flask_jwt_extended.verify_jwt_in_request()
 
             if schema is not None:
                 if method == "GET":
@@ -132,3 +118,15 @@ def validation(
         return wrapper  # pyright: ignore[reportGeneralTypeIssues]
 
     return decorator
+
+
+def create_access_token(user_id: int) -> str:
+    return flask_jwt_extended.create_access_token(
+        identity=user_id,
+        expires_delta=JWT_ACCESS_TOKEN_EXPIRES,
+    )
+
+
+def user_id_from_access_token() -> int:
+    user_id = flask_jwt_extended.get_jwt_identity()
+    return user_id

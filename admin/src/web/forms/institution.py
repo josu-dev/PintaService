@@ -1,10 +1,29 @@
 import typing as t
 
 from flask_wtf import FlaskForm
-from wtforms import EmailField, StringField, TextAreaField
+from wtforms import (
+    EmailField,
+    FloatField,
+    StringField,
+    TextAreaField,
+    ValidationError,
+)
 from wtforms import validators as v
 
 from src.services.institution import InstitutionParams
+
+
+class DecimalPlaces:
+    def __init__(self, places):  # type:ignore
+        self.places = places
+
+    def __call__(self, form, field):  # type:ignore
+        value = str(field.data)  # type:ignore
+        decimal_places = value[::-1].find(".")
+        if decimal_places > self.places:
+            raise ValidationError(
+                f"El campo debe tener un máximo de {self.places} decimales"
+            )
 
 
 class InstitutionForm(FlaskForm):
@@ -29,11 +48,29 @@ class InstitutionForm(FlaskForm):
             v.Length(min=0, max=256),
         ],
     )
-    location = StringField(
-        "Ubicación",
+    latitude = FloatField(
+        "Latitud",
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=0, max=256),
+            v.NumberRange(
+                min=-55,
+                max=-25.672960,
+                message="La latitud debe estar en el rango de Argentina -55 a -22.",  # noqa
+            ),
+            DecimalPlaces(20),
+        ],
+    )
+
+    longitude = FloatField(
+        "Longitud",
+        validators=[
+            v.DataRequired("Este campo es requerido"),
+            v.NumberRange(
+                min=-70,
+                max=-54,
+                message="La longitud debe estar en el rango de argentina -70 a -54.",  # noqa
+            ),
+            DecimalPlaces(20),
         ],
     )
     web = StringField(
@@ -66,11 +103,12 @@ class InstitutionForm(FlaskForm):
     )
 
     def values(self) -> InstitutionParams:
+        location = f"{self.latitude.data},{self.longitude.data}"
         return {  # type: ignore
             "name": self.name.data,
             "information": self.information.data,
             "address": self.address.data,
-            "location": self.location.data,
+            "location": location,
             "web": self.web.data,
             "keywords": self.keywords.data,
             "email": self.email.data,

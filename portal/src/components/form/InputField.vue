@@ -1,4 +1,6 @@
 <script setup>
+  import { onMounted, onUnmounted, ref } from 'vue';
+
   const props = defineProps({
     value: {
       type: String,
@@ -13,14 +15,31 @@
     required: {
       type: Boolean,
       default: false
+    },
+    autocomplete: {
+      type: String,
+      default: 'off'
+    },
+    inputClass: {
+      type: String,
+      default: ''
     }
   });
 
-  defineEmits(['update:value']);
+  const emit = defineEmits(['update:value', 'ref:input']);
+
+  const inputRef = ref(null);
+
+  onMounted(() => {
+    emit('ref:input', inputRef.value);
+  });
+  onUnmounted(() => {
+    emit('ref:input', null);
+  });
 </script>
 
 <template>
-  <div class="form-control w-full max-w-xs">
+  <div class="form-control w-full">
     <label class="label" :for="props.name">
       <span class="label-text text-sm md:text-base"
         >{{ props.label }}<span v-if="props.required" class="text-red-500 font-bold">&nbsp;*</span>
@@ -32,11 +51,13 @@
       :id="props.name"
       :value="value"
       :required="props.required"
+      :autocomplete="props.autocomplete"
       @input="
         // @ts-expect-error - target.value is valid
         $emit('update:value', $event.target?.value)
       "
-      class="input input-bordered w-full max-w-xs input-sm md:input-md"
+      ref="inputRef"
+      :class="'input input-bordered w-full input-sm md:input-md ' + props.inputClass"
     />
   </div>
 </template>

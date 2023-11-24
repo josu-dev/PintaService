@@ -70,6 +70,19 @@ class InstitutionService(BaseService):
         return institutions, total
 
     @classmethod
+    def get_enabled_institutions(
+        cls, page: int = 1, per_page: int = 10
+    ) -> t.Tuple[t.List[Institution], int]:
+        query = db.session.query(Institution).filter(Institution.enabled)
+
+        total = query.count()
+        institutions = (
+            query.offset((page - 1) * per_page).limit(per_page).all()
+        )
+
+        return institutions, total
+
+    @classmethod
     def get_institution(
         cls, institution_id: int
     ) -> t.Union[Institution, None]:

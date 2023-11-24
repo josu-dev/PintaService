@@ -1,4 +1,5 @@
 import typing as t
+import urllib.parse
 
 from flask import (
     Blueprint,
@@ -10,12 +11,19 @@ from flask import (
     url_for,
 )
 
-from src.core.enums import DocumentTypes, GenderOptions
+from src.core.enums import DocumentTypes, GenderOptions, RegisterTypes
+from src.core.google import oauth
 from src.services.auth import AuthService
+from src.services.mail import MailService
 from src.services.user import UserService
 from src.utils import status
 from src.web.controllers import _helpers as h
-from src.web.forms.auth import UserLogin, UserPreRegister, UserRegister
+from src.web.forms.auth import (
+    UserLogin,
+    UserPreRegister,
+    UserRegister,
+    UserRegisterGoogle,
+)
 from src.web.forms.user import ProfileUpdateForm
 
 bp = Blueprint("root", __name__)
@@ -81,7 +89,11 @@ def login_post():
 @h.require_no_session()
 def pre_register_get():
     form = UserPreRegister()
-    return render_template("pre_register.html", form=form)
+    redirect_to = request.args.get("redirect_to")
+    print(redirect_to, flush=True)
+    return render_template(
+        "pre_register.html", redirect_to=redirect_to, form=form
+    )
 
 
 @bp.post("/pre_register")
@@ -104,8 +116,21 @@ def pre_register_post():
             render_template("pre_register.html", form=form),
             status.HTTP_400_BAD_REQUEST,
         )
+    register_type = RegisterTypes.MANUAL
+    user = AuthService.create_pre_user(
+        register_type=register_type, **form.values()
+    )
 
-    AuthService.create_pre_user(**form.values())
+    register_link = f"{request.host_url}register?token={user.token}"
+    redirect_to_arg = request.args.get("redirect_to")
+    if redirect_to_arg is not None:
+        register_link += f"&redirect_to={urllib.parse.quote(redirect_to_arg + '?email=' + user.email)}"  # noqa: E501
+
+    MailService.send_mail(
+        "Confirmacion de Registro",
+        user.email,
+        f'Finalice el registro entrando a <a href="{register_link}">este link</a> completando la informacion restante.',  # noqa: E501
+    )
     return render_template("info_register.html")
 
 
@@ -127,8 +152,23 @@ def register_get():
         h.flash_info("El token expiro, realice el registro nuevamente")
         return redirect(url_for("root.pre_register_get"))
 
+    google_register = request.args.get("google")
+    if (
+        google_register is not None
+        and user.register_type == RegisterTypes.GOOGLE
+    ):
+        form = UserRegisterGoogle()
+        return render_template(
+            "register.html",
+            form=form,
+            form_action="/register_google" + "?token=" + user.token,
+        )
+
     form = UserRegister()
-    return render_template("register.html", form=form)
+    return render_template(
+        "register.html",
+        form=form,
+    )
 
 
 @bp.post("/register")
@@ -171,6 +211,58 @@ def register_post():
         **user.asdict(
             ("email", "firstname", "lastname"),
         ),
+        document_type=DocumentTypes.DNI,
+        document_number="",
+        gender=GenderOptions.NOT_SPECIFIED,
+        gender_other="",
+        address="",
+        phone="",
+    )
+    AuthService.delete_pre_user(token)
+
+    redirect_to_link = request.args.get("redirect_to")
+    if redirect_to_link is not None:
+        return redirect(redirect_to_link)
+
+    h.flash_success("Se ha registrado exitosamente")
+    return redirect("/login")
+
+
+@bp.post("/register_google")
+@h.require_no_session()
+def register_google_post():
+    token = request.args.get("token")
+    if not token:
+        h.flash_info("Realice el registro")
+        return redirect(url_for("root.login_get"))
+
+    user = AuthService.get_pre_user_by_token(token)
+    if user is None:
+        h.flash_info("Realice el registro")
+        return redirect(url_for("root.login_get"))
+
+    form = UserRegisterGoogle(request.form)
+    if not form.validate():
+        h.flash_info("Los datos ingresados son invalidos")
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    form_values = form.values()
+    if UserService.exist_user_with_username(form_values["username"]):
+        h.flash_info("El nombre de usuario esta utilizado")
+        return (
+            render_template("register.html", form=form),
+            status.HTTP_400_BAD_REQUEST,
+        )
+
+    UserService.create_user(
+        username=form_values["username"],
+        password=form_values["password"],
+        firstname=form_values["firstname"],
+        lastname=form_values["lastname"],
+        email=user.email,
         document_type=DocumentTypes.DNI,
         document_number="",
         gender=GenderOptions.NOT_SPECIFIED,
@@ -235,6 +327,57 @@ def user_setting_post():
             form=form,
         ),
         status_code,
+    )
+
+
+@bp.get("/login_callback")
+def google_login_get():  # type: ignore
+    return oauth.google.authorize_redirect(  # type: ignore
+        url_for("root.google_login_post", _external=True)
+    )
+
+
+@bp.get("/login_callback_get")
+def google_login_post():
+    token = oauth.google.authorize_access_token()  # type: ignore
+
+    if token is None:
+        h.flash_success("Parametros invalidos")
+        return redirect("/login")
+
+    user_info = token["userinfo"]  # type: ignore
+    user = UserService.get_by_email(user_info["email"])  # type: ignore
+    if user:
+        session["user"] = user.email
+        session["user_id"] = user.id
+        if AuthService.user_is_site_admin(user.id):
+            session["is_admin"] = True
+        h.flash_success("Se inicio sesion correctamente")
+        return redirect(url_for("root.index_get"))
+
+    user = AuthService.get_pre_user_by_email(user_info["email"])  # type:ignore
+    if user:
+        h.flash_info(
+            "Complete el registro para tener acceso a las funcionalidades"
+        )
+        return redirect(
+            url_for("root.register_get") + f"?token={user.token}&google=google"
+        )
+
+    register_type = RegisterTypes.GOOGLE
+
+    user = AuthService.create_pre_user(
+        firstname="",
+        lastname="",
+        email=user_info["email"],  # type: ignore
+        register_type=register_type,
+    )
+
+    h.flash_info(
+        "Complete el registro para tener acceso a las funcionalidades"
+    )
+    return redirect(
+        url_for("root.register_get") + f"?token={user.token}&google=google"
     )
 
 
