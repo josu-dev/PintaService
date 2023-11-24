@@ -43,4 +43,4 @@ export const DEFAULT_API_MAINTEINANCE_ERROR = 'toast';
  *
  * @type {number}
  */
-export const logLevel = parseInt(import.meta.env.VITE_LOG_LEVEL || '0');
+export const logLevel = parseInt(import.meta.env.VITE_LOG_LEVEL || '2');

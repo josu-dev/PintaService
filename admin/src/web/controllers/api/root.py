@@ -20,6 +20,12 @@ def auth_post(body: api_forms.AuthFormValues):
     if user is None:
         return base.API_BAD_REQUEST_RESPONSE
 
+    if not user.is_active:
+        return (
+            {"error": "Cuenta desactivada"},
+            status.HTTP_403_FORBIDDEN,
+        )
+
     access_token = base.create_access_token(user.id)
     response = (
         {
