@@ -137,7 +137,7 @@
             >
             <select v-model="searchType" class="mt-1 p-2 border rounded-md w-full">
               <option value="todos">Todos</option>
-              <option v-for="type in serviceTypes" :key="type">
+              <option v-for="type in serviceTypes" :key="type" :value="type" class="capitalize">
                 {{ type }}
               </option>
             </select>
