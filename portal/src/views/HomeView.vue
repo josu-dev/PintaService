@@ -48,8 +48,8 @@
         <ul class="flex justify-center flex-wrap mt-6 xs:mt-12 gap-8 xs:gap-16">
           <template v-for="action in actionCards" :key="action.id">
             <li class="">
-              <a
-                :href="action.link"
+              <RouterLink
+                :to="action.link"
                 class="px-4 py-6 max-w-[20rem] h-full flex flex-col rounded-2xl ring-1 ring-primary outline-none transition-all duration-150 ease-in-out shadow-sm hover:bg-base-200/50 hover:scale-[1.04] hover:shadow-md focus:bg-base-200 focus:scale-105 focus:!ring-primary-focus focus:ring-2 focus:shadow-xl"
               >
                 <figure class="grid place-items-center">
@@ -59,7 +59,7 @@
                   <h3 class="text-2xl font-semibold">{{ action.title }}</h3>
                   <p class="text-lg mt-2">{{ action.description }}</p>
                 </div>
-              </a>
+              </RouterLink>
             </li>
           </template>
         </ul>
