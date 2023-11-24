@@ -206,6 +206,7 @@ def me_requests_id_get(request_id: int):
             else ""
         ),
         "user_id": request.user_id,
+        "service_id": request.service_id,
     }
 
     return response
@@ -322,6 +323,7 @@ def me_requests_id_notes_post(
     response = {
         "id": note.id,
         "text": note.note,
+        "creation_date": funcs.date_as_yyyy_mm_dd(note.created_at),
     }
 
     return response, status.HTTP_201_CREATED

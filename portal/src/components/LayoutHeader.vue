@@ -63,7 +63,7 @@
   <div class="navbar shadow">
     <div class="navbar-start">
       <RouterLink to="/" class="btn btn-ghost normal-case text-xl">
-        <div class="w-10 -ml-2">
+        <div class="w-10 lg:-ml-2">
           <img src="/logo_64x64.png" />
         </div>
         <span class="sr-only lg:not-sr-only ml-2">Pinta Service</span>
