@@ -1,5 +1,6 @@
 <script>
   import pointer from '@/assets/map-pin.svg';
+  import { useToastStore } from '@/stores/toast';
   import Feature from 'ol/Feature';
   import Map from 'ol/Map';
   import View from 'ol/View';
@@ -10,8 +11,6 @@
   import OSM from 'ol/source/OSM';
   import VectorSource from 'ol/source/Vector';
   import { Icon, Style } from 'ol/style';
-  import { useToastStore } from '@/stores/toast';
-  import { TIMEOUT } from 'dns';
 
   const toastStore = useToastStore();
 
