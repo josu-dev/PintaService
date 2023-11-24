@@ -11,6 +11,7 @@
   import OSM from 'ol/source/OSM';
   import VectorSource from 'ol/source/Vector';
   import { Icon, Style } from 'ol/style';
+  import Zoom from 'ol/control/Zoom';
 
   const toastStore = useToastStore();
 
@@ -49,7 +50,9 @@
         view: new View({
           center: fromLonLat([lon, lat]),
           zoom: 10
-        })
+        }),
+        controls: [new Zoom({})],
+        logo: false
       });
 
       let marker = new Feature({
@@ -70,8 +73,6 @@
           features: [marker]
         })
       });
-      // Add this after defining the marker
-      // @ts-ignore
 
       // @ts-ignore
       this.map.addLayer(vectorLayer);
