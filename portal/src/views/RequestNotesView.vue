@@ -298,6 +298,11 @@
               {{ request?.status }}
             </span>
           </div>
+
+          <p class="text-lg md:text-m font-semibold text-neutral-800">
+            Descripción:
+            {{ request?.description }}
+          </p>
         </div>
 
         <div class="flex-1 flex flex-col my-4 md:my-8">

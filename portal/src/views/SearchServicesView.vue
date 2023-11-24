@@ -135,7 +135,7 @@
             <label for="typeFilter" class="block text-lg font-medium text-gray-700"
               >Tipo de servicio:</label
             >
-            <select v-model="searchType" class="mt-1 p-2 border rounded-md w-full">
+            <select v-model="searchType" class="mt-1 p-2 border rounded-md w-full capitalize">
               <option value="todos">Todos</option>
               <option v-for="type in serviceTypes" :key="type" :value="type" class="capitalize">
                 {{ type }}
