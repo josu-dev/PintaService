@@ -192,18 +192,21 @@ def me_requests_id_get(request_id: int):
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     if request is None or request.user_id != user_id:
-        return base.API_BAD_REQUEST_RESPONSE
+        return base.API_UNAUTHORIZED_RESPONSE
 
     response = {
+        "id": request.id,
         "title": request.title,
+        "description": request.description,
+        "status": request.status.value,
         "creation_date": funcs.date_as_yyyy_mm_dd(request.created_at),
         "close_date": (
             funcs.date_as_yyyy_mm_dd(request.closed_at)
             if request.closed_at
             else ""
         ),
-        "status": request.status.value,
-        "description": request.description,
+        "user_id": request.user_id,
+        "service_id": request.service_id,
     }
 
     return response
@@ -243,6 +246,65 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
     return response, status.HTTP_201_CREATED
 
 
+@bp.get("/me/requests/<int:request_id>/notes")
+@base.validation(
+    api_forms.PaginationForm, method="GET", require_auth=True, debug=True
+)
+def me_requests_id_notes_get(
+    request_id: int, args: api_forms.PaginationFormValues
+):
+    user_id = base.user_id_from_access_token()
+    if not UserService.exist_user(user_id):
+        return base.API_BAD_REQUEST_RESPONSE
+
+    try:
+        request = RequestService.get_request(request_id)
+    except RequestService.RequestServiceError:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    if request is None:
+        return base.API_BAD_REQUEST_RESPONSE
+
+    if request.user_id != user_id:
+        return base.API_UNAUTHORIZED_RESPONSE
+
+    page = args["page"]
+    per_page = args["per_page"] or flask.g.site_config.page_size
+    try:
+        raw_notes, total = RequestService.get_requests_notes_with_users(
+            request_id, page=page, per_page=per_page
+        )
+    except RequestService.RequestServiceError:
+        return base.API_INTERNAL_SERVER_ERROR_RESPONSE
+
+    notes = [
+        {
+            "note": {
+                "id": note.id,
+                "text": note.note,
+                "creation_date": funcs.date_as_yyyy_mm_dd(note.created_at),
+            },
+            "user": {
+                "id": user.id,
+                "username": user.username,
+                "email": user.email,
+                "is_active": user.is_active,
+            },
+        }
+        for note, user in raw_notes
+    ]
+
+    response = {
+        "data": notes,
+        "page": page,
+        "per_page": per_page,
+        "total": total,
+    }
+    print(response)
+
+    return response
+
+
 @bp.post("/me/requests/<int:request_id>/notes")
 @base.validation(api_forms.RequestNoteForm, require_auth=True)
 def me_requests_id_notes_post(
@@ -261,6 +323,7 @@ def me_requests_id_notes_post(
     response = {
         "id": note.id,
         "text": note.note,
+        "creation_date": funcs.date_as_yyyy_mm_dd(note.created_at),
     }
 
     return response, status.HTTP_201_CREATED

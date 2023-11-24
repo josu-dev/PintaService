@@ -90,7 +90,7 @@ class RequestNoteForm(FlaskForm):
     text = wtforms.StringField(
         validators=[
             v.DataRequired("Este campo es requerido"),
-            v.Length(min=8, max=512),
+            v.Length(min=1, max=512),
         ],
     )
 

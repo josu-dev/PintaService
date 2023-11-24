@@ -311,3 +311,52 @@ def load_test_data() -> None:
         keywords="agua, suave, lavado",
         service_type=enums.ServiceTypes.DEVELOPMENT,
     )
+    RequestService.create_note(
+        11,
+        5,
+        "lorem smum dolor sit amet consectetur adipiscing elit sed do",
+    )
+    RequestService.create_note(
+        11,
+        1,
+        "A beruy long note to test the note system",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 2",
+    )
+    RequestService.create_note(
+        11,
+        3,
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    )
+    RequestService.create_note(
+        11,
+        5,
+        "lorectetur adipiscing elit sed do",
+    )
+    RequestService.create_note(
+        11,
+        5,
+        "lorem smum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 4",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 5",
+    )
+    RequestService.create_note(
+        11,
+        1,
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua \
+            lorem ipsum dolor sit amet consectetur adipiscing elit sed do",
+    )

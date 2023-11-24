@@ -56,6 +56,15 @@ const router = createRouter({
       }
     },
     {
+      path: '/me/requests/:request_id(\\d+)',
+      name: 'me_request_notes',
+      props: true,
+      component: () => import('../views/RequestNotesView.vue'),
+      meta: {
+        requiresAuth: true
+      }
+    },
+    {
       path: '/stats',
       name: 'stats',
       component: () => import('../views/StatsView.vue'),

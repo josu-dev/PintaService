@@ -50,8 +50,8 @@
   watch(
     [requestsPage, filterRequestOrder, filterRequestStatus],
     () => {
-      console.log('watching');
       loading.value = true;
+
       let url = `/me/requests?page=${requestsPage.value}`;
       if (requestsPerPage.value) {
         url += '&per_page=' + requestsPerPage.value;
