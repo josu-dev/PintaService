@@ -15,7 +15,8 @@
     service_id: String
   });
 
-  const initializing = ref(true);
+  const loadingService = ref(true);
+  const loadingInstitution = ref(true);
 
   const router = useRouter();
   const toastStore = useToastStore();
@@ -50,11 +51,10 @@
 
   const service_id = parseInt(props.service_id || '1');
 
-  APIService.get(`/service_institution/${service_id}`, {
+  APIService.get(`/services/${service_id}`, {
     onJSON(json) {
-      dataService.value = json.data.service;
-      dataInstitution.value = json.data.institution;
-      initializing.value = false;
+      dataService.value = json;
+      loadingService.value = false;
     },
     onFailure(response) {
       log.warn('show service', 'failed to get service', response);
@@ -63,12 +63,36 @@
       log.error('show service', 'error getting service', error);
     },
     afterRequest() {
-      if (initializing.value) {
+      if (loadingService.value && !loadingInstitution.value) {
         log.warn('show service', 'failed to get service, going back');
         toastStore.warning('No se pudo obtener el servicio, intente mas tarde');
         router.back();
       } else {
-        initializing.value = false;
+        loadingService.value = false;
+      }
+    }
+  });
+
+  APIService.get(`/institution_of/${service_id}`, {
+    onJSON(json) {
+      dataInstitution.value = json;
+      loadingInstitution.value = false;
+    },
+    onFailure(response) {
+      console.error(response);
+      toastStore.error('Error al buscar servicios');
+    },
+    onError(error) {
+      console.error(error);
+      toastStore.error('Error al buscar servicios');
+    },
+    afterRequest() {
+      if (loadingInstitution.value && !loadingService.value) {
+        log.warn('show service', 'failed to get institution, going back');
+        toastStore.warning('No se pudo obtener la institucion, intente mas tarde');
+        router.back();
+      } else {
+        loadingInstitution.value = false;
       }
     }
   });
@@ -92,7 +116,7 @@
 <template>
   <div class="h-full overflow-y-auto">
     <main class="min-h-full flex flex-col px-2 py-4 md:py-8">
-      <template v-if="initializing">
+      <template v-if="loadingInstitution || loadingService">
         <div class="flex-1 grid place-items-center">
           <p
             class="text-lg md:text-xl flex flex-wrap max-w-[80%] justify-center text-balance items-center gap-2 font-semibold text-center text-neutral-800"

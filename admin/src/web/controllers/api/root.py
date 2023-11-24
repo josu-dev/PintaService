@@ -68,39 +68,26 @@ def institutions_get(args: api_forms.PaginationFormValues):
     return response
 
 
-@bp.get("/service_institution/<int:service_id>")
+@bp.get("/institution_of/<service_id>")
 @base.validation(method="GET")
-def institutions_id_get(service_id: int):
+def institution_of(service_id: int):
     institution_id = ServiceService.get_institution_of(service_id)
     if institution_id is None:
         return base.API_BAD_REQUEST_RESPONSE
-
-    institution = InstitutionService.get_institution(institution_id)  # type: ignore # noqa: E501
-    service = ServiceService.get_service(service_id)
-    if institution is None or service is None:
+    institution = InstitutionService.get_institution(institution_id)
+    if institution is None:
         return base.API_BAD_REQUEST_RESPONSE
 
     response = {
-        "data": {
-            "service": {
-                "name": service.name,
-                "description": service.description,
-                "laboratory": service.laboratory,
-                "keywords": service.keywords,
-                "enabled": service.enabled,
-            },
-            "institution": {
-                "name": institution.name,
-                "information": institution.information,
-                "address": institution.address,
-                "web": institution.web,
-                "keywords": institution.keywords,
-                "location": institution.location,
-                "enabled": institution.enabled,
-                "email": institution.email,
-                "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
-            },
-        }
+        "name": institution.name,
+        "information": institution.information,
+        "address": institution.address,
+        "web": institution.web,
+        "keywords": institution.keywords,
+        "location": institution.location,
+        "enabled": institution.enabled,
+        "email": institution.email,
+        "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
     }
 
     return response
@@ -390,7 +377,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 
 @bp.get("/services/<int:service_id>")
-@base.validation(method="GET", require_auth=True)
+@base.validation(method="GET")
 def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
