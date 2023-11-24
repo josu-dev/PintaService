@@ -1,16 +1,22 @@
 <script setup>
   import GoBackButton from '@/components/GoBackButton.vue';
+  import IconLoader from '@/components/icons/IconLoader.vue';
   import InstitutionDetail from '@/components/showservice/InstitutionDetail.vue';
   import LocationMap from '@/components/showservice/LocationMap.vue';
   import ServiceDetail from '@/components/showservice/ServiceDetail.vue';
-  import { APIService } from '@/utils/api';
-  import { defineProps, ref } from 'vue';
-  import { useRouter } from 'vue-router';
   import { useToastStore } from '@/stores/toast';
   import { useUserStore } from '@/stores/user';
+  import { APIService } from '@/utils/api';
+  import { log } from '@/utils/logging';
+  import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+
   const props = defineProps({
     service_id: String
   });
+
+  const initializing = ref(true);
+
   const router = useRouter();
   const toastStore = useToastStore();
   const userStore = useUserStore();
@@ -20,85 +26,127 @@
    *    name: string,
    *    description: string,
    *    laboratory: string,
-   *    keywords: string[],
+   *    keywords: string,
    *    enabled: boolean,
-   * }} ServiceData
-   */
-
-  /**
+   * }} DataService
+   *
    * @typedef {{
    *    name: string,
    *    information: string,
    *    address: string,
    *    web: string,
-   *    keywords: string[],
+   *    keywords: string,
    *    location: string,
    *    enabled: boolean,
    *    email: string,
    *    days_and_opening_hours: string,
-   * }} InstitutionData
+   * }} DataInstitution
    */
 
-  /** @type {import('vue').Ref<ServiceData>} */
-  const serviceData = ref(/** @type {any} */ (null));
+  /** @type {import('vue').Ref<DataService>} */
+  const dataService = ref(/** @type {any} */ (undefined));
+  /** @type {import('vue').Ref<DataInstitution>} */
+  const dataInstitution = ref(/** @type {any} */ (undefined));
 
-  /** @type {import('vue').Ref<InstitutionData>} */
-  const institutionData = ref(/** @type {any} */ (null));
-  const service_id = props.service_id ? props.service_id : '-1';
+  const service_id = parseInt(props.service_id || '1');
 
   APIService.get(`/service_institution/${service_id}`, {
     onJSON(json) {
-      institutionData.value = json.data.institution;
-      serviceData.value = json.data.service;
+      dataService.value = json.data.service;
+      dataInstitution.value = json.data.institution;
+      initializing.value = false;
     },
     onFailure(response) {
-      console.log('Request failed');
+      log.warn('show service', 'failed to get service', response);
     },
     onError(error) {
-      console.log(error);
+      log.error('show service', 'error getting service', error);
+    },
+    afterRequest() {
+      if (initializing.value) {
+        log.warn('show service', 'failed to get service, going back');
+        toastStore.warning('No se pudo obtener el servicio, intente mas tarde');
+        router.back();
+      } else {
+        initializing.value = false;
+      }
     }
   });
 
-  const redirectToRequest = () => {
-    if (!service_id) return;
+  function goToServiceRequest() {
     if (!userStore.user) {
-      toastStore.error('Debe iniciar sesión para solicitar un servicio');
-      router.push('/login');
-    } else {
-      router.push(`/services/${service_id}/request`);
+      toastStore.info('Inicia sesión para solicitar un servicio');
+      router.push(`/login?redirect_to=/services/${service_id}/request`);
+      return;
     }
-  };
+
+    if (userStore.user.is_site_admin) {
+      toastStore.info('No puedes solicitar un servicio siendo administrador del sitio');
+      return;
+    }
+
+    router.push(`/services/${service_id}/request`);
+  }
 </script>
+
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="grid grid-cols-1 sm:grid-cols-2 gap-8 px-2 mt-8">
-      <!-- Service and institution detail -->
-      <div>
-        <GoBackButton />
-        <h1 class="text-4xl font-bold text-center text-primary mb-4 mt-4">Servicio</h1>
-        <div>
-          <ServiceDetail :service="serviceData" />
+    <main class="min-h-full flex flex-col px-2 py-4 md:py-8">
+      <template v-if="initializing">
+        <div class="flex-1 grid place-items-center border border-fuchsia-500">
+          <p
+            class="text-lg md:text-xl flex flex-wrap max-w-[80%] justify-center text-balance items-center gap-2 font-semibold text-center text-neutral-800"
+          >
+            <IconLoader class="animate-spin inline-flex" />
+            <span class="">Cargando informacion...</span>
+          </p>
         </div>
-        <h1 class="text-4xl font-bold text-center text-primary mb-4">Institución</h1>
-        <div>
-          <InstitutionDetail :institution="institutionData" />
-        </div>
-      </div>
+      </template>
 
-      <!-- Map and Location -->
-      <div class="flex flex-col items-center justify-center mt-4 sm:mt-0">
-        <div style="width: 100%; height: 500px">
-          <LocationMap
-            v-if="institutionData.location"
-            :location="institutionData.location"
-            :contact="institutionData.email"
-          />
-          <div v-else class="text-center text-gray-500">Cargando ubicación...</div>
+      <template v-else>
+        <div class="flex-none flex flex-col justify-center items-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-primary leading-relaxed text-center">
+            Detalle de Servicio
+          </h1>
         </div>
-        <button type="submit" class="btn btn-primary" @click="redirectToRequest()">
-          Solicitar
-        </button>
-      </div>
+
+        <div class="flex-1 grid md:grid-cols-2 gap-4 my-4 md:my-8 md:px-4 lg:px-8">
+          <div class="flex flex-col gap-4 md:gap-8">
+            <div>
+              <h2 class="text-xl md:text-2xl font-bold text-center mb-2 mt-4">Servicio</h2>
+              <div>
+                <ServiceDetail :service="dataService" />
+              </div>
+            </div>
+            <div>
+              <h2 class="text-xl md:text-2xl font-bold text-center mb-2 mt-4">Institución</h2>
+              <div>
+                <InstitutionDetail :institution="dataInstitution" />
+              </div>
+            </div>
+          </div>
+
+          <div class="flex">
+            <div style="width: 100%; height: 500px">
+              <LocationMap :location="dataInstitution.location" :contact="dataInstitution.email" />
+            </div>
+          </div>
+
+          <div
+            class="md:col-span-2 self-start mx-auto flex flex-wrap-reverse justify-around gap-2 md:gap-8"
+          >
+            <GoBackButton class="btn-ghost bg-base-content bg-opacity-25 normal-case">
+              Volver
+            </GoBackButton>
+
+            <template v-if="!userStore.user?.is_site_admin || dataService.enabled">
+              <button class="btn btn-primary normal-case" @click="goToServiceRequest">
+                Solicitar
+              </button>
+            </template>
+          </div>
+        </div>
+      </template>
     </main>
   </div>
 </template>

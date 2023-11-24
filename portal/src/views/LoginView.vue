@@ -15,6 +15,8 @@
   const isLogging = ref(false);
 
   const initialMail = String(router.currentRoute.value.query.email || '');
+  const rawRedirectTo = router.currentRoute.value.query.redirect_to;
+  const redirectTo = Array.isArray(rawRedirectTo) ? rawRedirectTo[0] : rawRedirectTo;
 
   const form = ref({
     user: initialMail,
@@ -62,7 +64,12 @@
 
         toastStore.success('Inicio de sesión exitoso');
 
-        router.push({ name: 'home' });
+        if (redirectTo) {
+          router.push(`/${redirectTo.trim().slice(1)}`);
+          return;
+        }
+
+        router.push('/');
       },
       onFailure(response) {
         if (response.status === 403) {

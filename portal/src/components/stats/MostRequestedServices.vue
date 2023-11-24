@@ -41,7 +41,7 @@
     for (const item of mostRequestedServices.value) {
       data.push(item);
     }
-    tData.value = [...data, ...data, ...data, ...data, ...data];
+    tData.value = data;
   });
 </script>
 

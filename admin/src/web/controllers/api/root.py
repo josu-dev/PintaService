@@ -225,12 +225,19 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
     if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
+    if AuthService.user_is_site_admin(user_id):
+        return base.API_UNAUTHORIZED_RESPONSE
+
     service_id = body["service_id"]
+    service = ServiceService.get_service(body["service_id"])
+    if service is None or not service.enabled:
+        return base.API_BAD_REQUEST_RESPONSE
+
     title = body["title"]
     description = body["description"]
 
     try:
-        service = RequestService.create_request(
+        service_request = RequestService.create_request(
             user_id,
             service_id,
             title=title,
@@ -241,12 +248,12 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     response = {
-        "id": service.id,
-        "title": service.title,
-        "creation_date": funcs.date_as_yyyy_mm_dd(service.created_at),
+        "id": service_request.id,
+        "title": service_request.title,
+        "creation_date": funcs.date_as_yyyy_mm_dd(service_request.created_at),
         "close_date": "",
-        "status": service.status.value,
-        "description": service.description,
+        "status": service_request.status.value,
+        "description": service_request.description,
     }
 
     return response, status.HTTP_201_CREATED
