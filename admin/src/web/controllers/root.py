@@ -90,7 +90,6 @@ def login_post():
 def pre_register_get():
     form = UserPreRegister()
     redirect_to = request.args.get("redirect_to")
-    print(redirect_to, flush=True)
     return render_template(
         "pre_register.html", redirect_to=redirect_to, form=form
     )
@@ -100,10 +99,13 @@ def pre_register_get():
 @h.require_no_session()
 def pre_register_post():
     form = UserPreRegister(request.form)
+    redirect_to_arg = request.args.get("redirect_to")
     if not form.validate():
         h.flash_error("Los datos ingresados son invalidos")
         return (
-            render_template("pre_register.html", form=form),
+            render_template(
+                "pre_register.html", redirect_to=redirect_to_arg, form=form
+            ),
             status.HTTP_400_BAD_REQUEST,
         )
 
@@ -113,7 +115,9 @@ def pre_register_post():
     ) or UserService.get_by_email(email):
         h.flash_error("El mail ya esta registrado")
         return (
-            render_template("pre_register.html", form=form),
+            render_template(
+                "pre_register.html", redirect_to=redirect_to_arg, form=form
+            ),
             status.HTTP_400_BAD_REQUEST,
         )
     register_type = RegisterTypes.MANUAL
@@ -122,9 +126,12 @@ def pre_register_post():
     )
 
     register_link = f"{request.host_url}register?token={user.token}"
-    redirect_to_arg = request.args.get("redirect_to")
+
     if redirect_to_arg is not None:
-        register_link += f"&redirect_to={urllib.parse.quote(redirect_to_arg + '?email=' + user.email)}"  # noqa: E501
+        if "?email=" in redirect_to_arg:
+            register_link += f"&redirect_to={urllib.parse.quote(redirect_to_arg)}"  # noqa: E501
+        else:
+            register_link += f"&redirect_to={urllib.parse.quote(redirect_to_arg + '?email=' + user.email)}"  # noqa: E501
 
     MailService.send_mail(
         "Confirmacion de Registro",
@@ -150,7 +157,10 @@ def register_get():
     if AuthService.token_expired(user.created_at):
         AuthService.delete_pre_user(token)
         h.flash_info("El token expiro, realice el registro nuevamente")
-        return redirect(url_for("root.pre_register_get"))
+        redirect_to_link = request.args.get("redirect_to")
+        return redirect(
+            url_for("root.pre_register_get", redirect_to=redirect_to_link)
+        )
 
     google_register = request.args.get("google")
     if (
@@ -175,6 +185,7 @@ def register_get():
 @h.require_no_session()
 def register_post():
     token = request.args.get("token")
+    redirect_to_link = request.args.get("redirect_to")
     if not token:
         h.flash_info("Realice el registro o revise su casilla de email")
         return redirect(url_for("root.login_get"))
@@ -187,13 +198,17 @@ def register_post():
     if AuthService.token_expired(user.created_at):
         AuthService.delete_pre_user(token)
         h.flash_info("El token expiro, realice el registro nuevamente")
-        return redirect(url_for("root.pre_register_get"))
+        return redirect(
+            url_for("root.pre_register_get", redirect_to=redirect_to_link)
+        )
 
     form = UserRegister(request.form)
     if not form.validate():
         h.flash_info("Los datos ingresados son invalidos")
         return (
-            render_template("register.html", form=form),
+            render_template(
+                "register.html", redirect_to=redirect_to_link, form=form
+            ),
             status.HTTP_400_BAD_REQUEST,
         )
 
@@ -201,7 +216,9 @@ def register_post():
     if UserService.exist_user_with_username(form_values["username"]):
         h.flash_info("El nombre de usuario esta utilizado")
         return (
-            render_template("register.html", form=form),
+            render_template(
+                "register.html", redirect_to=redirect_to_link, form=form
+            ),
             status.HTTP_400_BAD_REQUEST,
         )
 
@@ -220,7 +237,6 @@ def register_post():
     )
     AuthService.delete_pre_user(token)
 
-    redirect_to_link = request.args.get("redirect_to")
     if redirect_to_link is not None:
         return redirect(redirect_to_link)
 
