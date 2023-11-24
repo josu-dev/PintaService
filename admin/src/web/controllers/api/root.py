@@ -408,7 +408,7 @@ def services_id_get(service_id: int):
 
 
 @bp.get("/services_types")
-@base.validation(method="GET", require_auth=True)
+@base.validation(method="GET")
 def services_types_get():
     response = {
         "data": [service_type.value for service_type in enums.ServiceTypes]
