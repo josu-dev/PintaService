@@ -4,12 +4,15 @@
   import { useToastStore } from '@/stores/toast';
   import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
+  import { log } from '@/utils/logging';
   import { onMounted, ref } from 'vue';
   import { useRouter } from 'vue-router';
 
   const router = useRouter();
   const toastStore = useToastStore();
   const userStore = useUserStore();
+
+  const isLogging = ref(false);
 
   const initialMail = String(router.currentRoute.value.query.email || '');
 
@@ -20,6 +23,11 @@
 
   /** @param {Event} event */
   async function submitLogin(event) {
+    if (isLogging.value) {
+      return;
+    }
+    isLogging.value = true;
+
     APIService.post('/auth', {
       body: {
         user: form.value.user,
@@ -57,11 +65,21 @@
         router.push({ name: 'home' });
       },
       onFailure(response) {
+        if (response.status === 403) {
+          toastStore.info('No puedes iniciar sesión en este momento');
+          router.push('/account_disabled');
+          return;
+        }
+
+        log.warn('login', 'failed to login', response);
         toastStore.error('Error al iniciar sesión');
       },
       onError(error) {
-        console.error('login error: ', error);
+        log.error('login', 'error logging in', error);
         toastStore.error('Error al iniciar sesión');
+      },
+      afterRequest() {
+        isLogging.value = false;
       }
     });
   }
@@ -104,7 +122,7 @@
           required
           @ref:input="passwordInput = $event"
         />
-        <button type="submit" class="btn btn-primary">Iniciar</button>
+        <button type="submit" class="btn btn-primary" :disabled="isLogging">Iniciar</button>
         <span class="text-secondary-content">
           No tienes cuenta?
           <a :href="registerLink" class="link link-hover font-semibold text-info">Registrate</a>

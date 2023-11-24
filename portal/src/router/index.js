@@ -73,6 +73,14 @@ const router = createRouter({
         requiresAuth: true,
         requiresSiteAdminOrInstitutionOwner: true
       }
+    },
+    {
+      path: '/account_disabled',
+      name: 'account_disabled',
+      component: () => import('../views/AccountDisabledView.vue'),
+      meta: {
+        requiresNoAuth: true
+      }
     }
   ]
 });

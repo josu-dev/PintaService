@@ -89,6 +89,22 @@ def load_test_data() -> None:
     )
 
     UserService.create_user(
+        firstname="disabled",
+        lastname="disabled",
+        password="disabled",
+        email="disabled@test.test",
+        username="disabled",
+        document_type=DocumentTypes.DNI,
+        document_number="40188223",
+        gender=GenderOptions.NOT_SPECIFIED,
+        address="disabled",
+        phone="12345678",
+        gender_other="",
+    )
+
+    UserService.toggle_active(6)
+
+    UserService.create_user(
         firstname="Luciano Ariel",
         lastname="Lopez",
         password="1234",
