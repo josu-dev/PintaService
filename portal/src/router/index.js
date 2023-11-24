@@ -36,7 +36,8 @@ const router = createRouter({
       name: 'request',
       component: () => import('../views/RequestServiceView.vue'),
       meta: {
-        requiresAuth: true
+        requiresAuth: true,
+        requiresNormalUser: true
       }
     },
     {

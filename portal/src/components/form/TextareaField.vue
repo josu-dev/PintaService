@@ -8,19 +8,15 @@
     },
     name: String,
     label: String,
-    type: {
-      type: String,
-      default: 'text'
-    },
     required: {
       type: Boolean,
       default: false
     },
-    autocomplete: {
-      type: String,
-      default: 'off'
+    rows: {
+      type: Number,
+      default: 4
     },
-    inputClass: {
+    classTextarea: {
       type: String,
       default: ''
     }
@@ -45,19 +41,22 @@
         >{{ props.label }}<span v-if="props.required" class="text-red-500 font-bold">&nbsp;*</span>
       </span>
     </label>
-    <input
-      :type="props.type"
+    <textarea
       :name="props.name"
       :id="props.name"
       :value="value"
       :required="props.required"
-      :autocomplete="props.autocomplete"
+      spellcheck="false"
+      :rows="props.rows"
       @input="
         // @ts-expect-error - target.value is valid
         $emit('update:value', $event.target?.value)
       "
       ref="inputRef"
-      :class="'input input-bordered w-full input-sm md:input-md ' + props.inputClass"
+      :class="
+        'textarea textarea-bordered w-full textarea-sm md:textarea-md resize-none !leading-normal ' +
+        props.classTextarea
+      "
     />
   </div>
 </template>

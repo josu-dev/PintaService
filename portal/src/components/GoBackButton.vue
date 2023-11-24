@@ -1,8 +1,12 @@
 <script setup>
-  const { btnClass } = defineProps({
+  const props = defineProps({
     btnClass: {
       type: String,
       default: 'btn-primary'
+    },
+    disabled: {
+      type: Boolean,
+      default: false
     }
   });
 
@@ -12,5 +16,7 @@
 </script>
 
 <template>
-  <button :class="'btn ' + btnClass" @click="goBack"><slot>Volver</slot></button>
+  <button :class="'btn ' + props.btnClass" :disabled="props.disabled" @click="goBack">
+    <slot>Volver</slot>
+  </button>
 </template>

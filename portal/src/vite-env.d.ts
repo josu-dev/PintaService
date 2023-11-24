@@ -11,6 +11,10 @@ declare module 'vue-router' {
      */
     requiresNoAuth?: boolean
     /**
+     * If `true`, requires the user to be a non site admin.
+     */
+    requiresNormalUser?: boolean
+    /**
      * If `true`, requires the user to be a site admin.
      */
     requiresSiteAdmin?: boolean
@@ -18,6 +22,7 @@ declare module 'vue-router' {
      * If `true`, requires the user to be a site admin or an institution owner.
      */
     requiresSiteAdminOrInstitutionOwner?: boolean
+
   }
 }
 

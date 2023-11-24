@@ -24,6 +24,10 @@ router.beforeEach(async (to, from) => {
       return { name: 'home' };
     }
 
+    if (to.meta.requiresNormalUser && userStore.user.is_site_admin) {
+      return { name: 'home' };
+    }
+
     if (to.meta.requiresSiteAdminOrInstitutionOwner) {
       if (!userStore.user.is_site_admin && !userStore.user.is_institution_owner) {
         return { name: 'home' };
