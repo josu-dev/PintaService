@@ -4,7 +4,7 @@ from typing import Optional
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
-from src.core.enums import DocumentTypes, GenderOptions
+from src.core.enums import DocumentTypes, GenderOptions, RegisterTypes
 from src.core.models.base import (
     BaseModel,
     IntPK,
@@ -51,6 +51,7 @@ class PreRegisterUser(BaseModel):
     lastname: Mapped[Str32]
     email: Mapped[Str64]
     token: Mapped[Str128]
+    register_type: Mapped[RegisterTypes]
 
     created_at: Mapped[Timestamp] = mapped_column(init=False)
     updated_at: Mapped[Timestamp] = mapped_column(

@@ -89,6 +89,22 @@ def load_test_data() -> None:
     )
 
     UserService.create_user(
+        firstname="disabled",
+        lastname="disabled",
+        password="disabled",
+        email="disabled@test.test",
+        username="disabled",
+        document_type=DocumentTypes.DNI,
+        document_number="40188223",
+        gender=GenderOptions.NOT_SPECIFIED,
+        address="disabled",
+        phone="12345678",
+        gender_other="",
+    )
+
+    UserService.toggle_active(6)
+
+    UserService.create_user(
         firstname="Luciano Ariel",
         lastname="Lopez",
         password="1234",
@@ -148,7 +164,7 @@ def load_test_data() -> None:
         address="Calle 1",
         days_and_opening_hours="Lunes a Viernes de 8:00 a 17:00",
         information="Información de la institución 1",
-        location="Lugar 1",
+        location="-36,-59",
         web="https://www.institucion1.com",
         keywords="institucion1, institucion, 1",
         email="ins1@ins1.com",
@@ -158,13 +174,24 @@ def load_test_data() -> None:
         address="Calle 2",
         days_and_opening_hours="Lunes a Viernes de 8:00 a 17:00",
         information="Información de la institución 2",
-        location="Lugar 2",
+        location="-45,-69",
         web="https://www.institucion2.com",
         keywords="institucion2, institucion, 2",
         email="ins2@ins2.com",
     )
+    ins3 = institution.Institution(
+        name="Grupo grisaseo 54",
+        address="Calle 45 y 54",
+        days_and_opening_hours="Lunes a Viernes de 8:00 a 17:00",
+        information="Conjunto de instituciones de la ciudad de La Plata",
+        location="-45,-69",
+        web="https://www.institucion2.com",
+        keywords="institucion2, institucion, 2",
+        email="ins3@ins3.com",
+    )
     db.session.add(ins1)
     db.session.add(ins2)
+    db.session.add(ins3)
     db.session.commit()
 
     AuthService.add_institution_role(
@@ -176,123 +203,176 @@ def load_test_data() -> None:
     AuthService.add_institution_role(
         "OWNER", user_id=4, institution_id=ins2.id
     )
+    AuthService.add_institution_role(
+        "OWNER", user_id=2, institution_id=ins3.id
+    )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        name="Brillo y pintura",
+        description="Pintamos su auto",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
-        keywords="servicio1, servicio, 1",
+        name="Laca y barniz",
+        description="Barnizamos su auto con laca de primera calidad",
+        keywords="laca, barniz, auto",
         service_type=ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Doble pintado al solvente",
+        description="Pintamos su auto con pintura al solvente durante \
+            la mañana y la tarde",
         keywords="servicio1, servicio, 1",
         service_type=ServiceTypes.DEVELOPMENT,
     )
     RequestService.create_request(
-        1,
+        5,
         1,
         title="Pelea",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
-        1,
+        5,
         1,
         title="Pelea2",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
-        1,
+        5,
         1,
         title="Pelea3",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
-        1,
+        5,
         1,
         title="Pelea4",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
+        5,
         1,
-        1,
-        title="Pelea44",
+        title="Pelea5",
         description=" pelea",
         status=RequestStatus.ACCEPTED,
     )
     RequestService.create_request(
+        5,
         1,
-        1,
-        title="Pelea4444",
+        title="Pelea6",
         description=" pelea",
         status=RequestStatus.CANCELED,
     )
     RequestService.create_request(
+        5,
         1,
-        1,
-        title="Pele2a4444",
+        title="Pelea7",
         description=" pelea",
         status=RequestStatus.CANCELED,
     )
     RequestService.create_request(
+        5,
         1,
-        1,
-        title="Pele2a4444",
+        title="Pelea8",
         description=" pelea",
         status=RequestStatus.FINISHED,
     )
 
     RequestService.create_request(
-        1,
+        5,
         2,
-        title="Pelea5",
+        title="Pelea9",
         description=" pelea",
         status=RequestStatus.IN_PROCESS,
     )
     RequestService.create_request(
-        1,
+        5,
         2,
-        title="Pelea5222",
+        title="Pelea10",
         description=" pelea",
         status=RequestStatus.FINISHED,
     )
     RequestService.create_request(
-        1,
+        5,
         2,
-        title="Pelea512",
+        title="Pelea11",
         description=" pelea",
         status=RequestStatus.FINISHED,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Colores mate",
+        description="Pintamos su auto con colores mate de garantía",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.ANALYSIS,
     )
     ServiceService.create_service(
-        institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
+        institution_id=2,
+        name="Colores brillantes",
+        description="Brillantina para sus vehículos",
         keywords="servicio1, servicio, 1",
         service_type=enums.ServiceTypes.CONSULTANCY,
     )
     ServiceService.create_service(
         institution_id=1,
-        name="Servicio 1",
-        description="Descripción del servicio 1",
-        keywords="servicio1, servicio, 1",
+        name="Pintado al agua",
+        description="Acualux para sus vehículos",
+        keywords="agua, suave, lavado",
         service_type=enums.ServiceTypes.DEVELOPMENT,
+    )
+    RequestService.create_note(
+        11,
+        5,
+        "lorem smum dolor sit amet consectetur adipiscing elit sed do",
+    )
+    RequestService.create_note(
+        11,
+        1,
+        "A beruy long note to test the note system",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 2",
+    )
+    RequestService.create_note(
+        11,
+        3,
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    )
+    RequestService.create_note(
+        11,
+        5,
+        "lorectetur adipiscing elit sed do",
+    )
+    RequestService.create_note(
+        11,
+        5,
+        "lorem smum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 4",
+    )
+    RequestService.create_note(
+        11,
+        2,
+        "Nota 5",
+    )
+    RequestService.create_note(
+        11,
+        1,
+        "lorem ipsum dolor sit amet consectetur adipiscing elit sed do \
+            eiusmod tempor incididunt ut labore et dolore magna aliqua \
+            lorem ipsum dolor sit amet consectetur adipiscing elit sed do",
     )

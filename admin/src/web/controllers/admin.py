@@ -282,7 +282,14 @@ def institutions_id_get(institution_id: int):
     institution_owners = InstitutionService.get_institution_owners(
         institution_id
     )
-    form = InstitutionForm(obj=institution)
+
+    location_parts = institution.location.split(",")
+    latitude = location_parts[0]
+    longitude = location_parts[1]
+
+    form = InstitutionForm(
+        obj=institution, latitude=latitude, longitude=longitude
+    )
     form_new_owner = EmailForm()
 
     return render_template(
