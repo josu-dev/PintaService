@@ -96,6 +96,6 @@
 </style>
 
 <template>
-  <h1 class="text-4xl font-bold text-center text-primary mb-4">¿Cómo Llegar?</h1>
+  <h2 class="text-xl md:text-2xl font-bold text-center mb-2 mt-4">Como Llegar</h2>
   <div id="map" ref="mapContainer"></div>
 </template>
