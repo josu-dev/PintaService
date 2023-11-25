@@ -1,6 +1,19 @@
 <script setup>
   import { APIService } from '@/utils/api';
+  import { log } from '@/utils/logging';
+  import {
+    BarElement,
+    CategoryScale,
+    Chart as ChartJS,
+    Legend,
+    LinearScale,
+    Title,
+    Tooltip
+  } from 'chart.js';
   import { ref, watchEffect } from 'vue';
+  import { Bar } from 'vue-chartjs';
+
+  ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale);
 
   /**
    * @typedef {{
@@ -11,67 +24,70 @@
    *  },
    *  avg_resolution_time:number
    * }[]} APIResponse
+   *
+   * @typedef {{
+   *  labels: string[],
+   *  datasets:{
+   *    label:string,
+   *    backgroundColor:string,
+   *    data:number[],
+   *  }[]
+   * }} ChartData
    */
 
-  /** @type {import('vue').Ref<APIResponse>} */
-  const mostEfficientInstitutions = ref([]);
-
-  /** @type {import('vue').Ref<APIResponse>} */
-  const tData = ref([]);
+  /** @type {import('vue').Ref<APIResponse | undefined>} */
+  const mostEfficientInstitutions = ref();
+  /** @type {import('vue').Ref<ChartData | undefined>} */
+  const chartData = ref();
 
   APIService.get('/stats/most_efficient_institutions', {
     onJSON(json) {
       mostEfficientInstitutions.value = json.data;
     },
     onFailure(response) {
-      console.warn('Request failed');
+      log.warn('stats', 'failed to get most efficient institutions', response);
     },
     onError(error) {
-      console.error(error);
+      log.error('stats', 'error getting most efficient institutions', error);
     }
   });
 
   watchEffect(() => {
-    /** @type {APIResponse} */
-    const data = [];
+    /** @type {ChartData} */
+    const data = {
+      labels: [],
+      datasets: [
+        {
+          label: 'Tiempo de resolucion promedio',
+          backgroundColor: '#03b675',
+          data: []
+        }
+      ]
+    };
     if (!mostEfficientInstitutions.value) {
-      tData.value = data;
+      chartData.value = undefined;
       return;
     }
     for (const item of mostEfficientInstitutions.value) {
-      data.push(item);
+      data.labels.push(item.institution.name);
+      data.datasets[0].data.push(item.avg_resolution_time);
     }
-    tData.value = data;
-    console.log(data);
+    chartData.value = data;
   });
+
+  /** @type {any} */
+  const chartOptions = {
+    responsive: true,
+    maintainAspectRatio: false,
+    indexAxis: 'y'
+  };
 </script>
 
 <template>
-  <div class="overflow-x-auto text-primary-content rounded-3xl shadow">
-    <table class="table w-full">
-      <thead>
-        <tr>
-          <th class=""></th>
-          <th class="">Nombre</th>
-          <th class="">Tiempo de resolucion promedio</th>
-          <th class="">Habilitada</th>
-        </tr>
-      </thead>
-      <tbody class="">
-        <template v-for="(item, index) in tData" :key="item.id">
-          <tr class="hover text-center">
-            <td>{{ index + 1 }}</td>
-            <td>{{ item.institution.name }}</td>
-            <td>{{ item.avg_resolution_time }}</td>
-            <td>{{ item.institution.enabled ? '✅' : '❌' }}</td>
-          </tr>
-        </template>
-        <template v-if="tData.length === 0">
-          <tr>
-            <td colspan="4" class="text-center">No hay servicios</td>
-          </tr>
-        </template>
-      </tbody>
-    </table>
-  </div>
+  <Bar
+    v-if="chartData"
+    id="stats-most-requested-services"
+    :data="chartData"
+    :options="chartOptions"
+  />
 </template>
