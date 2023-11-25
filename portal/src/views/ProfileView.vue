@@ -39,8 +39,8 @@
     <main class="flex flex-col gap-8 items-center h-full pt-8 md:pt-16 p-2 overflow-y-auto">
       <div>
         <div class="px-4 sm:px-0">
-          <h1 class="text-2xl font-semibold leading-relaxed text-neutral-900">
-            Informacion del Perfil
+          <h1 class="text-2xl md:text-3xl font-bold text-primary leading-relaxed">
+            Informacion de Perfil
           </h1>
           <p class="mt-1 max-w-2xl text-sm text-neutral-500 text-balance">
             Detalles personales de la cuenta para
@@ -88,7 +88,7 @@
           </dl>
         </div>
       </div>
-      <GoBackButton />
+      <GoBackButton class="normal-case" />
     </main>
   </div>
 </template>

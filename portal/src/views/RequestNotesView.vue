@@ -284,7 +284,7 @@
       </template>
       <template v-else>
         <div class="flex-none flex flex-col justify-center items-center">
-          <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
             Solicitud de Servicio
           </h1>
           <div class="mt-2 md:mt-4 flex flex-wrap justify-center gap-x-2">
@@ -298,14 +298,14 @@
               {{ request?.status }}
             </span>
           </div>
-
-          <p class="text-lg md:text-m font-semibold text-neutral-800">
-            Descripción:
+          <p
+            class="mt-1 md:mt-2 text-sm md:text-base text-neutral-600 text-center text-balance line-clamp-2 max-w-[90%] xs:max-w-[75%]"
+          >
             {{ request?.description }}
           </p>
         </div>
 
-        <div class="flex-1 flex flex-col my-4 md:my-8">
+        <div class="flex-1 flex flex-col my-4 md:my-6">
           <section
             class="flex flex-col w-full xs:max-w-[95%] md:max-w-[80%] mx-auto bg-base-100 ring-1 ring-primary/50 rounded-md"
           >

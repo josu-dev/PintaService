@@ -86,7 +86,7 @@ if (APIService.setJWTFromLS()) {
         is_institution_owner: is_institution_owner
       });
 
-      if (router.currentRoute.value.name === 'login') {
+      if (router.currentRoute.value.meta.requiresNoAuth) {
         router.push('/');
       } else if (router.currentRoute.value.path !== INITIAL_CLIENT_URL.pathname) {
         router.push(INITIAL_CLIENT_URL.pathname);

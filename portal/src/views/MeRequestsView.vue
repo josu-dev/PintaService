@@ -88,12 +88,22 @@
 
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="flex flex-col p-2 py-4 md:py-8">
-      <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">Mis solicitudes</h1>
+    <main class="flex flex-col px-2 py-4 md:py-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
+        Mis Solicitudes
+      </h1>
+
       <div class="flex flex-wrap gap-4 justify-center my-4">
         <div class="w-full xs:max-w-[10rem]">
-          <label for="status" class="block text-lg font-medium text-gray-700">Estado</label>
-          <select v-model="filterRequestStatus" class="mt-1 p-2 border rounded-md w-full">
+          <label for="filterRequestStatus" class="block text-lg font-medium text-gray-700"
+            >Estado</label
+          >
+          <select
+            v-model="filterRequestStatus"
+            id="filterRequestStatus"
+            name="filterRequestStatus"
+            class="mt-1 p-2 border rounded-md w-full"
+          >
             <template v-for="option in requestStatusOptions" :key="option.value">
               <option :value="option.value">
                 {{ option.label }}
@@ -102,10 +112,15 @@
           </select>
         </div>
         <div class="w-full xs:max-w-[10rem]">
-          <label for="orden" class="block text-lg font-medium text-gray-700">
+          <label for="filterRequestOrder" class="block text-lg font-medium text-gray-700">
             Orden de creacion
           </label>
-          <select v-model="filterRequestOrder" class="mt-1 p-2 border rounded-md w-full">
+          <select
+            v-model="filterRequestOrder"
+            id="filterRequestOrder"
+            name="filterRequestOrder"
+            class="mt-1 p-2 border rounded-md w-full"
+          >
             <option value="desc">Descendente</option>
             <option value="asc">Ascendente</option>
           </select>
