@@ -6,6 +6,7 @@
   import IconSearch from '@/components/icons/IconSearch.vue';
   import IconStats from '@/components/icons/IconStats.vue';
   import IconUser from '@/components/icons/IconUser.vue';
+  import { useToastStore } from '@/stores/toast';
   import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
   import { computed } from 'vue';
@@ -13,10 +14,12 @@
 
   const router = useRouter();
   const userStore = useUserStore();
+  const toastStore = useToastStore();
 
   function submitLogout() {
     APIService.clearJWT();
     userStore.clearUser();
+    toastStore.info('Cierre de sesion exitoso');
 
     router.push({
       name: 'login'

@@ -9,7 +9,9 @@
   <div class="h-full overflow-y-auto">
     <main class="flex flex-col gap-8 w-full p-2 py-4 md:py-8">
       <div class="mx-auto w-full max-w-[90%] lg:max-w-3xl">
-        <h1 class="text-2xl font-semibold leading-relaxed">Estadisticas generales</h1>
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
+          Estadisticas Generales
+        </h1>
         <div class="flex flex-col gap-8 lg:gap-16 mt-4 sm:pl-4">
           <section class="flex flex-col gap-2">
             <h2 class="text-lg font-medium">Solicitudes por estado</h2>

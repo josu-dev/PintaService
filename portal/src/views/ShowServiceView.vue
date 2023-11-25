@@ -129,7 +129,7 @@
 
       <template v-else>
         <div class="flex-none flex flex-col justify-center items-center">
-          <h1 class="text-2xl md:text-3xl font-bold text-primary leading-relaxed text-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
             Detalle de Servicio
           </h1>
         </div>

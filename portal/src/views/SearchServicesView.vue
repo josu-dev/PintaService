@@ -52,8 +52,15 @@
   });
 
   async function filterServices() {
+    const rawQuery = searchQuery.value;
+    const trimmedQuery = rawQuery.trim();
+    if (!trimmedQuery && rawQuery !== '') {
+      toastStore.info('La busqueda no pueden ser solo espacios');
+      return;
+    }
+
     searching.value = true;
-    const url = `/services/search?q=${searchQuery.value}&type=${searchType.value}&page=${currentPage.value}`;
+    const url = `/services/search?q=${trimmedQuery}&type=${searchType.value}&page=${currentPage.value}`;
     APIService.get(url, {
       onJSON(json) {
         searchedServices.value = json.data;
@@ -123,22 +130,34 @@
 
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="p-4 text-center">
-      <h1 class="text-4xl font-bold text-primary mt-4 mb-4">Buscar Servicios</h1>
+    <main class="text-center px-2 py-4 md:py-8">
+      <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
+        Buscar Servicios
+      </h1>
 
-      <div class="mx-auto max-w-md md:max-w-3xl">
+      <div class="mx-auto max-w-md md:max-w-3xl mt-1 xs:mt-2">
         <form
           class="flex flex-col gap-y-4 mx-auto md:flex-row md:gap-x-4"
           @submit.prevent="submitSearch"
         >
           <div class="md:w-36">
-            <label for="typeFilter" class="block text-lg font-medium text-gray-700"
+            <label for="searchType" class="block text-lg font-medium text-gray-700"
               >Tipo de servicio:</label
             >
-            <select v-model="searchType" class="mt-1 p-2 border rounded-md w-full capitalize">
+            <select
+              v-model="searchType"
+              id="searchType"
+              name="searchType"
+              class="mt-1 p-2 border rounded-md w-full capitalize"
+            >
               <option value="todos">Todos</option>
-              <option v-for="type in serviceTypes" :key="type" :value="type" class="capitalize">
-                {{ type }}
+              <option
+                v-for="serviceType in serviceTypes"
+                :key="serviceType"
+                :value="serviceType"
+                class="capitalize"
+              >
+                {{ serviceType }}
               </option>
             </select>
           </div>
@@ -154,7 +173,7 @@
             />
           </div>
 
-          <button type="submit" class="btn btn-primary btn-block md:w-36 md:self-end">
+          <button type="submit" class="btn btn-primary btn-block md:w-36 md:self-end normal-case">
             <template v-if="searching">
               <IconLoader class="animate-spin mr-1" />
               Buscando
@@ -163,9 +182,15 @@
           </button>
         </form>
         <div class="form-control ml-auto w-max mt-2">
-          <label class="label cursor-pointer gap-4">
+          <label for="autoSearch" class="label cursor-pointer gap-4">
             <span class="label-text">Busqueda automatica</span>
-            <input type="checkbox" v-model="autoSearch" class="checkbox checkbox-primary" />
+            <input
+              type="checkbox"
+              v-model="autoSearch"
+              id="autoSearch"
+              name="autoSearch"
+              class="checkbox checkbox-primary"
+            />
           </label>
         </div>
       </div>

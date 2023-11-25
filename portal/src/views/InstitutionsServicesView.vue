@@ -84,9 +84,9 @@
 
 <template>
   <div class="h-full overflow-y-auto">
-    <main class="flex flex-col p-2 py-4 md:py-8">
+    <main class="flex flex-col px-2 py-4 md:py-8">
       <div class="mx-auto w-full">
-        <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
           Servicios por Institucion
         </h1>
 
