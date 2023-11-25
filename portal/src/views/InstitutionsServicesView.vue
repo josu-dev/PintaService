@@ -3,7 +3,7 @@
   import { APIService } from '@/utils/api';
   import { ref, watch } from 'vue';
 
-  const PER_PAGE = 5;
+  const PER_PAGE = 4;
   /**
    * @typedef {Object} Institution
    * @property {number} id

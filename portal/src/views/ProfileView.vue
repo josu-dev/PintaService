@@ -88,7 +88,7 @@
           </dl>
         </div>
       </div>
-      <GoBackButton />
+      <GoBackButton class="normal-case" />
     </main>
   </div>
 </template>
