@@ -74,6 +74,7 @@ def institution_of(service_id: int):
     institution_id = ServiceService.get_institution_of(service_id)
     if institution_id is None:
         return base.API_BAD_REQUEST_RESPONSE
+
     institution = InstitutionService.get_institution(institution_id)
     if institution is None:
         return base.API_BAD_REQUEST_RESPONSE
@@ -87,7 +88,7 @@ def institution_of(service_id: int):
         "location": institution.location,
         "enabled": institution.enabled,
         "email": institution.email,
-        "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
+        "days_and_opening_hours": institution.days_and_opening_hours,
     }
 
     return response
@@ -247,9 +248,7 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
 
 
 @bp.get("/me/requests/<int:request_id>/notes")
-@base.validation(
-    api_forms.PaginationForm, method="GET", require_auth=True, debug=True
-)
+@base.validation(api_forms.PaginationForm, method="GET", require_auth=True)
 def me_requests_id_notes_get(
     request_id: int, args: api_forms.PaginationFormValues
 ):
@@ -300,7 +299,6 @@ def me_requests_id_notes_get(
         "per_page": per_page,
         "total": total,
     }
-    print(response)
 
     return response
 
@@ -330,7 +328,7 @@ def me_requests_id_notes_post(
 
 
 @bp.get("/services/search")
-@base.validation(api_forms.ServiceSearchForm, "GET")
+@base.validation(api_forms.ServiceSearchForm, method="GET")
 def services_search_get(args: api_forms.ServiceSearchFormValues):
     q = args["q"]
     service_type_value = args["type"]
@@ -350,7 +348,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
         raw_services, total = ServiceService.search_services(
             q, service_type, page, per_page
         )
-    except Exception:
+    except ServiceService.ServiceServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
@@ -405,7 +403,7 @@ def services_types_get():
 
 
 @bp.get("/stats/requests_per_status")
-@base.validation(method="GET", require_auth=True, debug=True)
+@base.validation(method="GET", require_auth=True)
 def stats_requests_per_status_get():
     user_id = base.user_id_from_access_token()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
@@ -579,7 +577,7 @@ def enabled_institutions_id_services_get(
         ) = ServiceService.get_enabled_institution_services(
             institution_id=institution_id, page=page, per_page=per_page
         )
-    except InstitutionService.InstitutionServiceError:
+    except ServiceService.ServiceServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
