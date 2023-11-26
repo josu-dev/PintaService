@@ -8,6 +8,7 @@
   import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
   import { requestStatus } from '@/utils/enums';
+  import { log } from '@/utils/logging';
   import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import { RouterLink, useRouter } from 'vue-router';
 
@@ -111,16 +112,16 @@
         request.value = json;
       },
       onFailure(response) {
-        console.error('failed to load request ', response);
-        if (response.status == 403) {
+        if (response.status == 401) {
           router.push('/me/requests');
           return;
         }
+        log.warn('request_notes', 'failed to load request', response);
         toastStore.error('No se pudo cargar la solicitud de servicio');
         router.push('/me/requests');
       },
       onError(error) {
-        console.error('error loading request ', error);
+        log.error('request_notes', 'error loading request', error);
         toastStore.error('No se pudo cargar la solicitud de servicio');
         router.push('/me/requests');
       }

@@ -12,7 +12,6 @@
           <img class="mx-auto max-w-[50%]" src="/logo_256x256.png" alt="Pinta Service Logo" />
           <div>
             <h1 class="text-4xl md:text-5xl !leading-snug font-bold text-center">
-              <!-- <span class="text-primary">404</span><br /> -->
               Pagina no encontrada
             </h1>
             <p

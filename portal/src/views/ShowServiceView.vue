@@ -79,11 +79,10 @@
       loadingInstitution.value = false;
     },
     onFailure(response) {
-      console.error(response);
+      log.warn('show service', 'failed to get institution', response);
       toastStore.error('Error al buscar servicios');
     },
-    onError(error) {
-      console.error(error);
+    onError() {
       toastStore.error('Error al buscar servicios');
     },
     afterRequest() {

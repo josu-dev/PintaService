@@ -3,6 +3,7 @@
   import IconLoader from '@/components/icons/IconLoader.vue';
   import { useToastStore } from '@/stores/toast';
   import { APIService } from '@/utils/api';
+  import { log } from '@/utils/logging';
   import { ref, watchEffect } from 'vue';
   import { RouterLink } from 'vue-router';
 
@@ -42,11 +43,11 @@
       serviceTypes.value = json.data;
     },
     onFailure(response) {
-      console.error(response);
+      log.warn('services search', 'failed to get service types', response);
       toastStore.error('Error al buscar servicios');
     },
     onError(error) {
-      console.error(error);
+      log.error('services search', 'error getting service types', error);
       toastStore.error('Error al buscar servicios');
     }
   });
@@ -69,11 +70,11 @@
         totalServices.value = json.total;
       },
       onFailure(response) {
-        console.error(response);
+        log.warn('services search', 'failed to search services', response);
         toastStore.error('Error al buscar servicios');
       },
       onError(error) {
-        console.error(error);
+        log.error('services search', 'error searching services', error);
         toastStore.error('Error al buscar servicios');
       },
       afterRequest() {
