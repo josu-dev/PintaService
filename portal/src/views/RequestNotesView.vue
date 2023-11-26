@@ -8,6 +8,7 @@
   import { useUserStore } from '@/stores/user';
   import { APIService } from '@/utils/api';
   import { requestStatus } from '@/utils/enums';
+  import { log } from '@/utils/logging';
   import { computed, nextTick, onBeforeMount, onBeforeUnmount, onMounted, ref, watch } from 'vue';
   import { RouterLink, useRouter } from 'vue-router';
 
@@ -111,16 +112,16 @@
         request.value = json;
       },
       onFailure(response) {
-        console.error('failed to load request ', response);
-        if (response.status == 403) {
+        if (response.status == 401) {
           router.push('/me/requests');
           return;
         }
+        log.warn('request_notes', 'failed to load request', response);
         toastStore.error('No se pudo cargar la solicitud de servicio');
         router.push('/me/requests');
       },
       onError(error) {
-        console.error('error loading request ', error);
+        log.error('request_notes', 'error loading request', error);
         toastStore.error('No se pudo cargar la solicitud de servicio');
         router.push('/me/requests');
       }
@@ -284,7 +285,7 @@
       </template>
       <template v-else>
         <div class="flex-none flex flex-col justify-center items-center">
-          <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
+          <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
             Solicitud de Servicio
           </h1>
           <div class="mt-2 md:mt-4 flex flex-wrap justify-center gap-x-2">
@@ -298,9 +299,14 @@
               {{ request?.status }}
             </span>
           </div>
+          <p
+            class="mt-1 md:mt-2 text-sm md:text-base text-neutral-600 text-center text-balance line-clamp-2 max-w-[90%] xs:max-w-[75%]"
+          >
+            {{ request?.description }}
+          </p>
         </div>
 
-        <div class="flex-1 flex flex-col my-4 md:my-8">
+        <div class="flex-1 flex flex-col my-4 md:my-6">
           <section
             class="flex flex-col w-full xs:max-w-[95%] md:max-w-[80%] mx-auto bg-base-100 ring-1 ring-primary/50 rounded-md"
           >

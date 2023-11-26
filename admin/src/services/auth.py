@@ -168,8 +168,7 @@ class AuthService(BaseService):
                 },
             )
             db.session.commit()
-        except sa_exc.SQLAlchemyError as e:
-            print(e)
+        except sa_exc.SQLAlchemyError:
             return False
 
         return True
@@ -199,8 +198,7 @@ class AuthService(BaseService):
                 .delete()
             )
             db.session.commit()
-        except sa_exc.SQLAlchemyError as e:
-            print("error", e, flush=True)
+        except sa_exc.SQLAlchemyError:
             return False
 
         return delete_count == 1

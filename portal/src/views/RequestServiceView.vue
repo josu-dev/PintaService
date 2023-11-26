@@ -63,7 +63,7 @@
   <div class="h-full overflow-y-auto">
     <main class="h-full flex flex-col px-2 py-4 md:py-8">
       <div class="flex-none flex flex-col justify-center items-center">
-        <h1 class="text-2xl md:text-3xl font-bold leading-relaxed text-center">
+        <h1 class="text-2xl md:text-3xl font-bold text-center text-primary leading-relaxed">
           Solicitar Servicio
         </h1>
       </div>

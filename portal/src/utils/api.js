@@ -4,6 +4,7 @@ import {
   DEFAULT_API_JWT_ERROR_MESSAGE_KEY,
   DEFAULT_API_MAINTEINANCE_ERROR
 } from '@/config.js';
+import { log } from '@/utils/logging';
 
 /**
  * @typedef {'toast' | 'fail' | 'ignore' | 'throw'} MaintenanceErrorOptions
@@ -214,7 +215,7 @@ export class APIService {
     try {
       localStorage.setItem(JWT_LS_KEY, token);
     } catch (error) {
-      console.error('Error while saving JWT token to local storage: ', error);
+      log.error('jwt', 'Error while saving JWT token to local storage: ', error);
     }
   }
 
@@ -225,7 +226,7 @@ export class APIService {
     try {
       localStorage.removeItem(JWT_LS_KEY);
     } catch (error) {
-      console.error('Error while removing JWT token from local storage: ', error);
+      log.error('jwt', 'Error while removing JWT token from local storage: ', error);
     }
     delete APIService.defaultHeaders.Authorization;
   }
@@ -257,7 +258,7 @@ export class APIService {
     try {
       localStorage.setItem(JWT_LS_KEY, token);
     } catch (error) {
-      console.error('Error while saving JWT token to local storage: ', error);
+      log.error('jwt', 'Error while saving JWT token to local storage: ', error);
     }
   }
 }

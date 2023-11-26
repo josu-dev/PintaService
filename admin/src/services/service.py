@@ -166,7 +166,7 @@ class ServiceService(BaseService):
         return services, total
 
     @classmethod
-    def get_institution_of(cls, service_id: int) -> t.Union[Institution, None]:
+    def get_institution_of(cls, service_id: int) -> t.Union[int, None]:
         service = db.session.query(Service).get(service_id)
         if service is None:
             return None
