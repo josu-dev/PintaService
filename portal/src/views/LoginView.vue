@@ -15,6 +15,8 @@
   const isLogging = ref(false);
 
   const initialMail = String(router.currentRoute.value.query.email || '');
+  const rawRedirectTo = router.currentRoute.value.query.redirect_to;
+  const redirectTo = Array.isArray(rawRedirectTo) ? rawRedirectTo[0] : rawRedirectTo;
 
   const form = ref({
     user: initialMail,
@@ -60,9 +62,14 @@
           is_institution_owner: is_institution_owner
         });
 
-        toastStore.success('Inicio de sesión exitoso');
+        toastStore.success('Inicio de sesion exitoso');
 
-        router.push({ name: 'home' });
+        if (redirectTo) {
+          router.push(`/${redirectTo.trim().slice(1)}`);
+          return;
+        }
+
+        router.push('/');
       },
       onFailure(response) {
         if (response.status === 403) {
@@ -100,8 +107,10 @@
 
 <template>
   <main class="grid grid-rows-[1fr_2fr_2fr] h-full">
-    <div class="row-start-2 w-full p-6 m-auto rounded-md lg:max-w-xl">
-      <h1 class="text-4xl font-bold text-center text-primary">Inicio de Sesion</h1>
+    <div class="row-start-2 w-full p-4 m-auto rounded-md max-w-md">
+      <h1 class="text-3xl md:text-4xl font-bold text-center text-primary leading-relaxed">
+        Inicio de Sesion
+      </h1>
       <form
         class="flex flex-col items-center text-primary-content space-y-4 [&>:first-child]:mt-4 md:[&>:first-child]:mt-8"
         @submit.prevent="submitLogin"
@@ -122,7 +131,9 @@
           required
           @ref:input="passwordInput = $event"
         />
-        <button type="submit" class="btn btn-primary" :disabled="isLogging">Iniciar</button>
+        <button type="submit" class="btn btn-primary normal-case" :disabled="isLogging">
+          Iniciar
+        </button>
         <span class="text-secondary-content">
           No tienes cuenta?
           <a :href="registerLink" class="link link-hover font-semibold text-info">Registrate</a>

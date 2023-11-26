@@ -1,5 +1,6 @@
 <script>
   import pointer from '@/assets/map-pin.svg';
+  import { useToastStore } from '@/stores/toast';
   import Feature from 'ol/Feature';
   import Map from 'ol/Map';
   import View from 'ol/View';
@@ -10,8 +11,7 @@
   import OSM from 'ol/source/OSM';
   import VectorSource from 'ol/source/Vector';
   import { Icon, Style } from 'ol/style';
-  import { useToastStore } from '@/stores/toast';
-  import { TIMEOUT } from 'dns';
+  import Zoom from 'ol/control/Zoom';
 
   const toastStore = useToastStore();
 
@@ -50,7 +50,9 @@
         view: new View({
           center: fromLonLat([lon, lat]),
           zoom: 10
-        })
+        }),
+        controls: [new Zoom({})],
+        logo: false
       });
 
       let marker = new Feature({
@@ -71,8 +73,6 @@
           features: [marker]
         })
       });
-      // Add this after defining the marker
-      // @ts-ignore
 
       // @ts-ignore
       this.map.addLayer(vectorLayer);
@@ -96,6 +96,6 @@
 </style>
 
 <template>
-  <h1 class="text-4xl font-bold text-center text-primary mb-4">¿Cómo Llegar?</h1>
+  <h2 class="text-xl md:text-2xl font-bold text-center mb-2 mt-4">Como Llegar</h2>
   <div id="map" ref="mapContainer"></div>
 </template>

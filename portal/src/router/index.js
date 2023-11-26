@@ -1,5 +1,8 @@
 import HomeView from '@/views/HomeView.vue';
+import NotFoundView from '@/views/NotFoundView.vue';
 import { createRouter, createWebHistory } from 'vue-router';
+
+export const INITIAL_CLIENT_URL = new URL(window.location.href);
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -10,9 +13,25 @@ const router = createRouter({
       component: HomeView
     },
     {
+      path: '/:pathMatch(.*)*',
+      name: 'not_found',
+      component: NotFoundView
+    },
+    {
       path: '/login',
       name: 'login',
-      component: () => import('../views/LoginView.vue')
+      component: () => import('../views/LoginView.vue'),
+      meta: {
+        requiresNoAuth: true
+      }
+    },
+    {
+      path: '/account_disabled',
+      name: 'account_disabled',
+      component: () => import('../views/AccountDisabledView.vue'),
+      meta: {
+        requiresNoAuth: true
+      }
     },
     {
       path: '/services',
@@ -72,14 +91,6 @@ const router = createRouter({
       meta: {
         requiresAuth: true,
         requiresSiteAdminOrInstitutionOwner: true
-      }
-    },
-    {
-      path: '/account_disabled',
-      name: 'account_disabled',
-      component: () => import('../views/AccountDisabledView.vue'),
-      meta: {
-        requiresNoAuth: true
       }
     }
   ]

@@ -1,24 +1,28 @@
 <script setup>
+  import IconClipboardlist from '@/components/icons/IconClipboardlist.vue';
+  import IconMailplus from '@/components/icons/IconMailplus.vue';
+  import IconSearch from '@/components/icons/IconSearch.vue';
+
   const actionCards = [
     {
       id: 1,
       title: 'Listar',
       description: 'Lista de servicios prestados por cada institución',
-      img: 'https://github.com/Fabian-Martinez-Rincon/Fabian-Martinez-Rincon/assets/55964635/68cedb8a-b2fa-4082-8b2b-52b747e6d7a1',
+      icon: IconClipboardlist,
       link: '/services'
     },
     {
       id: 2,
       title: 'Buscar',
       description: 'Realizar búsqueda de servicios',
-      img: 'https://github.com/Fabian-Martinez-Rincon/Fabian-Martinez-Rincon/assets/55964635/447700ab-c31f-45a2-8b11-6fbae78e5ed8',
+      icon: IconSearch,
       link: '/services/search'
     },
     {
       id: 3,
       title: 'Solicitar',
       description: 'Iniciar una solicitud de servicio',
-      img: 'https://github.com/Fabian-Martinez-Rincon/Fabian-Martinez-Rincon/assets/55964635/68cedb8a-b2fa-4082-8b2b-52b747e6d7a1',
+      icon: IconMailplus,
       link: '/services/search'
     }
   ];
@@ -47,19 +51,22 @@
         </h2>
         <ul class="flex justify-center flex-wrap mt-6 xs:mt-12 gap-8 xs:gap-16">
           <template v-for="action in actionCards" :key="action.id">
-            <li class="">
-              <a
-                :href="action.link"
+            <li class="w-full max-w-[20rem]">
+              <RouterLink
+                :to="action.link"
                 class="px-4 py-6 max-w-[20rem] h-full flex flex-col rounded-2xl ring-1 ring-primary outline-none transition-all duration-150 ease-in-out shadow-sm hover:bg-base-200/50 hover:scale-[1.04] hover:shadow-md focus:bg-base-200 focus:scale-105 focus:!ring-primary-focus focus:ring-2 focus:shadow-xl"
               >
-                <figure class="grid place-items-center">
-                  <img :src="action.img" :alt="action.title" class="w-1/3 rounded-xl" />
-                </figure>
-                <div class="flex-1 flex flex-col mt-4 items-center text-center">
+                <div class="mx-auto">
+                  <component
+                    :is="action.icon"
+                    class="w-12 h-12 xs:w-20 xs:h-20 md:w-20 md:h-20 lg:w-24 lg:h-24"
+                  />
+                </div>
+                <div class="flex-1 flex flex-col mt-2 items-center text-center">
                   <h3 class="text-2xl font-semibold">{{ action.title }}</h3>
                   <p class="text-lg mt-2">{{ action.description }}</p>
                 </div>
-              </a>
+              </RouterLink>
             </li>
           </template>
         </ul>

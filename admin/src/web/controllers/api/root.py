@@ -68,39 +68,27 @@ def institutions_get(args: api_forms.PaginationFormValues):
     return response
 
 
-@bp.get("/service_institution/<int:service_id>")
+@bp.get("/institution_of/<service_id>")
 @base.validation(method="GET")
-def institutions_id_get(service_id: int):
+def institution_of(service_id: int):
     institution_id = ServiceService.get_institution_of(service_id)
     if institution_id is None:
         return base.API_BAD_REQUEST_RESPONSE
 
-    institution = InstitutionService.get_institution(institution_id)  # type: ignore # noqa: E501
-    service = ServiceService.get_service(service_id)
-    if institution is None or service is None:
+    institution = InstitutionService.get_institution(institution_id)
+    if institution is None:
         return base.API_BAD_REQUEST_RESPONSE
 
     response = {
-        "data": {
-            "service": {
-                "name": service.name,
-                "description": service.description,
-                "laboratory": service.laboratory,
-                "keywords": service.keywords,
-                "enabled": service.enabled,
-            },
-            "institution": {
-                "name": institution.name,
-                "information": institution.information,
-                "address": institution.address,
-                "web": institution.web,
-                "keywords": institution.keywords,
-                "location": institution.location,
-                "enabled": institution.enabled,
-                "email": institution.email,
-                "days_and_opening_hours": institution.days_and_opening_hours,  # noqa: E501
-            },
-        }
+        "name": institution.name,
+        "information": institution.information,
+        "address": institution.address,
+        "web": institution.web,
+        "keywords": institution.keywords,
+        "location": institution.location,
+        "enabled": institution.enabled,
+        "email": institution.email,
+        "days_and_opening_hours": institution.days_and_opening_hours,
     }
 
     return response
@@ -225,12 +213,19 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
     if not UserService.exist_user(user_id):
         return base.API_BAD_REQUEST_RESPONSE
 
+    if AuthService.user_is_site_admin(user_id):
+        return base.API_UNAUTHORIZED_RESPONSE
+
     service_id = body["service_id"]
+    service = ServiceService.get_service(body["service_id"])
+    if service is None or not service.enabled:
+        return base.API_BAD_REQUEST_RESPONSE
+
     title = body["title"]
     description = body["description"]
 
     try:
-        service = RequestService.create_request(
+        service_request = RequestService.create_request(
             user_id,
             service_id,
             title=title,
@@ -241,21 +236,19 @@ def me_requests_post(body: api_forms.ServiceRequestFormValues):
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     response = {
-        "id": service.id,
-        "title": service.title,
-        "creation_date": funcs.date_as_yyyy_mm_dd(service.created_at),
+        "id": service_request.id,
+        "title": service_request.title,
+        "creation_date": funcs.date_as_yyyy_mm_dd(service_request.created_at),
         "close_date": "",
-        "status": service.status.value,
-        "description": service.description,
+        "status": service_request.status.value,
+        "description": service_request.description,
     }
 
     return response, status.HTTP_201_CREATED
 
 
 @bp.get("/me/requests/<int:request_id>/notes")
-@base.validation(
-    api_forms.PaginationForm, method="GET", require_auth=True, debug=True
-)
+@base.validation(api_forms.PaginationForm, method="GET", require_auth=True)
 def me_requests_id_notes_get(
     request_id: int, args: api_forms.PaginationFormValues
 ):
@@ -306,7 +299,6 @@ def me_requests_id_notes_get(
         "per_page": per_page,
         "total": total,
     }
-    print(response)
 
     return response
 
@@ -336,7 +328,7 @@ def me_requests_id_notes_post(
 
 
 @bp.get("/services/search")
-@base.validation(api_forms.ServiceSearchForm, "GET")
+@base.validation(api_forms.ServiceSearchForm, method="GET")
 def services_search_get(args: api_forms.ServiceSearchFormValues):
     q = args["q"]
     service_type_value = args["type"]
@@ -356,7 +348,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
         raw_services, total = ServiceService.search_services(
             q, service_type, page, per_page
         )
-    except Exception:
+    except ServiceService.ServiceServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
@@ -383,7 +375,7 @@ def services_search_get(args: api_forms.ServiceSearchFormValues):
 
 
 @bp.get("/services/<int:service_id>")
-@base.validation(method="GET", require_auth=True)
+@base.validation(method="GET")
 def services_id_get(service_id: int):
     try:
         service = ServiceService.get_service(service_id)
@@ -401,7 +393,7 @@ def services_id_get(service_id: int):
 
 
 @bp.get("/services_types")
-@base.validation(method="GET", require_auth=True)
+@base.validation(method="GET")
 def services_types_get():
     response = {
         "data": [service_type.value for service_type in enums.ServiceTypes]
@@ -411,7 +403,7 @@ def services_types_get():
 
 
 @bp.get("/stats/requests_per_status")
-@base.validation(method="GET", require_auth=True, debug=True)
+@base.validation(method="GET", require_auth=True)
 def stats_requests_per_status_get():
     user_id = base.user_id_from_access_token()
     user_is_site_admin = AuthService.user_is_site_admin(user_id)
@@ -585,7 +577,7 @@ def enabled_institutions_id_services_get(
         ) = ServiceService.get_enabled_institution_services(
             institution_id=institution_id, page=page, per_page=per_page
         )
-    except InstitutionService.InstitutionServiceError:
+    except ServiceService.ServiceServiceError:
         return base.API_INTERNAL_SERVER_ERROR_RESPONSE
 
     services = [
