@@ -1,33 +1,29 @@
-# Base image
-FROM node:20-alpine as base
+FROM node:20-alpine AS base
 
 ARG VITE_BACKEND_BASE_URL
 ENV VITE_BACKEND_BASE_URL=$VITE_BACKEND_BASE_URL
 
 WORKDIR /tmp/app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 
-# Can't use npm ci because breaks because of pinia
-# RUN npm i --ignore-scripts
 RUN npm ci --ignore-scripts
 
 COPY public ./public
 COPY src ./src
-COPY index.html ./index.html
-COPY vite.config.js ./vite.config.js
-COPY postcss.config.js ./postcss.config.js
-COPY tailwind.config.js ./tailwind.config.js
+COPY index.html .
+COPY postcss.config.js .
+COPY tailwind.config.js .
+COPY vite.config.js .
 
 RUN npm run build
 
 
-# Prod image
-FROM node:20-alpine as prod
+FROM node:20-alpine AS prod
 
 WORKDIR /app
 
-COPY --from=base /tmp/app/package.json ./
+COPY --from=base /tmp/app/package*.json .
 
 RUN npm i --omit=dev --ignore-scripts
 
@@ -39,5 +35,4 @@ EXPOSE 4173
 
 USER node
 
-# Start the app
 CMD ["npx", "serve", "-s", "dist", "-l", "4173"]
