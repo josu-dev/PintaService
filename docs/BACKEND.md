@@ -44,7 +44,7 @@ Some of the most important files/folders are:
 
 - [Development enviroment](#development-enviroment)
   - [Pyenv](#pyenv)
-  - [Poetry](#poetry)
+  - [Pip](#pip)
   - [Enviroment variables](#enviroment-variables)
   - [Docker](#docker)
     - [Running the database and mail server](#running-the-database-and-mail-server)
@@ -84,22 +84,14 @@ pyenv local 3.8.10
 
 <br/>
 
-### Poetry
+### Pip
 
-Poetry is the tool used to manage the python dependencies and virtual enviroments for the project.
-
-To install poetry, follow the official [poetry installation guide](https://python-poetry.org/docs/#installation).
-
-After installing poetry is recommended to run the following command to configure the virtual enviroments to be created inside the project folder:
-
-```bash
-poetry config virtualenvs.in-project true
-```
+Pip is the tool used to install the python dependencies for the project.
 
 To install the dependencies, run the following command:
 
 ```bash
-poetry install
+pip install -r requirements.txt -r requirements-dev.txt
 ```
 
 
@@ -119,12 +111,8 @@ If the application will be runned manually, the following enviroment variables m
 
 
 ```ini
-# Postgres (docker compose)
-DB_HOST=127.0.0.1
-DB_PORT=5432
-DB_USER=username
-DB_PASS=password
-DB_NAME=pinta_service
+# Docker compose
+DB_URL=postgresql://username:password@db:5432/dbname
 ```
 
 The above variables and the defaults provided are planned to be used with docker compose, so if you aren't using it, you must change the values to match your custom configuration. In the [Questions and Answers](#questions-and-answers) section you can find more information about how to use different configurations.
@@ -444,10 +432,10 @@ The backend is located in the `admin/` folder.
 ┣ 📄 app.py
 ┣ 📄 compose.yaml
 ┣ 📄 Dockerfile
-┣ 📄 poetry.lock
-┣ 📄 poetry.toml
 ┣ 📄 pyproject.toml
 ┣ 📄 README.md
+┣ 📄 requirements-dev.txt
+┣ 📄 requirements.txt
 ┗ 📄 tailwind.config.js
 ```
 
@@ -532,12 +520,13 @@ Folder and files description:
   This file contains the docker image definition for the project. This configuration is used to run the application on a container.
 - `poetry.lock`:
   This file contains the poetry dependencies lock file.
-- `poetry.toml`:
-  This file contains the poetry especific configuration for the project.
-- `pyproject.toml`:
   This file contains the poetry and tools configuration for the project.
 - `README.md`:
   This file contains the project general information of the project backend.
+- `requirements-dev.txt`:
+  This file contains the development dependencies for the project.
+- `requirements.txt`:
+  This file contains the dependencies for the project.
 - `tailwind.config.js`:
   This file contains the tailwindcss configuration for the project used in the templates.
 
@@ -554,9 +543,9 @@ The python version used in the project is `3.8.10`.
 
 ### Which python dependencies are used in the project?
 
-The dependencies used in the project are listed in the [pyproject.toml](../admin/pyproject.toml) file under the `[tool.poetry.dependencies]` section.
+The dependencies used in the project are listed in [requirements.txt](../admin/requirements.txt).
 
-The development dependencies are listed in the [pyproject.toml](../admin/pyproject.toml) file under the `[tool.poetry.dev-dependencies]` section.
+The development dependencies are listed in [requirements-dev.txt](../admin/requirements-dev.txt).
 
 
 ### Where is the flask configuration?
@@ -570,8 +559,7 @@ The tooling configuration is located:
 
 - pre-commit: [admin/.pre-commit-config.yaml](../admin/.pre-commit-config.yaml)
 - pyenv: [admin/.python-version](../admin/.python-version)
-- poetry: [admin/pyproject.toml](../admin/pyproject.toml)
-- tailwindcss: [admin/tailwind.config.js](../admin/tailwind.config.js), [../admin/src/static/.dev/global.css](../admin/static/.dev/global.css) and [..admin/pyproject.toml](../admin/pyproject.toml) under the `[tool.flask-livetw]` section.
+- tailwindcss: [admin/tailwind.config.js](../admin/tailwind.config.js), [admin/src/static/.dev/global.css](../admin/static/.dev/global.css) and [admin/pyproject.toml](../admin/pyproject.toml) under the `[tool.flask-livetw]` section.
 
 
 ### Where is the database configuration?
@@ -611,12 +599,7 @@ From the connection string copy the following information:
 Add the following enviroment variables to the `.env` file:
 
 ```ini
-# Postgres
-DB_HOST=host
-DB_PORT=port
-DB_USER=user
-DB_PASS=password
-DB_NAME=dbname
+DB_URL=postgresql://username:password@host:port/dbname
 ```
 
 > **Note:** The values above are the ones gathered from the connection string, if you update/regenerate the connection string, you must update the values in the `.env` file as well.

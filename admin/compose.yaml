@@ -11,11 +11,7 @@ services:
     env_file:
       - "${BACKEND_ENV_FILE:-.env}"
     environment:
-      DB_HOST: db
-      DB_PORT: 5432
-      DB_USER: ${DOCKER_POSTGRES_USER:-username}
-      DB_PASS: ${DOCKER_POSTGRES_PASSWORD:-password}
-      DB_NAME: ${DOCKER_POSTGRES_DB:-pinta_service}
+      DB_URL: ${DOCKER_DB_URL:-postgresql://username:password@db:5432/pinta_service}
       MAIL_SERVER: mailtrap
       MAIL_PORT: 25
       MAIL_USERNAME: ${DOCKER_MAILTRAP_USER:-username}

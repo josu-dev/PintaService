@@ -10,4 +10,4 @@ flask-cors>=4.0.0
 authlib>=1.2.1
 flask-jwt-extended>=4.5.3
 requests>=2.31.0
-gunicorn
+gunicorn>=21.2.0
