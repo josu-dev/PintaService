@@ -163,6 +163,7 @@ class Config:
     DB_HOST: str
     DB_PORT: str
     DB_NAME: str
+    DB_URL: str
 
     # SQLAlchemy config
     SQLALCHEMY_TRACK_MODIFICATIONS: bool
@@ -204,15 +205,10 @@ class Config:
 
     @classmethod
     def load_env_config(cls) -> None:
-        # DB environment variables names CAN'T be changed
-        cls.DB_USER = env_or_error("DB_USER")
-        cls.DB_PASS = env_or_error("DB_PASS")
-        cls.DB_HOST = env_or_error("DB_HOST")
-        cls.DB_PORT = env_or_error("DB_PORT", "5432")
-        cls.DB_NAME = env_or_error("DB_NAME")
+        cls.DB_URL = env_or_error("DB_URL")
 
         cls.SQLALCHEMY_TRACK_MODIFICATIONS = True
-        cls.SQLALCHEMY_DATABASE_URI = f"postgresql://{cls.DB_USER}:{cls.DB_PASS}@{cls.DB_HOST}:{cls.DB_PORT}/{cls.DB_NAME}"  # noqa: E501
+        cls.SQLALCHEMY_DATABASE_URI = cls.DB_URL
 
         cls.SECRET_KEY = env_or_error("SECRET_KEY")
 
@@ -263,8 +259,8 @@ def init_app(app: Flask, env: str) -> None:
     """
     if env == "development":
         load_dotenv()
-    else:
-        load_db_dotenv()
+    # else:
+    #     load_db_dotenv()
 
     Config.load_env_config()
 
