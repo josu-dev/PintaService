@@ -6,7 +6,7 @@ from src.core.enums import (
 )
 
 
-def load_test_data() -> None:
+def seed_db_dev() -> None:
     """Loads test data into the database for development purposes."""
     import sqlalchemy as sa
 

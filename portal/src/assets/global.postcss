@@ -15,3 +15,21 @@ body {
 body > div {
   @apply h-full max-w-7xl mx-auto overflow-hidden flex flex-col bg-orange-50/[0.98] shadow-2xl;
 }
+
+body *::-webkit-scrollbar {
+  @apply w-2 h-2 bg-transparent;
+}
+
+body *::-webkit-scrollbar:hover,
+body *::-webkit-scrollbar:active {
+  @apply bg-gray-500/25
+}
+
+body *::-webkit-scrollbar-thumb {
+  @apply bg-orange-500/50;
+}
+
+body *::-webkit-scrollbar-thumb:hover,
+body *::-webkit-scrollbar-thumb:active {
+  @apply bg-orange-500;
+}

@@ -27,6 +27,18 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
         """Clear all tables and create them again."""
         db.reset_db()
 
+    @app.cli.command("reset-db-dev")
+    def reset_db_dev():
+        """
+        Drops all tables, creates them again and seeds the database.
+        Also loads test data for development.
+        """
+        from src.core import seed, seed_dev
+
+        db.reset_db()
+        seed.seed_db()
+        seed_dev.seed_db_dev()
+
     @app.cli.command("seed-db")
     def seed_db():
         """Seed the database with initial data."""
@@ -34,23 +46,11 @@ def create_app(env: str = "development", static_folder: str = "../../static"):
 
         seed.seed_db()
 
-    @app.cli.command("test-data")
-    def load_test_data():
+    @app.cli.command("seed-db-dev")
+    def seed_db_dev():
         """Load test data for development."""
-        from src.core import test_data
+        from src.core import seed_dev
 
-        test_data.load_test_data()
-
-    @app.cli.command("full-reset")
-    def full_reset():
-        """
-        Drops all tables, creates them again and seeds the database.
-        Also loads test data for development.
-        """
-        from src.core import seed, test_data
-
-        db.reset_db()
-        seed.seed_db()
-        test_data.load_test_data()
+        seed_dev.seed_db_dev()
 
     return app
