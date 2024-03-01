@@ -1,14 +1,16 @@
 # Base image
-FROM node:14.21.3-bullseye as base
+FROM node:20-alpine as base
 
-ARG VITE_API_URL
+ARG VITE_BACKEND_BASE_URL
+ENV VITE_BACKEND_BASE_URL=$VITE_BACKEND_BASE_URL
 
 WORKDIR /tmp/app
 
-COPY package.json ./
+COPY package.json package-lock.json ./
 
 # Can't use npm ci because breaks because of pinia
-RUN npm i --ignore-scripts
+# RUN npm i --ignore-scripts
+RUN npm ci --ignore-scripts
 
 COPY public ./public
 COPY src ./src
@@ -21,7 +23,7 @@ RUN npm run build
 
 
 # Prod image
-FROM node:14.21.3-bullseye as prod
+FROM node:20-alpine as prod
 
 WORKDIR /app
 

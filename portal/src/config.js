@@ -7,8 +7,7 @@ export const DEFAULT_TOAST_TIMEOUT = 3000;
  * Base URL for the backend.
  * @type {string}
  */
-export const BACKEND_BASE_URL =
-  import.meta.env.VITE_BACKEND_BASE_URL ?? 'https://admin-grupo04.proyecto2023.linti.unlp.edu.ar';
+export const BACKEND_BASE_URL = import.meta.env.VITE_BACKEND_BASE_URL || 'http://localhost:5000';
 
 /**
  * API URL for the backend.
@@ -36,7 +35,7 @@ export const DEFAULT_API_MAINTEINANCE_ERROR = 'toast';
  * Default log level.
  *
  * - 0: No logs.
- * - 1: Only errors.
+ * - 1: Errors.
  * - 2: Errors and warnings.
  * - 3: Errors, warnings and info.
  * - 4: Errors, warnings, info and debug.

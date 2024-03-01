@@ -5,7 +5,7 @@ This document describes the development enviroment, files/folders layout (struct
 
 The public frontend is a [Vue.js](https://vuejs.org/) application with [Tailwindcss](https://tailwindcss.com/) as the css framework.
 
-The node version used in the project is `v14.21.3`.
+The node version used in the project is `v20.11.1`.
 
 This document assumes that your working directory is `portal/` (the folder for the public frontend).
 
@@ -70,13 +70,13 @@ To install nvm, follow the official [nmv installation guide](https://github.com/
 After installing nvm, run the following command to install the node version used in the project:
 
 ```bash
-nvm install 14.21.3
+nvm install 20.11.1
 ```
 
 To use the node version installed, run the following command:
 
 ```bash
-nvm use 14.21.3
+nvm use 20.11.1
 ```
 
 
@@ -94,8 +94,8 @@ If the application will be runned manually, the following enviroment variables m
 
 
 ```ini
-# Backend API url
-VITE_API_URL=http://127.0.0.1:5000
+# Base URL for the backend API
+VITE_BACKEND_BASE_URL=http://127.0.0.1:5000
 ```
 
 The above variables and the defaults provided are planned to be used with docker compose, so if you aren't using it, you must change the values to match your custom configuration.
@@ -120,7 +120,7 @@ docker compose up -d
 
 > **Note:** The `-d` flag is to detach the process from the terminal, so it can run in the background.
 
-To access the vue application, go to [http://localhost:5174](http://localhost:3000) (or the port you configured) in your browser.
+To access the vue application, go to [localhost:5174](http://localhost:5174) (or the port you configured) in your browser.
 
 
 #### Stopping the vue application
@@ -161,12 +161,6 @@ Required settings:
   "prettier.tabWidth": 2,
   "prettier.vueIndentScriptAndStyle": true
 }
-```
-
-Optional settings:
-
-```json
-{}
 ```
 
 The .vscode folder is ignored by git, so you can add your own settings without worrying about commiting them.
@@ -215,8 +209,7 @@ The public frontent is located in the `portal/` folder.
 ```text
 🌳 portal/
 ┣ 📁 public/
-┃ ┗ 📁 img/
-┃   ┗ 📄 image...
+┃ ┗ 📄 images...
 ┣ 📁 src/
 ┃ ┣ 📁 assets/
 ┃ ┣ 📁 components/
