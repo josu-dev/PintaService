@@ -8,10 +8,10 @@ WORKDIR /app
 COPY requirements-dev.txt requirements.txt ./
 RUN pip install -r requirements.txt -r requirements-dev.txt
 
-COPY app.py .
-COPY pyproject.toml .
 COPY src ./src
 COPY static ./static
+COPY app.py .
+COPY pyproject.toml .
 COPY tailwind.config.js .
 
 RUN flask-livetw build
