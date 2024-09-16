@@ -1,4 +1,5 @@
 """Model for user."""
+
 from typing import Optional
 
 from sqlalchemy.orm import Mapped, mapped_column

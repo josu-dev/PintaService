@@ -5,6 +5,7 @@ https://www.iana.org/assignments/http-status-codes/http-status-codes.xhtml
 
 And RFC 2324 - https://tools.ietf.org/html/rfc2324
 """
+
 # Code adapted from https://github.com/encode/starlette/blob/ad02ee6336faadadf97e0c79dd3a91759f1f32a7/starlette/status.py  # noqa: E501
 
 __all__ = (

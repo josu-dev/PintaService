@@ -1,4 +1,5 @@
 """Model for service request."""
+
 import typing as t
 
 from sqlalchemy.orm import Mapped, mapped_column

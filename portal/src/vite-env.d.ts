@@ -5,23 +5,23 @@ declare module 'vue-router' {
     /**
      * If `true`, requires the user to be authenticated.
      */
-    requiresAuth?: boolean
+    requiresAuth?: boolean;
     /**
      * If `true`, requires the user to be unauthenticated.
      */
-    requiresNoAuth?: boolean
+    requiresNoAuth?: boolean;
     /**
      * If `true`, requires the user to be a non site admin.
      */
-    requiresNormalUser?: boolean
+    requiresNormalUser?: boolean;
     /**
      * If `true`, requires the user to be a site admin.
      */
-    requiresSiteAdmin?: boolean
+    requiresSiteAdmin?: boolean;
     /**
      * If `true`, requires the user to be a site admin or an institution owner.
      */
-    requiresSiteAdminOrInstitutionOwner?: boolean
+    requiresSiteAdminOrInstitutionOwner?: boolean;
 
   }
 }
