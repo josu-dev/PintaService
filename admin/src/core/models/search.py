@@ -1,3 +1,4 @@
+# pyright: basic, reportAttributeAccessIssue=false
 # source:
 # https://sqlalchemy-utils.readthedocs.io/en/latest/_modules/sqlalchemy_utils/types/ts_vector.html
 #

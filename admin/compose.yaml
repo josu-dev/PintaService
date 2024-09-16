@@ -17,7 +17,7 @@ services:
       MAIL_USERNAME: ${DOCKER_MAILTRAP_USER:-username}
       MAIL_PASSWORD: ${DOCKER_MAILTRAP_PASSWORD:-password}
     ports:
-      - "5001:5000"
+      - "5000:5000"
     networks:
       - database
       - email

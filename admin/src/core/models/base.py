@@ -47,14 +47,16 @@ Timestamp = Annotated[
 CreatedAt = Annotated[
     datetime,
     orm.mapped_column(
-        DateTime(timezone=True), nullable=False, default=datetime.utcnow
+        DateTime(timezone=True),
+        nullable=False,
+        default=datetime.utcnow,  # pyright: ignore[reportDeprecated]
     ),
 ]
 UpdatedAt = Annotated[
     datetime,
     orm.mapped_column(
         server_default=sql.func.current_timestamp(),
-        onupdate=datetime.utcnow,
+        onupdate=datetime.utcnow,  # pyright: ignore[reportDeprecated]
     ),
 ]
 

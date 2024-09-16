@@ -14,7 +14,7 @@ description = "Private application for managing the public website for the servi
 
 readme = "README.md"
 
-requires-python = ">=3.8"
+requires-python = ">=3.12.1"
 
 license = { file = "../LICENSE" }
 

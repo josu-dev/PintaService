@@ -1,2 +1,2 @@
-flask-livetw>=0.3.3
-pre-commit>=3.4.0
+flask-livetw==0.4.2
+pre-commit>=3.8.0

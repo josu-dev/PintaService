@@ -385,4 +385,4 @@ class InstitutionService(BaseService):
         )
         res = query.all()
 
-        return res  # pyright: ignore[reportGeneralTypeIssues]
+        return res  # pyright: ignore[reportReturnType]
