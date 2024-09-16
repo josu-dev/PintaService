@@ -1,7 +1,7 @@
-FROM node:20-alpine AS base
+FROM node:22.8-alpine AS base
 
-ARG VITE_BACKEND_BASE_URL
-ENV VITE_BACKEND_BASE_URL=$VITE_BACKEND_BASE_URL
+ARG BACKEND_BASE_URL
+ENV VITE_BACKEND_BASE_URL=$BACKEND_BASE_URL
 
 WORKDIR /tmp/app
 
@@ -12,14 +12,14 @@ RUN npm ci --ignore-scripts
 COPY public ./public
 COPY src ./src
 COPY index.html .
-COPY postcss.config.js .
-COPY tailwind.config.js .
+COPY postcss.config.cjs .
+COPY tailwind.config.cjs .
 COPY vite.config.js .
 
 RUN npm run build
 
 
-FROM node:20-alpine AS prod
+FROM node:22.8-alpine AS prod
 
 WORKDIR /app
 
@@ -29,10 +29,10 @@ RUN npm i --omit=dev --ignore-scripts
 
 COPY --from=base /tmp/app/dist ./dist
 
-RUN npm i serve
+RUN npm i -g serve
 
 EXPOSE 4173
 
 USER node
 
-CMD ["npx", "serve", "-s", "dist", "-l", "4173"]
+CMD ["serve", "-s", "dist", "-l", "4173"]

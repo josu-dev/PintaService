@@ -40,7 +40,7 @@ def require_session(
 
             return func(*args, **kwargs)
 
-        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
+        return wrapper  # pyright: ignore[reportReturnType]
 
     return decorator
 
@@ -59,7 +59,7 @@ def require_no_session(
 
             return func(*args, **kwargs)
 
-        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
+        return wrapper  # pyright: ignore[reportReturnType]
 
     return decorator
 
@@ -100,7 +100,7 @@ def authenticated_route(
 
             return func(*args, **kwargs)
 
-        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
+        return wrapper  # pyright: ignore[reportReturnType]
 
     return decorator
 

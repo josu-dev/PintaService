@@ -418,9 +418,7 @@ def stats_requests_per_status_get():
 
     for statusEnum in enums.RequestStatus:
         if statusEnum not in [status for status, _ in res]:
-            res.append(
-                (statusEnum, 0)  # pyright: ignore[reportGeneralTypeIssues]
-            )
+            res.append((statusEnum, 0))
 
     response = {
         "data": [

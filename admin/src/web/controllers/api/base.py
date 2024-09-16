@@ -65,7 +65,7 @@ class BaseAPIError(Exception):
         self.payload = payload
 
     def asdict(self) -> t.Dict[str, t.Any]:
-        rv = dict(self.payload or ())
+        rv = dict(self.payload or tuple())
         rv["error"] = self.message
         return rv
 
@@ -115,7 +115,7 @@ def validation(
 
             return func(*args, **kwargs)
 
-        return wrapper  # pyright: ignore[reportGeneralTypeIssues]
+        return wrapper  # pyright: ignore[reportReturnType]
 
     return decorator
 

@@ -5,7 +5,7 @@ This document describes the development enviroment, files/folders layout (struct
 
 The public frontend is a [Vue.js](https://vuejs.org/) application with [Tailwindcss](https://tailwindcss.com/) as the css framework.
 
-The node version used in the project is `v20.11.1`.
+The node version used in the project is `v22.8.0`.
 
 This document assumes that your working directory is `portal/` (the folder for the public frontend).
 
@@ -70,13 +70,13 @@ To install nvm, follow the official [nmv installation guide](https://github.com/
 After installing nvm, run the following command to install the node version used in the project:
 
 ```bash
-nvm install 20.11.1
+nvm install 22.8.0
 ```
 
 To use the node version installed, run the following command:
 
 ```bash
-nvm use 20.11.1
+nvm use 22.8.0
 ```
 
 
@@ -120,7 +120,7 @@ docker compose up -d
 
 > **Note:** The `-d` flag is to detach the process from the terminal, so it can run in the background.
 
-To access the vue application, go to [localhost:5174](http://localhost:5174) (or the port you configured) in your browser.
+To access the vue application, go to [localhost:4174](http://localhost:4174) (or the port you configured) in your browser.
 
 
 #### Stopping the vue application
@@ -229,9 +229,9 @@ The public frontent is located in the `portal/` folder.
 ┣ 📄 index.html
 ┣ 📄 package-lock.json
 ┣ 📄 package.json
-┣ 📄 postcss.config.js
+┣ 📄 postcss.config.cjs
 ┣ 📄 README.md
-┣ 📄 tailwind.config.js
+┣ 📄 tailwind.config.cjs
 ┗ 📄 vite.config.js
 ```
 
@@ -277,18 +277,17 @@ Folder and files description:
   This file contains the especific versions of the node dependencies.
 - `package.json`:
   This file contains the node dependencies and scripts for the project.
-- `postcss.config.js`:
+- `postcss.config.cjs`:
   This file contains the postcss configuration.
 - `README.md`:
   This file contains the project general information of the project backend.
-- `tailwind.config.js`:
+- `tailwind.config.cjs`:
   This file contains the tailwindcss configuration.
 
 
 <br/>
 
 ## Questions and Answers
-
 
 ### What is vite?
 

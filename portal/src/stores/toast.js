@@ -27,8 +27,8 @@ const DEFAULT_TOAST_CLOSEABLE = false;
 let toastAIID = 0;
 
 export const useToastStore = defineStore('toast', () => {
-  const notifications = ref(/** @type {Notification[]} */ ([]));
-  const notificationsArchive = ref(/** @type {Notification[]} */ ([]));
+  const notifications = ref(/** @type {Notification[]} */([]));
+  const notificationsArchive = ref(/** @type {Notification[]} */([]));
 
   /**
    * @param {Notification} notification

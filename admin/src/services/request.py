@@ -253,7 +253,7 @@ class RequestService(BaseService):
         total = query.count()
         requests = query.offset((page - 1) * per_page).limit(per_page).all()
 
-        return requests, total  # pyright: ignore[reportGeneralTypeIssues]
+        return requests, total  # pyright: ignore[reportReturnType]
 
     @classmethod
     def create_note(
@@ -373,7 +373,7 @@ class RequestService(BaseService):
         cls,
         institution_owner_id: t.Union[int, None] = None,
         institution_id: t.Union[int, None] = None,
-    ):
+    ) -> t.List[t.Tuple[RequestStatus, int]]:
         query = db.session.query(ServiceRequest.status, sa.func.count("*"))
 
         if institution_owner_id is not None:
@@ -404,4 +404,4 @@ class RequestService(BaseService):
 
         res = query.all()
 
-        return res
+        return res  # pyright: ignore[reportReturnType]

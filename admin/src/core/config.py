@@ -220,7 +220,9 @@ class Config:
             env_or_error("WTF_CSRF_CHECK_DEFAULT", "true").lower() == "true"
         )
 
-        cls.LIVETW_DEV = env_or_error("LIVETW_DEV", "false").lower() == "true"
+        cls.LIVETW_DEV = (
+            env_or_error("LIVETW_ENV", "production").lower() == "development"
+        )
 
         cls.SESSION_TYPE = env_or_error("SESSION_TYPE", "filesystem")
 

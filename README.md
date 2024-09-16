@@ -31,7 +31,7 @@ El codigo fuente se encuentra en la carpeta [portal](./portal).
 
 - [Fabian Martinez](https://github.com/Fabian-Martinez-Rincon)
 - [Iñaki](https://github.com/KinnaGt)
-- [Josue](https://github.com/J-Josu)
+- [Josue](https://github.com/josu-dev)
 - [Luciano Lopez](https://github.com/Lucho-lopez)
 
 
